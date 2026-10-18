@@ -73,7 +73,7 @@ Order: what the first demo shows (walk a hot aisle, follow a wafer, build a chip
 - [ ] earth-site-pin
 
 ## l2 Fab
-- [~] wafer-300mm
+- [~] wafer-300mm (0.832, unsigned, iter 3)
 - [~] foup
 - [~] oht-vehicle
 - [ ] oht-rail

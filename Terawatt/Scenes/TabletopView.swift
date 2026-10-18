@@ -5,12 +5,27 @@ struct TabletopView: View {
     @Environment(ProjectStore.self) private var store
     @State private var root = Entity()
     @State private var fab: FabScene?
+    @State private var chipScene: ChipScene?
 
     var body: some View {
         RealityView { content in
             content.add(root)
         }
         .task(id: store.sceneKey) {
+            if store.mode == .chip {
+                fab = nil
+                let c = ChipScene()
+                await c.build(chip: store.current.chip, step: store.current.chipStep, micro: store.micro,
+                              installed: store.current.installedChips > 0, packaged: store.current.packaged ?? false)
+                guard !Task.isCancelled else { return }
+                c.root.position = [0, -0.28, 0]
+                chipScene = c
+                root.children.removeAll()
+                root.addChild(c.root)
+                c.setExplode(store.explode, animated: false)
+                return
+            }
+            chipScene = nil
             if store.mode == .fab {
                 let f = FabScene()
                 await f.build(immersive: false, station: store.current.wafer.station)
@@ -33,7 +48,8 @@ struct TabletopView: View {
             root.children.removeAll()
             root.addChild(campus)
         }
+        .onChange(of: store.explode) { _, e in chipScene?.setExplode(e, animated: true) }
         .onChange(of: store.current.wafer.station) { _, s in fab?.apply(s, animated: true) }
-        .ornament(attachmentAnchor: .scene(.bottomFront)) { if store.mode == .studio { HUDStrip() } }
+        .ornament(attachmentAnchor: .scene(.bottomFront)) { if store.mode != .fab { HUDStrip() } }
     }
 }

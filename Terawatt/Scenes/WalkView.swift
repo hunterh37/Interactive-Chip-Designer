@@ -15,7 +15,7 @@ struct WalkView: View {
                 content.add(hud)
             }
         } attachments: {
-            Attachment(id: "hud") { if store.mode == .studio { HUDStrip() } }
+            Attachment(id: "hud") { if store.mode != .fab { HUDStrip() } }
         }
         .task(id: store.sceneKey) {
             if store.mode == .fab {

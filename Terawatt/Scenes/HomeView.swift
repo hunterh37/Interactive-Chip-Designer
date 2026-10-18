@@ -17,7 +17,10 @@ struct HomeView: View {
                     store.mode = .fab
                     openWindow(id: SceneID.tabletop); openWindow(id: SceneID.inspector)
                 }
-                tile("Chip Workshop", "cpu") { openWindow(id: SceneID.inspector) }
+                tile("Chip Workshop", "cpu") {
+                    store.openChip()
+                    openWindow(id: SceneID.tabletop); openWindow(id: SceneID.inspector)
+                }
             }
             HStack {
                 Text("Projects").font(.title3)

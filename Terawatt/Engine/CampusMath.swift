@@ -82,9 +82,11 @@ enum CampusMath {
         o.facilityMW = o.itMW * o.pue
         o.wue = wue(s.cooling, site: site)
         o.pflopsFP4 = pflops(s, chip: chip, installedChips: installedChips)
-        let t = tokens(s)
+        var t = tokens(s)
+        t.prefill += Double(installedChips) * 120_000 * chip.perfFactor
+        t.decode += Double(installedChips) * 8_000 * chip.perfFactor
         o.prefillTokS = t.prefill; o.decodeTokS = t.decode
-        o.capexUSD = capex(s)
+        o.capexUSD = capex(s) + Double(installedChips) * ChipMath.unitCostUSD(chip)
         o.usdPerMTok = usdPerMTok(capex: o.capexUSD, facilityMW: o.facilityMW, site: site, tokS: t.decode)
         o.carbonTPerYr = o.facilityMW * hoursPerYear * site.carbonKgPerMWh / 1000
         o.latencyMs = site.latencyMs

@@ -23,6 +23,9 @@ struct FabInspector: View {
             Section {
                 Button("Next") { store.current.wafer.advance() }.disabled(store.current.wafer.finished)
                 Button("Restart") { store.current.wafer = WaferState() }
+                if store.current.tapedOut != nil && store.current.wafer.finished {
+                    Button("Package") { store.openChip(.package) }
+                }
                 Button("Walk") { Task { await openImmersive(id: SceneID.walk) } }
             }
         }

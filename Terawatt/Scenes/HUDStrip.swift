@@ -5,6 +5,8 @@ struct HUDStrip: View {
 
     var body: some View {
         let s = store.stats
+        VStack(spacing: 8) {
+        if store.current.installedChips > 0 { deltaRow }
         HStack(spacing: 20) {
             stat("MW", Fmt.n(s.facilityMW, 0), warn: s.overBudget)
             stat("PUE", Fmt.n(s.pue, 2))
@@ -14,9 +16,21 @@ struct HUDStrip: View {
             stat("Capex", "$" + Fmt.big(s.capexUSD))
             stat("CO₂ t/yr", Fmt.big(s.carbonTPerYr))
         }
+        }
         .padding(.horizontal, 24).padding(.vertical, 12)
         .glassBackgroundEffect()
     }
+
+    @ViewBuilder private var deltaRow: some View {
+        let d = store.delta
+        HStack(spacing: 20) {
+            stat("Δ PFLOPS", sign(d.pflops, 0))
+            stat("Δ MW", sign(d.mw, 1))
+            stat("Δ $/M tok", sign(d.usdPerMTok, 3))
+        }
+    }
+
+    private func sign(_ v: Double, _ d: Int) -> String { (v >= 0 ? "+" : "") + Fmt.n(v, d) }
 
     private func stat(_ label: String, _ value: String, warn: Bool = false) -> some View {
         VStack(spacing: 2) {

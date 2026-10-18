@@ -5,7 +5,11 @@ struct InspectorView: View {
     @Environment(\.openImmersiveSpace) private var openImmersive
 
     var body: some View {
-        if store.mode == .fab { FabInspector() } else { studio }
+        switch store.mode {
+        case .fab: FabInspector()
+        case .chip: ChipInspector()
+        case .studio: studio
+        }
     }
 
     @ViewBuilder private var studio: some View {

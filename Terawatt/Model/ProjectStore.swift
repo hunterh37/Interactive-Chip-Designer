@@ -9,12 +9,18 @@ struct Project: Codable, Identifiable, Equatable, Sendable {
     var chip = ChipSpec()
     var wafer = WaferState()
     var installedChips = 0
+    // Optional so project files saved before Chip Workshop still decode.
+    var chipStepRaw: ChipStep?
+    var tapedOut: ChipSpec?
+    var packaged: Bool?
+    var chipStep: ChipStep { get { chipStepRaw ?? .spec } set { chipStepRaw = newValue } }
 }
 
-enum AppMode: Sendable { case studio, fab }
+enum AppMode: Sendable { case studio, fab, chip }
 
 /// Rebuild trigger for tabletop and walk scenes.
-struct SceneKey: Equatable { var mode: AppMode; var campus: CampusSpec? }
+struct ChipView: Equatable { var chip: ChipSpec; var step: ChipStep; var micro: MicroLevel; var installed: Bool; var packaged: Bool }
+struct SceneKey: Equatable { var mode: AppMode; var campus: CampusSpec?; var chip: ChipView? = nil }
 
 @MainActor @Observable
 final class ProjectStore {
@@ -22,7 +28,27 @@ final class ProjectStore {
     var current = Project(name: "Campus 1")
     var selectedRow: UUID?
     var mode = AppMode.studio
-    var sceneKey: SceneKey { SceneKey(mode: mode, campus: mode == .studio ? current.campus : nil) }
+    var micro = MicroLevel.off
+    var explode = false
+    var sceneKey: SceneKey {
+        SceneKey(mode: mode, campus: mode == .studio ? current.campus : nil,
+                 chip: mode == .chip ? ChipView(chip: current.chip, step: current.chipStep, micro: micro,
+                                                installed: current.installedChips > 0, packaged: current.packaged ?? false) : nil)
+    }
+    var delta: CampusDelta { ChipLoop.delta(current.campus, chip: current.chip, installed: current.installedChips) }
+
+    func openChip(_ step: ChipStep? = nil) { mode = .chip; if let step { current.chipStep = step }; micro = .off }
+
+    /// Freezes the floorplan, sets TDP from the model, hands the ChipSpec to Fab at wafer start.
+    @discardableResult func tapeOut() -> Bool {
+        guard let t = ChipMath.tapeOut(current.chip) else { return false }
+        current.chip = t; current.tapedOut = t; current.packaged = false
+        current.wafer = WaferState(); mode = .fab; persist()
+        return true
+    }
+    func package() { guard current.tapedOut != nil else { return }; current.packaged = true; current.chipStep = .integrate; persist() }
+    func install() { guard current.packaged == true else { return }; current.installedChips = ChipLoop.installCount(current.campus); persist() }
+    func uninstall() { current.installedChips = 0; persist() }
     private let dir: URL
 
     init(directory: URL? = nil) {

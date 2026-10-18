@@ -2,7 +2,7 @@
 
 Spec: /Users/hunter/Dev/Terawatt/notes/PROPS.md (ids, sizes, budgets, articulated parts, materials).
 Loop: RealityHD skill .claude/skills/realityhd-prop/SKILL.md (brief, new prop, build(seed:), lint, gate, signoff, thumbs).
-Quality bar: ultra realistic, gate threshold 0.90 (brief threshold field), honest verdicts.
+Quality bar: ultra realistic, gate threshold 0.85. Breadth first: max 3 gate iterations, then mark [~] with score and move on. Polish pass later.
 
 Lanes (separate clones, disjoint folders, never git stash / git worktree):
 - ~/dev/RealityHD-lib-l1  branch terawatt-dc    Props/DataCenter, materials file Library/TerawattDC*.swift

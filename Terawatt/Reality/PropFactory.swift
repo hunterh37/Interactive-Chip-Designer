@@ -13,12 +13,13 @@ enum PropFactory {
         "litho-track": [8, 2.5, 3], "euv-scanner-highna": [14, 4, 4], "ebeam-metrology": [3, 2.2, 2.5],
         "plasma-etch-cluster": [4, 2.5, 4], "ion-implanter": [8, 2.5, 3], "pvd-cluster": [4, 2.5, 4],
         "cmp-tool": [4, 2.2, 3], "probe-station": [1.5, 1.8, 1.5], "hybrid-bonder": [3, 2.2, 2.5],
+        "hbm-stack": [0.011, 0.0008, 0.01], "gpu-module-2035": [0.12, 0.02, 0.18], "compute-tray-gpu": [0.44, 0.09, 0.9],
         "foup": [0.4, 0.36, 0.34], "oht-vehicle": [0.6, 0.9, 0.6], "oht-rail": [3, 0.2, 0.2],
     ]
     /// Fab ids render as light powder-coat placeholders until RealityHD ships them.
     static let fabIDs: Set<String> = ["foup-stocker", "wet-bench", "cvd-ald-cluster", "litho-track", "euv-scanner-highna",
         "ebeam-metrology", "plasma-etch-cluster", "ion-implanter", "pvd-cluster", "cmp-tool", "probe-station",
-        "hybrid-bonder", "foup", "oht-vehicle", "oht-rail"]
+        "hybrid-bonder", "hbm-stack", "gpu-module-2035", "compute-tray-gpu", "foup", "oht-vehicle", "oht-rail"]
     private static var cache: [String: Entity] = [:]
 
     static func make(_ id: String) async -> Entity {
