@@ -173,6 +173,20 @@ const sheet = (id, hint, openTxt = 'Hide ↓', closedTxt = 'Show ↑') => {
   return set;
 };
 const rackSheet = sheet('racksheet', 'rackhint');
+// Keep the rack canvas in the open area above the sheet and frame the whole rack in it.
+const fitRack = () => {
+  const el = $('racksheet'), v = $('rackview');
+  v.style.bottom = (el.classList.contains('min') ? 52 : el.offsetHeight) + 'px';
+  const cam = rackStage.camera, w = v.clientWidth || 1, h = v.clientHeight || 1;
+  const half = THREE.MathUtils.degToRad(cam.fov / 2), need = 1.25; // half of rack height + margin, m
+  const d = Math.max(need / Math.tan(half), need / (Math.tan(half) * (w / h)) * 0.6) + 0.6;
+  const dir = cam.position.clone().sub(rackStage.controls.target).normalize();
+  if (!isFinite(dir.x)) dir.set(0.35, 0.15, 1).normalize();
+  cam.position.copy(rackStage.controls.target).addScaledVector(dir, d);
+  dispatchEvent(new Event('resize'));
+};
+new ResizeObserver(fitRack).observe($('racksheet'));
+$('racksheet').addEventListener('transitionend', fitRack);
 const roomSheet = sheet('roomsheet', 'roomhint');
 
 // ── shared room: every player's rack in the hall, name tags, tap to inspect
@@ -280,7 +294,7 @@ function renderRoom(force) {
 
 function renderRack() {
   const r = mine(), ui = $('rackui');
-  replace(rackStage.world, 'rack', buildRack(r, cat)); rackStage.controls.target.set(0, 1, 0);
+  replace(rackStage.world, 'rack', buildRack(r, cat)); if (rackStage.controls.target.y !== 1) { rackStage.controls.target.set(0, 1, 0); fitRack(); }
   $('sum').textContent = `${r.totals?.u ?? 0}/${r.totals?.capacity ?? 42}U · ${money(r.totals?.price ?? 1890)}`;
   ui.innerHTML = '';
   const frames = el('div', 'chips'); cat.racks.forEach(f => frames.append(btn(f.name, () => send({ type: 'rack.frameType', id: f.id }), r.rackId === f.id ? 'on' : '')));

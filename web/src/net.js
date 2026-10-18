@@ -25,3 +25,16 @@ export function connect({ room = 'DEMO', kind, mode, name, pid = '', onState, on
     close() { closed = true; ws.close(); },
   };
 }
+
+// Cache buster: reload when a newer deploy is live (version.json is emitted per build, served no-cache).
+if (import.meta.env.PROD) {
+  const check = async () => {
+    try {
+      const v = await (await fetch(`/version.json?t=${Date.now()}`, { cache: 'no-store' })).json();
+      if (v.build && v.build !== __BUILD__) location.reload();
+    } catch {}
+  };
+  setInterval(check, 30000);
+  addEventListener('visibilitychange', () => document.visibilityState === 'visible' && check());
+  addEventListener('pageshow', e => e.persisted && check());
+}
