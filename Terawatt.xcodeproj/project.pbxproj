@@ -1,0 +1,573 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		05B0961D9DE3C60C527D660D /* Sites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AEE770C52F8048942193C11 /* Sites.swift */; };
+		109285CEBF7D4C355F2135D4 /* TabletopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E70D78EB72AFFC0443DEB5 /* TabletopView.swift */; };
+		2461E4F6D8DA76AAF48EB662 /* CampusSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = C07FDE5AC48389E85B7D0694 /* CampusSpec.swift */; };
+		29F39AFC470F803531969475 /* RealityHD in Frameworks */ = {isa = PBXBuildFile; productRef = CDD01246C0017034C1F52343 /* RealityHD */; };
+		380F26E0550738F485FAD4D5 /* CampusMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE3079113F06C7504AACB39F /* CampusMath.swift */; };
+		44829DFD9658B7B1DF8B59C4 /* ChipSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = A39E218CB481B64784B69A25 /* ChipSpec.swift */; };
+		49BF4D6420248699CC761F3B /* PropFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90BD441E41239F5642BB823F /* PropFactory.swift */; };
+		4C2A074898FCE3438D7872D3 /* TerawattApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D659CEA256D537808DF487C2 /* TerawattApp.swift */; };
+		6039C9AFC661061A750DCDB4 /* HUDStrip.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB47A07AE16FC0A90E220E85 /* HUDStrip.swift */; };
+		686E04C57C7D59ED30C1CFDA /* WalkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D460E38421471A3222AA955B /* WalkView.swift */; };
+		754650B82A9DB8941A37666F /* ProjectStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2863D7A0E34E2CA74B62A599 /* ProjectStore.swift */; };
+		7F5F3D0D15CC18C0902BE61E /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F180FEF1CC0AACE4AF0E6649 /* HomeView.swift */; };
+		7FC3A23E09407463CF9493E3 /* DicyaninPerfProbe in Frameworks */ = {isa = PBXBuildFile; productRef = 0983DE37AAE253DA277346C4 /* DicyaninPerfProbe */; };
+		886F5E9A309CCCFDC6751CCB /* RackPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CC6811BF5B715A7C4DD33F /* RackPreset.swift */; };
+		B1EA71FB28C00DEEF56EF3F2 /* DemoRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B71ACC7FA7D9840788BFA4E2 /* DemoRoutes.swift */; };
+		B3E0159968B028C9C4072E3A /* CampusMathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D3D6148E6ACCD213F6B8A8 /* CampusMathTests.swift */; };
+		C6B6469B053326A9FF010D4C /* InspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 132146695A84AE10106344B8 /* InspectorView.swift */; };
+		E2D80DC3C247255CBB00EFA6 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5CB49D08AEB602A6C80D597 /* Theme.swift */; };
+		E72E65E5ED56BDDECCB4B439 /* Wafer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB11D9300E93C2C67CF518D3 /* Wafer.swift */; };
+		F4F5CCBA3B2A3BDB5A215A42 /* CampusBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 455FE0D6AE48DF17C279BAD2 /* CampusBuilder.swift */; };
+		F844A2DA0196A3FAE7610D4D /* DicyaninStageDirector in Frameworks */ = {isa = PBXBuildFile; productRef = 16C9CF0522F2BD76295989E1 /* DicyaninStageDirector */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		8BEB4B39859E91D7E2925500 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9B8E01194A1A85E6BA3E7B27 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B61763B56F5598310043705F;
+			remoteInfo = Terawatt;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		132146695A84AE10106344B8 /* InspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InspectorView.swift; sourceTree = "<group>"; };
+		2863D7A0E34E2CA74B62A599 /* ProjectStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectStore.swift; sourceTree = "<group>"; };
+		2A51BBBE49EC6BADCAB06343 /* TerawattTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TerawattTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		455FE0D6AE48DF17C279BAD2 /* CampusBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CampusBuilder.swift; sourceTree = "<group>"; };
+		6375D69AA54D0CCF2931CCC4 /* Terawatt.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Terawatt.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		66D3D6148E6ACCD213F6B8A8 /* CampusMathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CampusMathTests.swift; sourceTree = "<group>"; };
+		6AEE770C52F8048942193C11 /* Sites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sites.swift; sourceTree = "<group>"; };
+		6DD0DFD01C7ECFDF59653215 /* RealityHD */ = {isa = PBXFileReference; lastKnownFileType = folder; name = RealityHD; path = ../RealityHD; sourceTree = SOURCE_ROOT; };
+		90BD441E41239F5642BB823F /* PropFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PropFactory.swift; sourceTree = "<group>"; };
+		93CC6811BF5B715A7C4DD33F /* RackPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RackPreset.swift; sourceTree = "<group>"; };
+		A39E218CB481B64784B69A25 /* ChipSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChipSpec.swift; sourceTree = "<group>"; };
+		A5CB49D08AEB602A6C80D597 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		B6E70D78EB72AFFC0443DEB5 /* TabletopView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabletopView.swift; sourceTree = "<group>"; };
+		B71ACC7FA7D9840788BFA4E2 /* DemoRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoRoutes.swift; sourceTree = "<group>"; };
+		BB11D9300E93C2C67CF518D3 /* Wafer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Wafer.swift; sourceTree = "<group>"; };
+		C07FDE5AC48389E85B7D0694 /* CampusSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CampusSpec.swift; sourceTree = "<group>"; };
+		D460E38421471A3222AA955B /* WalkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalkView.swift; sourceTree = "<group>"; };
+		D659CEA256D537808DF487C2 /* TerawattApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerawattApp.swift; sourceTree = "<group>"; };
+		DB47A07AE16FC0A90E220E85 /* HUDStrip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HUDStrip.swift; sourceTree = "<group>"; };
+		EE3079113F06C7504AACB39F /* CampusMath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CampusMath.swift; sourceTree = "<group>"; };
+		F180FEF1CC0AACE4AF0E6649 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E37C9160C09ED9491324159D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				29F39AFC470F803531969475 /* RealityHD in Frameworks */,
+				F844A2DA0196A3FAE7610D4D /* DicyaninStageDirector in Frameworks */,
+				7FC3A23E09407463CF9493E3 /* DicyaninPerfProbe in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		105CE4A2A91587B365B747D8 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				6DD0DFD01C7ECFDF59653215 /* RealityHD */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		35F3E786B7DD807D5BF16C8D /* Reality */ = {
+			isa = PBXGroup;
+			children = (
+				455FE0D6AE48DF17C279BAD2 /* CampusBuilder.swift */,
+				90BD441E41239F5642BB823F /* PropFactory.swift */,
+			);
+			path = Reality;
+			sourceTree = "<group>";
+		};
+		56A0AEAE86B16B08BCCB64FC /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				C07FDE5AC48389E85B7D0694 /* CampusSpec.swift */,
+				A39E218CB481B64784B69A25 /* ChipSpec.swift */,
+				2863D7A0E34E2CA74B62A599 /* ProjectStore.swift */,
+				93CC6811BF5B715A7C4DD33F /* RackPreset.swift */,
+				BB11D9300E93C2C67CF518D3 /* Wafer.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		5CE2B3FB72049A2FB3C34D3B = {
+			isa = PBXGroup;
+			children = (
+				105CE4A2A91587B365B747D8 /* Packages */,
+				A0956C813A140B24D2D87B5F /* Terawatt */,
+				A645144BD570755BAE8152D0 /* TerawattTests */,
+				66AB629BF02C740AA2307A64 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		66AB629BF02C740AA2307A64 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6375D69AA54D0CCF2931CCC4 /* Terawatt.app */,
+				2A51BBBE49EC6BADCAB06343 /* TerawattTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		79635ABF5C7EED67766F4ACD /* Demo */ = {
+			isa = PBXGroup;
+			children = (
+				B71ACC7FA7D9840788BFA4E2 /* DemoRoutes.swift */,
+			);
+			path = Demo;
+			sourceTree = "<group>";
+		};
+		A0956C813A140B24D2D87B5F /* Terawatt */ = {
+			isa = PBXGroup;
+			children = (
+				D659CEA256D537808DF487C2 /* TerawattApp.swift */,
+				A5CB49D08AEB602A6C80D597 /* Theme.swift */,
+				79635ABF5C7EED67766F4ACD /* Demo */,
+				B290B4217A3847F1B00E184B /* Engine */,
+				56A0AEAE86B16B08BCCB64FC /* Model */,
+				35F3E786B7DD807D5BF16C8D /* Reality */,
+				F07F296BD180B06245D74BFD /* Scenes */,
+			);
+			path = Terawatt;
+			sourceTree = "<group>";
+		};
+		A645144BD570755BAE8152D0 /* TerawattTests */ = {
+			isa = PBXGroup;
+			children = (
+				66D3D6148E6ACCD213F6B8A8 /* CampusMathTests.swift */,
+			);
+			path = TerawattTests;
+			sourceTree = "<group>";
+		};
+		B290B4217A3847F1B00E184B /* Engine */ = {
+			isa = PBXGroup;
+			children = (
+				EE3079113F06C7504AACB39F /* CampusMath.swift */,
+				6AEE770C52F8048942193C11 /* Sites.swift */,
+			);
+			path = Engine;
+			sourceTree = "<group>";
+		};
+		F07F296BD180B06245D74BFD /* Scenes */ = {
+			isa = PBXGroup;
+			children = (
+				F180FEF1CC0AACE4AF0E6649 /* HomeView.swift */,
+				DB47A07AE16FC0A90E220E85 /* HUDStrip.swift */,
+				132146695A84AE10106344B8 /* InspectorView.swift */,
+				B6E70D78EB72AFFC0443DEB5 /* TabletopView.swift */,
+				D460E38421471A3222AA955B /* WalkView.swift */,
+			);
+			path = Scenes;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		61FBC682C7C3605647FC4144 /* TerawattTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D8B80AA0ED62C3158B8F4097 /* Build configuration list for PBXNativeTarget "TerawattTests" */;
+			buildPhases = (
+				ED1A0DBE1C724DA57EB71BAB /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				14DA3925ADC8A6332E618CF1 /* PBXTargetDependency */,
+			);
+			name = TerawattTests;
+			packageProductDependencies = (
+			);
+			productName = TerawattTests;
+			productReference = 2A51BBBE49EC6BADCAB06343 /* TerawattTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		B61763B56F5598310043705F /* Terawatt */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 811E16FF384B87077213CE85 /* Build configuration list for PBXNativeTarget "Terawatt" */;
+			buildPhases = (
+				4917CE7C4B882C8E5D4E6E12 /* Sources */,
+				E37C9160C09ED9491324159D /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Terawatt;
+			packageProductDependencies = (
+				CDD01246C0017034C1F52343 /* RealityHD */,
+				16C9CF0522F2BD76295989E1 /* DicyaninStageDirector */,
+				0983DE37AAE253DA277346C4 /* DicyaninPerfProbe */,
+			);
+			productName = Terawatt;
+			productReference = 6375D69AA54D0CCF2931CCC4 /* Terawatt.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9B8E01194A1A85E6BA3E7B27 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					61FBC682C7C3605647FC4144 = {
+						DevelopmentTeam = NWR2UZ4V67;
+					};
+					B61763B56F5598310043705F = {
+						DevelopmentTeam = NWR2UZ4V67;
+					};
+				};
+			};
+			buildConfigurationList = AB8940BA22ECE494D875F3C5 /* Build configuration list for PBXProject "Terawatt" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 5CE2B3FB72049A2FB3C34D3B;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				D2BD88469C89067DE1486C67 /* XCRemoteSwiftPackageReference "DicyaninPerfProbe" */,
+				EDCF09E5D5CFC68CFFB6CEB6 /* XCRemoteSwiftPackageReference "DicyaninStageDirector" */,
+				873F81917B581C61171C89D8 /* XCLocalSwiftPackageReference "../RealityHD" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 66AB629BF02C740AA2307A64 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				B61763B56F5598310043705F /* Terawatt */,
+				61FBC682C7C3605647FC4144 /* TerawattTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4917CE7C4B882C8E5D4E6E12 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F4F5CCBA3B2A3BDB5A215A42 /* CampusBuilder.swift in Sources */,
+				380F26E0550738F485FAD4D5 /* CampusMath.swift in Sources */,
+				2461E4F6D8DA76AAF48EB662 /* CampusSpec.swift in Sources */,
+				44829DFD9658B7B1DF8B59C4 /* ChipSpec.swift in Sources */,
+				B1EA71FB28C00DEEF56EF3F2 /* DemoRoutes.swift in Sources */,
+				6039C9AFC661061A750DCDB4 /* HUDStrip.swift in Sources */,
+				7F5F3D0D15CC18C0902BE61E /* HomeView.swift in Sources */,
+				C6B6469B053326A9FF010D4C /* InspectorView.swift in Sources */,
+				754650B82A9DB8941A37666F /* ProjectStore.swift in Sources */,
+				49BF4D6420248699CC761F3B /* PropFactory.swift in Sources */,
+				886F5E9A309CCCFDC6751CCB /* RackPreset.swift in Sources */,
+				05B0961D9DE3C60C527D660D /* Sites.swift in Sources */,
+				109285CEBF7D4C355F2135D4 /* TabletopView.swift in Sources */,
+				4C2A074898FCE3438D7872D3 /* TerawattApp.swift in Sources */,
+				E2D80DC3C247255CBB00EFA6 /* Theme.swift in Sources */,
+				E72E65E5ED56BDDECCB4B439 /* Wafer.swift in Sources */,
+				686E04C57C7D59ED30C1CFDA /* WalkView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ED1A0DBE1C724DA57EB71BAB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B3E0159968B028C9C4072E3A /* CampusMathTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		14DA3925ADC8A6332E618CF1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B61763B56F5598310043705F /* Terawatt */;
+			targetProxy = 8BEB4B39859E91D7E2925500 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0A326B0FB60F9DB244227D38 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = NWR2UZ4V67;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = xros;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 7;
+				XROS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Debug;
+		};
+		74BC83D296ACB52546A4AAC6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = NWR2UZ4V67;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = xros;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 7;
+				XROS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Release;
+		};
+		EF2BFF59467E5A971E946F3A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Support/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.dicyaninlabs.terawatt;
+				SDKROOT = xros;
+				TARGETED_DEVICE_FAMILY = 7;
+			};
+			name = Debug;
+		};
+		F681727CCF5ACE18069354F0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.dicyaninlabs.terawatt.tests;
+				SDKROOT = xros;
+				TARGETED_DEVICE_FAMILY = 7;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Terawatt.app/Terawatt";
+			};
+			name = Release;
+		};
+		FAA73412811D4719BC569DCE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Support/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.dicyaninlabs.terawatt;
+				SDKROOT = xros;
+				TARGETED_DEVICE_FAMILY = 7;
+			};
+			name = Release;
+		};
+		FDEBF22413FAB6741E316C6D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.dicyaninlabs.terawatt.tests;
+				SDKROOT = xros;
+				TARGETED_DEVICE_FAMILY = 7;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Terawatt.app/Terawatt";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		811E16FF384B87077213CE85 /* Build configuration list for PBXNativeTarget "Terawatt" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EF2BFF59467E5A971E946F3A /* Debug */,
+				FAA73412811D4719BC569DCE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		AB8940BA22ECE494D875F3C5 /* Build configuration list for PBXProject "Terawatt" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0A326B0FB60F9DB244227D38 /* Debug */,
+				74BC83D296ACB52546A4AAC6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D8B80AA0ED62C3158B8F4097 /* Build configuration list for PBXNativeTarget "TerawattTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FDEBF22413FAB6741E316C6D /* Debug */,
+				F681727CCF5ACE18069354F0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		873F81917B581C61171C89D8 /* XCLocalSwiftPackageReference "../RealityHD" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../RealityHD;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		D2BD88469C89067DE1486C67 /* XCRemoteSwiftPackageReference "DicyaninPerfProbe" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hunterh37/DicyaninPerfProbe";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		EDCF09E5D5CFC68CFFB6CEB6 /* XCRemoteSwiftPackageReference "DicyaninStageDirector" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hunterh37/DicyaninStageDirector";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		0983DE37AAE253DA277346C4 /* DicyaninPerfProbe */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D2BD88469C89067DE1486C67 /* XCRemoteSwiftPackageReference "DicyaninPerfProbe" */;
+			productName = DicyaninPerfProbe;
+		};
+		16C9CF0522F2BD76295989E1 /* DicyaninStageDirector */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EDCF09E5D5CFC68CFFB6CEB6 /* XCRemoteSwiftPackageReference "DicyaninStageDirector" */;
+			productName = DicyaninStageDirector;
+		};
+		CDD01246C0017034C1F52343 /* RealityHD */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = RealityHD;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 9B8E01194A1A85E6BA3E7B27 /* Project object */;
+}

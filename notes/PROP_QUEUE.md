@@ -1,0 +1,123 @@
+# Prop queue (demo order)
+
+One prop per agent run. Mark `[x]` when signed off, `[~]` when built but unsigned.
+Order: what the first demo shows (walk a hot aisle, follow a wafer, build a chip), then depth.
+
+## l1 DataCenter
+- [ ] rack-ai-1mw
+- [~] cold-plate (7128 tris vs 3000 budget)
+- [ ] compute-tray-gpu
+- [ ] hot-aisle-containment
+- [ ] raised-floor-tile
+- [ ] overhead-busway
+- [ ] cable-tray-ladder
+- [ ] led-row-light
+- [ ] rack-lpu
+- [ ] rack-air-42u
+- [ ] rack-nvl72-2025
+- [ ] gpu-module-2035
+- [ ] rack-manifold
+- [ ] cdu-liquid
+- [ ] immersion-tank
+- [ ] switch-tray-cpo
+- [ ] power-shelf-800vdc
+- [ ] hall-shell
+- [ ] hall-column
+- [ ] campus-building
+- [ ] dry-cooler
+- [ ] chiller-unit
+- [ ] transformer-pad
+- [ ] generator-container
+- [ ] smr-module
+- [ ] switchgear-lineup
+- [ ] ups-cabinet
+- [ ] battery-rack-li
+- [ ] chilled-water-pipe
+- [ ] pipe-valve-butterfly
+- [ ] pump-skid
+- [ ] crah-unit
+- [ ] cooling-tower-cell
+- [ ] fuel-cell-bank
+- [ ] noc-video-wall
+- [ ] noc-console
+- [ ] security-mantrap
+- [ ] biometric-reader
+- [ ] cable-tray-fiber
+- [ ] fiber-trunk-bundle
+- [ ] network-patch-panel
+- [ ] storage-jbof
+- [ ] nvme-sled
+- [ ] rack-pdu
+- [ ] blanking-panel
+- [ ] lpu-card
+- [ ] air-inference-card
+- [ ] raised-floor-pedestal
+- [ ] fire-suppression-cylinder
+- [ ] vesda-pipe
+- [ ] emergency-power-off
+- [ ] leak-detection-cable
+- [ ] aisle-sign
+- [ ] crash-cart-kvm
+- [ ] loading-dock-leveler
+- [ ] server-lift
+- [ ] rack-pallet-crate
+- [ ] esd-workbench
+- [ ] dc-roof-mech
+- [ ] perimeter-fence
+- [ ] orbital-dc-module
+- [ ] space-radiator-panel
+- [ ] solar-array-wing
+- [ ] lunar-dc-habitat
+- [ ] mars-dc-dome
+- [ ] ground-station-dish
+- [ ] earth-site-pin
+
+## l2 Fab
+- [~] wafer-300mm
+- [~] foup
+- [~] oht-vehicle
+- [ ] oht-rail
+- [ ] euv-scanner-highna
+- [ ] litho-track
+- [ ] plasma-etch-cluster
+- [ ] cvd-ald-cluster
+- [ ] cmp-tool
+- [ ] ion-implanter
+- [ ] diffusion-furnace
+- [ ] wet-bench
+- [ ] pvd-cluster
+- [ ] ebeam-metrology
+- [ ] probe-station
+- [ ] dicing-saw
+- [ ] hybrid-bonder
+- [ ] ffu-ceiling-tile
+- [ ] cleanroom-floor-grate
+- [ ] cleanroom-wall-panel
+- [ ] fab-yellow-light-panel
+- [ ] tool-status-tower
+- [ ] foup-stocker
+- [ ] efem-robot
+- [ ] euv-light-source
+- [ ] duv-immersion-scanner
+- [ ] wafer-cassette
+- [ ] reticle-pod
+- [ ] air-shower
+- [ ] gowning-bench
+- [ ] bunny-suit-rack
+- [ ] gas-cabinet
+- [ ] chemical-cabinet
+- [ ] process-piping-rack
+
+## l3 ChipLab
+- [~] package-substrate (0.563)
+- [ ] chip-package-final
+- [ ] hbm-stack
+- [ ] die-blank-reticle
+- [ ] die-block-tile
+- [ ] interposer-glass
+- [ ] holo-table
+- [ ] design-workbench-2035
+- [ ] transistor-gaa-cutaway
+- [ ] interconnect-stack-cutaway
+- [ ] wafer-display-stand
+- [ ] bond-wire-macro

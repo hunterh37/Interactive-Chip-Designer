@@ -1,0 +1,24 @@
+{
+  "originHash" : "d0b9fe4937aa39fc06b766337e582da50e229a63976393d6e1876b42c356a407",
+  "pins" : [
+    {
+      "identity" : "dicyaninperfprobe",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/hunterh37/DicyaninPerfProbe",
+      "state" : {
+        "branch" : "main",
+        "revision" : "79b2a0ef149084b3a720a73e4d365a8afca9f22d"
+      }
+    },
+    {
+      "identity" : "dicyaninstagedirector",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/hunterh37/DicyaninStageDirector",
+      "state" : {
+        "branch" : "main",
+        "revision" : "b414dc80e0f99dce51e68a11f42db51b2ac869cc"
+      }
+    }
+  ],
+  "version" : 3
+}

@@ -1,0 +1,59 @@
+name: Terawatt
+options:
+  bundleIdPrefix: org.dicyaninlabs
+  deploymentTarget:
+    visionOS: "26.0"
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    DEVELOPMENT_TEAM: NWR2UZ4V67
+    TARGETED_DEVICE_FAMILY: "7"
+packages:
+  RealityHD:
+    path: ../RealityHD
+  DicyaninStageDirector:
+    url: https://github.com/hunterh37/DicyaninStageDirector
+    branch: main
+  DicyaninPerfProbe:
+    url: https://github.com/hunterh37/DicyaninPerfProbe
+    branch: main
+targets:
+  Terawatt:
+    type: application
+    platform: visionOS
+    sources: [Terawatt]
+    info:
+      path: Support/Info.plist
+      properties:
+        CFBundleDisplayName: Terawatt
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: true
+          UIApplicationPreferredDefaultSceneSessionRole: UIWindowSceneSessionRoleApplication
+          UISceneConfigurations: {}
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.dicyaninlabs.terawatt
+        GENERATE_INFOPLIST_FILE: NO
+    dependencies:
+      - package: RealityHD
+        product: RealityHD
+      - package: DicyaninStageDirector
+      - package: DicyaninPerfProbe
+  TerawattTests:
+    type: bundle.unit-test
+    platform: visionOS
+    sources: [TerawattTests]
+    dependencies:
+      - target: Terawatt
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.dicyaninlabs.terawatt.tests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/Terawatt.app/Terawatt
+        BUNDLE_LOADER: $(TEST_HOST)
+schemes:
+  Terawatt:
+    build:
+      targets: {Terawatt: all, TerawattTests: [test]}
+    test:
+      targets: [TerawattTests]
