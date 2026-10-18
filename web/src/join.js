@@ -10,7 +10,8 @@ const q = new URLSearchParams(location.search);
 const room = (q.get('room') || 'DEMO').toUpperCase();
 const store = { get: k => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch {} } };
 const pid = store.get('cd-pid') || Math.random().toString(36).slice(2, 12); store.set('cd-pid', pid);
-let name = store.get('cd-name') || '';
+const randName = () => { const a = ['ADA','VOLT','NOVA','ZED','BYTE','FLUX','ION','ECHO','NEO','RAY','KAI','LUX','ORB','PIX','REX','SOL']; return a[Math.random() * a.length | 0] + (10 + Math.random() * 90 | 0); };
+let name = store.get('cd-name') || randName(); store.set('cd-name', name);
 const cat = monoCatalog(await catalog());
 const DURATION = 120, POWER = 1000;
 const money = n => '$' + n.toLocaleString('en-US');
@@ -44,6 +45,7 @@ const enter = () => {
   field.pulse(); go('menu');
 };
 $('enter').onclick = enter;
+$('who').onclick = () => { go('intro'); setTimeout(() => { $('name').focus(); $('name').select(); }, 300); };
 $('name').onkeydown = e => { if (e.key === 'Enter') enter(); };
 
 // ── menu
@@ -496,5 +498,4 @@ function btn(label, fn, cls = '') { const b = el('button', cls, label); b.onclic
 function colorIn(v, fn) { const i = el('input'); i.type = 'color'; i.value = v; i.onchange = () => fn(i.value); return i; }
 
 // Deep links: ?mode=rack opens the builder directly once a name exists.
-if (name) { send({ type: 'player.name', name }); go('menu'); }
-else setTimeout(() => $('name').focus(), 300);
+send({ type: 'player.name', name }); go('menu');
