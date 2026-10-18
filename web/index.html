@@ -21,7 +21,7 @@
 
   /* top-left title */
   #title { left:36px; top:30px; display:flex; flex-direction:column; gap:8px; }
-  #title b { font-size:15px; font-weight:500; letter-spacing:.32em; }
+  #title b { font-family:var(--mono); color:var(--fg); font-size:clamp(24px, 3.2vw, 44px); font-weight:600; letter-spacing:.28em; line-height:1.1; }
 
   /* top-right mini join */
   #mini { right:28px; top:26px; display:flex; gap:12px; align-items:center; border:1px solid var(--dim); padding:10px; background:#000; }
@@ -65,7 +65,7 @@
   @media (max-width:720px), (max-height:500px) {
     body { overflow:auto; }
     #title { left:max(12px, env(safe-area-inset-left)); top:max(12px, env(safe-area-inset-top)); gap:4px; max-width:55vw; }
-    #title b { font-size:12px; letter-spacing:.2em; }
+    #title b { font-size:18px; letter-spacing:.2em; }
     #mini { right:12px; top:max(10px, env(safe-area-inset-top)); padding:6px; gap:8px; }
     #mini canvas { width:48px !important; height:48px !important; }
     #join, #join.globe { flex-direction:column; justify-content:center; gap:20px; padding:72px 16px 150px; overflow-y:auto; background:rgba(0,0,0,.75); }
