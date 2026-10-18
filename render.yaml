@@ -8,6 +8,8 @@ services:
     healthCheckPath: /healthz
     buildFilter: { paths: [server/**, package.json, package-lock.json] }
     envVars:
+      - key: HOST_KEY
+        sync: false
       - key: WEB_URL
         value: https://chipdesigner-web.onrender.com
   - type: web

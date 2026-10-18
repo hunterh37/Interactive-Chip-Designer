@@ -3,11 +3,14 @@ import { catalog, connect } from './net.js';
 import { stage, buildRoom, buildChip, buildDieGrid, replace, realityHDProps } from './scene.js';
 import { buildGlobe, setPins, faceQuat, fmtLatLon } from './globe.js';
 import { monoCatalog, asciiField, scramble } from './ascii.js';
+import { hostGate } from './hostgate.js'; hostGate();
 
 const $ = id => document.getElementById(id);
 const params = new URLSearchParams(location.search);
-// Chip/Rack switches only for the host: open once with ?host=1 (remembered), ?host=0 clears.
-const isHost = (() => { try { const h = params.get('host'); if (h === '1') localStorage.setItem('tw.host', '1'); if (h === '0') localStorage.removeItem('tw.host'); return localStorage.getItem('tw.host') === '1'; } catch { return params.get('host') === '1'; } })();
+// Host controls only with ?host=<HOST_KEY> (remembered in localStorage), ?host=0 clears. Server enforces the key.
+const hostKey = (() => { const h = params.get('host'); try { if (h === '0') localStorage.removeItem('tw.host'); else if (h) localStorage.setItem('tw.host', h); return localStorage.getItem('tw.host') || ''; } catch { return h && h !== '0' ? h : ''; } })();
+const isHost = !!hostKey;
+['prev', 'next', 'reset'].forEach(id => document.getElementById(id).hidden = !isHost);
 document.querySelectorAll('[data-mode]').forEach(b => b.hidden = !isHost);
 let mode = params.get('mode') === 'rack' ? 'rack' : 'chip';
 const STAGES = ['Join', 'Design', 'Results'];
@@ -40,6 +43,7 @@ function goStage(i) {
 $('prev').onclick = () => goStage(st - 1);
 $('next').onclick = () => goStage(st + 1);
 addEventListener('keydown', e => {
+  if (!isHost) return;
   if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); goStage(st + 1); }
   if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); goStage(st - 1); }
 });
@@ -138,9 +142,9 @@ async function showQR() {
   $('code').textContent = room; $('code2').textContent = room; $('url').textContent = url.replace(/^https?:\/\//, '');
 }
 
-const net = connect({ room, kind: 'host', mode, name: 'Stage', onState: s => {
+const net = connect({ room, kind: 'host', mode, key: hostKey, name: 'Stage', onState: s => {
   const first = !last; last = s;
-  if (first && params.get('stage')) { localAt = Date.now(); net.send({ type: 'show.set', stage: st, mode }); } // explicit URL stage wins on load
+  if (first && isHost && params.get('stage') && !s.started && s.show?.stage === 0) { localAt = Date.now(); net.send({ type: 'show.set', stage: st, mode }); } // explicit URL stage wins on load
   else if (first && s.show) { st = s.show.stage; mode = s.show.mode; sync(); showQR(); }
   else if (s.show && Date.now() - localAt > 800 && (s.show.stage !== st || s.show.mode !== mode)) { st = s.show.stage; mode = s.show.mode; view = ''; sync(); showQR(); } // follow XR presenter
   render();

@@ -151,9 +151,34 @@ let REF = null;
 /** Official random layout through the same model: the score's denominator (judge does the same with HotSpot). */
 export const reference = () => (REF ??= (({ gpu, hbm }) => ({ gpu, hbm }))(simulate(defaultPlace())));
 
+/** Nearest single-die move that makes the layout valid: { i, id, x, y } or null. Tries each broken die, closest spots first. */
+export function suggestFix(place, bad = []) {
+  const geo = pl => { const b = pl.map(box), e = T2.edge, g = T2.gap;
+    if (b.some(([x0, y0, x1, y1]) => Math.min(x0, y0) < e || x1 > W - e || y1 > H - e)) return false;
+    for (let a = 0; a < b.length; a++) for (let c = a + 1; c < b.length; c++) if (Math.max(b[c][0] - b[a][2], b[a][0] - b[c][2], 0) < g && Math.max(b[c][1] - b[a][3], b[a][1] - b[c][3], 0) < g) return false;
+    return true; };
+  const ok = pl => { if (!geo(pl)) return false; try { validate(pl, false); validate(pl); return true; } catch { return false; } };
+  const order = [...new Set([...bad, ...place.map(p => p.id)])];
+  for (const id of order) {
+    const i = place.findIndex(p => p.id === id); if (i < 0) continue;
+    const home = defaultPlace().find(q => q.id === id);
+    if (home) { const pl = place.map(q => ({ ...q })); Object.assign(pl[i], { x: home.x, y: home.y }); if (ok(pl)) var fallback = { i, id, x: home.x, y: home.y }; }
+    const [, , bw, bh] = box({ ...place[i], x: 0, y: 0 }), e = T2.edge, cand = [];
+    const p0 = { x: Math.min(Math.max(place[i].x, e), W - e - bw), y: Math.min(Math.max(place[i].y, e), H - e - bh) }; // search from the die pulled back on board
+    for (let dx = -16; dx <= 16; dx += 1) for (let dy = -16; dy <= 16; dy += 1) if (dx || dy) cand.push([dx, dy, dx * dx + dy * dy]);
+    cand.sort((a, b) => a[2] - b[2]);
+    for (const [dx, dy] of cand) {
+      const pl = place.map(q => ({ ...q })); pl[i].x = +(p0.x + dx).toFixed(2); pl[i].y = +(p0.y + dy).toFixed(2);
+      if (ok(pl)) return { i, id, x: pl[i].x, y: pl[i].y };
+    }
+    if (fallback) return fallback;
+  }
+  return null;
+}
+
 /** Judge score, lower is better; below 1 beats the seeded random layout on both GPU and HBM. Invalid → passed false. */
 export function score(place) {
-  let val; try { val = validate(place); } catch (e) { return { passed: false, reason: e.message, bad: e.dies ?? [], link: e.link ?? null, score: null, points: 0 }; }
+  let val; try { val = validate(place); } catch (e) { return { passed: false, reason: e.message, bad: e.dies ?? [], link: e.link ?? null, fix: suggestFix(place, e.dies ?? []), score: null, points: 0 }; }
   const sim = simulate(place, { val, maps: true }), ref = reference(), a = TM.ambient_c;
   const s = Math.max((sim.gpu - a) / (ref.gpu - a), (sim.hbm - a) / (ref.hbm - a));
   const hot = sim.per[sim.gpuWorkload];

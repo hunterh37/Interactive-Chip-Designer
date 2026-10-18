@@ -4,6 +4,7 @@ import QRCode from 'qrcode';
 import { catalog, connect } from './net.js';
 import { stage, buildRoom, buildChip, buildDieGrid, replace, realityHDProps } from './scene.js';
 import { monoCatalog } from './ascii.js';
+import { hostGate } from './hostgate.js'; hostGate();
 
 const q = new URLSearchParams(location.search);
 const room = (q.get('room') || 'DEMO').toUpperCase();
@@ -29,7 +30,8 @@ else {
     session.addEventListener('end', () => { session = null; label(); });
   };
 }
-renderer.xr.addEventListener('sessionstart', () => { world.position.set(0, -0.15, -2.2); hud.position.set(0, 1.0, -1.05); });
+renderer.xr.addEventListener('sessionstart', () => { scene.background = new THREE.Color('#000000'); world.position.set(0, -0.15, -2.2); hud.position.set(0, 1.0, -1.05); });
+renderer.xr.addEventListener('sessionend', () => { scene.background = null; });
 
 // ── text panels as canvas textures
 function panel(w, h, px = 512) {
@@ -118,5 +120,5 @@ renderer.domElement.addEventListener('click', e => {
 });
 addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(show.stage + 1); if (e.key === 'ArrowLeft') go(show.stage - 1); });
 
-const net = connect({ room, kind: 'xr', mode: 'chip', name: 'WebXR', onState: st => { s = st; render(); } });
+const net = connect({ room, kind: 'xr', key: (() => { try { return localStorage.getItem('tw.host') || new URLSearchParams(location.search).get('host') || ''; } catch { return ''; } })(), mode: 'chip', name: 'WebXR', onState: st => { s = st; render(); } });
 setInterval(() => { if (renderer.xr.isPresenting) net.send({ type: 'pose', p: camera.position.toArray().map(v => +v.toFixed(3)) }); }, 200);

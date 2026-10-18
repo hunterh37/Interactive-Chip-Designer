@@ -7,6 +7,7 @@ import { PAINT_PARTS, DESIGNS } from './rooms.js';
 import { newState, apply, snapshot } from './rooms.js';
 
 const PORT = process.env.PORT || 8787;
+const HOST_KEY = process.env.HOST_KEY || ''; // set in prod: lobby.*/show.* ops need ?key=HOST_KEY
 const WEB_URL = process.env.WEB_URL || 'http://localhost:5173';
 const rooms = new Map(); // code -> { state, sockets:Set }
 
@@ -47,6 +48,7 @@ wss.on('connection', (ws, req) => {
   const id = (url.searchParams.get('pid') || '').replace(/[^a-z0-9]/gi, '').slice(0, 16) || Math.random().toString(36).slice(2, 10);
   const kind = ['phone', 'host', 'vision', 'xr'].includes(url.searchParams.get('kind')) ? url.searchParams.get('kind') : 'phone';
   r.state.players[id] = { name: (url.searchParams.get('name') || kind).slice(0, 20), kind, mode: url.searchParams.get('mode') === 'chip' ? 'chip' : 'rack' };
+  const admin = !HOST_KEY || url.searchParams.get('key') === HOST_KEY;
   r.sockets.add(ws);
   // Stable player id from the client lets a phone keep its rack across reconnects.
   ws.send(JSON.stringify({ t: 'hello', id }));
@@ -58,6 +60,7 @@ wss.on('connection', (ws, req) => {
       for (const o of r.sockets) if (o !== ws && o.readyState === 1) o.send(msg);
       return;
     }
+    if (/^(lobby|show)\./.test(op.type) && !admin) return ws.send(JSON.stringify({ t: 'error', error: 'host only' }));
     const err = apply(r.state, op, id);
     r.touched = Date.now();
     if (err) ws.send(JSON.stringify({ t: 'error', error: err })); else broadcast(r);

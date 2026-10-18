@@ -72,11 +72,12 @@ const grid = $('grid'); grid.className = 'ip';
 const svg = document.createElementNS(SV, 'svg'); svg.setAttribute('viewBox', `0 0 ${IW} ${IH}`); grid.append(svg);
 const heatImg = document.createElementNS(SV, 'image'); heatImg.setAttribute('width', IW); heatImg.setAttribute('height', IH); heatImg.setAttribute('preserveAspectRatio', 'none'); svg.append(heatImg);
 const [cx0, cy0, cx1, cy1] = T2.contact;
-svg.insertAdjacentHTML('beforeend', `<rect x="${cx0}" y="${IH - cy1}" width="${cx1 - cx0}" height="${cy1 - cy0}" class="contact"/><rect x="${T2.edge}" y="${T2.edge}" width="${IW - 2 * T2.edge}" height="${IH - 2 * T2.edge}" class="margin"/><g id="wires"></g><g id="dies"></g><g id="hots"></g>`);
+svg.insertAdjacentHTML('beforeend', `<rect x="${cx0}" y="${IH - cy1}" width="${cx1 - cx0}" height="${cy1 - cy0}" class="contact"/><rect x="${T2.edge}" y="${T2.edge}" width="${IW - 2 * T2.edge}" height="${IH - 2 * T2.edge}" class="margin"/><defs><marker id="fixhead" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="3" markerHeight="3" orient="auto"><path d="M0,0L6,3L0,6z" fill="#fff"/></marker></defs><g id="wires"></g><g id="dies"></g><g id="fix"></g><g id="hots"></g>`);
 let drag = null, local = null; // local: optimistic place while dragging
 const place = () => local ?? me()?.place ?? [];
 const svgPt = e => { const r = svg.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * IW, (e.clientY - r.top) / r.height * IH]; };
 grid.onpointerdown = e => {
+  if (e.target.closest('[data-fix]') && !me()?.taped) { const f = result().fix; if (f) { send({ type: 'my.move', i: f.i, x: f.x, y: f.y }); navigator.vibrate?.(12); } return; }
   const t = e.target.closest('[data-i]'); if (!t || me()?.taped) return;
   const i = +t.dataset.i, p = place()[i], [mx, my] = svgPt(e), [, h] = T2.dies[p.id];
   local = place().map(q => ({ ...q })); drag = { i, dx: mx - p.x, dy: my - (IH - p.y - h) }; grid.setPointerCapture(e.pointerId);
@@ -324,7 +325,7 @@ function drawHeat(r) {
 }
 function drawPlace() {
   const r = result(), bad = new Set(drag ? [] : r.bad ?? []);
-  $('dies').innerHTML = place().map((p, i) => {
+  $('dies').innerHTML = place().map((p, i) => [p, i]).sort(([a], [b]) => bad.has(a.id) - bad.has(b.id)).map(([p, i]) => { // broken dies on top
     const [w, h] = T2.dies[p.id], y = IH - p.y - h;
     return `<g data-i="${i}" class="die ${p.id[0] === 'G' ? 'gpu' : 'hbm'}${bad.has(p.id) ? ' bad' : ''}"><rect x="${p.x}" y="${y}" width="${w}" height="${h}"/><text x="${p.x + w / 2}" y="${y + h / 2 + 1.2}">${p.id}</text></g>`;
   }).join('');
@@ -332,6 +333,9 @@ function drawPlace() {
     const pts = [l.from, ...l.path.map(([i, j]) => [(i + 0.5) * 0.5, (j + 0.5) * 0.5]), l.to].map(([x, y]) => `${x},${IH - y}`).join(' ');
     return `<polyline class="${id[0] === 'P' ? 'wp' : 'ws'}" points="${pts}"/>`;
   }).join('');
+  const f = !drag && !r.passed && r.fix, fp = f && place()[f.i];
+  $('fix').innerHTML = fp ? (() => { const [w, h] = T2.dies[fp.id], y0 = IH - fp.y - h, y1 = IH - f.y - h;
+    return `<line class="fixarrow" x1="${fp.x + w / 2}" y1="${y0 + h / 2}" x2="${f.x + w / 2}" y2="${y1 + h / 2}" marker-end="url(#fixhead)"/><g class="fixghost" data-fix="1"><rect x="${f.x}" y="${y1}" width="${w}" height="${h}"/><text x="${f.x + w / 2}" y="${y1 + h / 2 + 1.2}">${fp.id}</text></g>`; })() : '';
   $('hots').innerHTML = drag || !r.passed ? '' : [[r.gpuHot, 'g'], [r.hbmHot, 'h']].map(([[x, y], k]) => `<circle class="hot ${k}" cx="${x}" cy="${IH - y}" r="1.2"/>`).join('');
 }
 
@@ -339,6 +343,7 @@ function renderDesign() {
   const r = result();
   $('dname').textContent = `${name || 'Guest'} · interposer`;
   replace(chipStage.world, 'chip', buildChip({ place: place(), result: r, taped: false }, cat));
+  $('chipload').classList.add('done');
   const ref = r.ref ?? { gpu: 100, hbm: 85 };
   $('meters').innerHTML = !r.passed ? '' : [
     ['GPU max', bar(r.worstGpu - 25, (ref.gpu - 25) * 1.3), `${r.worstGpu} °C`],
@@ -353,9 +358,19 @@ function renderDesign() {
   drawHeat(r); drawPlace();
 }
 
+/** Judge wording → short plain words. */
+function plain(why = '') {
+  let m;
+  if ((m = why.match(/^(\w+) and (\w+) violate/))) return `${m[1]} and ${m[2]} are too close (need 1 mm gap).`;
+  if ((m = why.match(/^(\w+) violates package edge/))) return `${m[1]} is too close to the edge.`;
+  if ((m = why.match(/(\w+)→(\w+) needs/))) return `${m[1]} is too far from ${m[2]}.`;
+  if (/route .* exceeds/.test(why)) return 'A wire is too long.';
+  if (/13,500/.test(why)) return 'Wires are too long overall. Pull GPUs closer to their HBMs.';
+  return why;
+}
 function hintFor(r) {
   const cooled = me()?.cooled;
-  if (!r.passed) return `✕ ${r.reason}`;
+  if (!r.passed) return r.fix ? `✕ ${plain(r.reason)} → drag ${r.fix.id} to the dashed box, or tap the box.` : `✕ ${plain(r.reason)}`;
   const g = (r.worstGpu - 25) / (r.ref.gpu - 25), h = (r.worstHbm - 25) / (r.ref.hbm - 25);
   if (g >= h) return `→ GPU binds: ${r.worstGpu} °C in ${r.gpuWorkload.replace('_', ' ')}. Spread GPUs toward the cooler center.`;
   return `→ HBM binds: ${r.worstHbm} °C in ${r.hbmWorkload.replace('_', ' ')}. Move HBMs off GPU hot sides.`;
