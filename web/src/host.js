@@ -6,6 +6,9 @@ import { monoCatalog, asciiField, scramble } from './ascii.js';
 
 const $ = id => document.getElementById(id);
 const params = new URLSearchParams(location.search);
+// Chip/Rack switches only for the host: open once with ?host=1 (remembered), ?host=0 clears.
+const isHost = (() => { try { const h = params.get('host'); if (h === '1') localStorage.setItem('tw.host', '1'); if (h === '0') localStorage.removeItem('tw.host'); return localStorage.getItem('tw.host') === '1'; } catch { return params.get('host') === '1'; } })();
+document.querySelectorAll('[data-mode]').forEach(b => b.hidden = !isHost);
 let mode = params.get('mode') === 'rack' ? 'rack' : 'chip';
 const STAGES = ['Join', 'Design', 'Results'];
 let st = Math.max(0, STAGES.indexOf(params.get('stage') || 'Join'));

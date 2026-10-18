@@ -98,7 +98,7 @@ const DEMO = [
   'Every GPU links to two HBMs: its primary (600 GB/s, ≤ 5 mm wire) and a secondary (300 GB/s, ≤ 6 mm). Yellow lines are the routed wires.',
   'Wires and PHYs dissipate power: 0.20 pJ/bit at the ends plus 0.08 pJ/bit per mm. Total GB/s × mm must stay ≤ 13,500.',
   'Keep 1 mm between dies and 1 mm from the edge. Red dies break a rule. Only the dashed center sits on good cooler contact.',
-  'Five workloads run. Score = worst GPU and HBM rise vs the random baseline. Below 1.000 wins. Try AI cool.',
+  'Five workloads run. Score = worst GPU and HBM rise vs the random baseline. Below 1.000 wins.',
 ];
 $('demo').hidden = true;
 let demoT = null;
@@ -111,7 +111,6 @@ let tipHeld = 0;
 $('help').onclick = () => { tipHeld = Date.now(); showTip(); };
 $('tipok').onclick = () => { $('tip').hidden = true; clearTimeout(demoT); store.set('cd-tip', '1'); deadline += Date.now() - tipHeld; };
 $('clear').onclick = () => send({ type: 'my.clear' });
-$('cool').onclick = () => send({ type: 'my.autocool' });
 $('tape').onclick = () => tapeout();
 
 function tapeout() {
@@ -357,7 +356,6 @@ function renderDesign() {
 function hintFor(r) {
   const cooled = me()?.cooled;
   if (!r.passed) return `✕ ${r.reason}`;
-  if (cooled && cooled.after < cooled.before && r.score === cooled.after) return `■ AI cool: ${cooled.before.toFixed(3)} → ${cooled.after.toFixed(3)}.`;
   const g = (r.worstGpu - 25) / (r.ref.gpu - 25), h = (r.worstHbm - 25) / (r.ref.hbm - 25);
   if (g >= h) return `→ GPU binds: ${r.worstGpu} °C in ${r.gpuWorkload.replace('_', ' ')}. Spread GPUs toward the cooler center.`;
   return `→ HBM binds: ${r.worstHbm} °C in ${r.hbmWorkload.replace('_', ' ')}. Move HBMs off GPU hot sides.`;

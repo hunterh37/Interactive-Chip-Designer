@@ -39,7 +39,7 @@ test(`${N} guests: join, chip tape-out, rack purchase, host UI holds`, async ({ 
     if (await p.locator('#tipok').isVisible()) await p.locator('#tipok').click();
     await expect(p.locator('#grid .die')).toHaveCount(8);
   }));
-  bots.forEach((b, i) => { b.send({ type: 'my.clear' }); if (i % 2) b.send({ type: 'my.autocool' }); });
+  bots.forEach((b, i) => { b.send({ type: 'my.clear' }) });
   await expect(statRow(host, 'Designing')).toHaveText(String(N));
   await host.waitForTimeout(1500); await shot(host, '2-chip-design');
   await Promise.all(guests.map(p => p.locator('#tape').click()));

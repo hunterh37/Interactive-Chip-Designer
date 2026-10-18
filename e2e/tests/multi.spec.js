@@ -19,8 +19,6 @@ test('two guests: live count, chip dies on host, leaderboard, racks in shared ro
   }
   await expect(statRow(host, 'Designing')).toHaveText('2');
   await expect(a.locator('#meters')).toContainText('°C');
-  await a.locator('#cool').click();
-  await expect(a.locator('#hint')).toContainText(/AI cool/, { timeout: 20000 });
   await a.locator('#tape').click(); await b.locator('#tape').click();
   await expect(a.locator('#s-result.on')).toBeVisible({ timeout: 15000 });
   await expect(b.locator('#s-result.on')).toBeVisible({ timeout: 15000 });
