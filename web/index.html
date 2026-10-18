@@ -49,6 +49,50 @@
   #dots { display:flex; gap:6px; } #dots i { width:7px; height:7px; border:1px solid var(--fg); } #dots i.on { background:var(--fg); }
   #modes { right:36px; bottom:28px; display:flex; } #modes button { padding:10px 14px; } #modes button + button { border-left:none; }
   #reset { left:36px; bottom:28px; padding:10px 14px; }
+  body { height:100dvh; }
+
+  /* tablets / narrow windows */
+  @media (max-width:1100px) {
+    #title { left:20px; top:18px; } #mini { right:16px; top:16px; }
+    #sites { right:16px; top:90px; width:min(340px, 42vw); }
+    #board { left:20px; width:min(460px, 52vw); } #stats { right:16px; }
+    #stagename { min-width:180px; padding:0 16px; }
+    #ctl button { padding:16px 18px; }
+    #modes { right:16px; } #reset { left:16px; }
+  }
+
+  /* phones */
+  @media (max-width:720px), (max-height:500px) {
+    body { overflow:auto; }
+    #title { left:max(12px, env(safe-area-inset-left)); top:max(12px, env(safe-area-inset-top)); gap:4px; max-width:55vw; }
+    #title b { font-size:12px; letter-spacing:.2em; }
+    #mini { right:12px; top:max(10px, env(safe-area-inset-top)); padding:6px; gap:8px; }
+    #mini canvas { width:48px !important; height:48px !important; }
+    #join, #join.globe { flex-direction:column; justify-content:center; gap:20px; padding:72px 16px 150px; overflow-y:auto; background:rgba(0,0,0,.75); }
+    #qrwrap { padding:12px; }
+    #qr, #join.globe #qr { width:min(60vw, 34vh, 260px) !important; }
+    #joininfo { max-width:100%; align-items:center; text-align:center; gap:10px; }
+    #names { justify-content:center; }
+    #count { font-size:clamp(48px, 16vw, 96px); }
+    #url { word-break:break-all; font-size:11px; }
+    #board, #sites, #stats { left:12px; right:12px; width:auto; max-height:34dvh; overflow-y:auto; }
+    #board { bottom:128px; } #board .row { font-size:13px; padding:7px 0; }
+    #sites { top:84px; padding:10px 12px; } #sites .row { font-size:12px; padding:6px 0; }
+    #stats { bottom:auto; top:84px; }
+    #ctl { left:12px; right:12px; bottom:max(64px, calc(env(safe-area-inset-bottom) + 56px)); transform:none; }
+    #ctl button { padding:14px 12px; font-size:11px; letter-spacing:.12em; flex:none; }
+    #stagename { flex:1; min-width:0; padding:0 8px; gap:8px; font-size:11px; letter-spacing:.12em; }
+    #sname { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    #reset { left:12px; bottom:max(12px, env(safe-area-inset-bottom)); padding:10px 12px; }
+    #modes { right:12px; bottom:max(12px, env(safe-area-inset-bottom)); } #modes button { padding:10px 10px; }
+  }
+  @media (max-height:500px) and (orientation:landscape) {
+    #join, #join.globe { flex-direction:row; padding:56px 16px 110px; }
+    #qr, #join.globe #qr { width:min(40vh, 200px) !important; }
+    #ctl { left:50%; right:auto; transform:translateX(-50%); bottom:12px; width:min(460px, 60vw); }
+    #board, #sites, #stats { max-height:40dvh; }
+    #board { bottom:64px; width:46vw; right:auto; } #sites { left:auto; width:46vw; top:64px; }
+  }
 </style></head>
 <body>
   <canvas class="view" id="view"></canvas>
