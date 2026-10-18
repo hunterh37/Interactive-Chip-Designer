@@ -1,7 +1,7 @@
 import { test, expect, devices } from '@playwright/test';
 import { hostRoom, resetLobby, statRow, parseMoney } from './util.js';
 
-const api = process.env.E2E_API || 'http://localhost:8787';
+const api = process.env.E2E_API || (process.env.E2E_WEB?.includes('localhost') ? 'http://localhost:8787' : 'https://chipdesigner-api.onrender.com');
 const add = (p, cat, name) => p.getByRole('button', { name: cat, exact: true }).click()
   .then(() => p.locator('.item', { hasText: name }).getByRole('button', { name: 'Add' }).click());
 
