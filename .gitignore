@@ -1,4 +1,32 @@
+# macOS
 .DS_Store
+
+# Xcode
 build/
 DerivedData/
+*.xcodeproj/
+*.xcworkspace/
+!*.xcodeproj/project.xcworkspace/
 xcuserdata/
+*.xcuserstate
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# XcodeGen (generated from project.yml)
+Terawatt.xcodeproj/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Packages/
+Package.resolved
+
+# Reality Composer Pro
+*.rcproject/.build/
+
+# Misc
+*.log
+.env

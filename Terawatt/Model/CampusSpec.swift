@@ -45,6 +45,22 @@ struct CampusSpec: Codable, Equatable, Sendable {
     var cooling: CoolingKind = .directLiquid
     var power: PowerKind = .dc800
 
+    static let rackDepth = 1.4, hotAisle = 1.2, coldAisle = 1.8
+
+    /// Most racks one row holds at its pitch.
+    var maxRacksPerRow: Int { max(1, Int((hall.length - 6) / (rows.first?.pitch ?? 0.6))) }
+
+    /// Rebuilds the non-hall rooms from hall dimensions and power.
+    mutating func relayoutRooms() {
+        let L = hall.length, W = hall.width
+        rooms = [
+            Room(kind: .dataHall, x: 0, z: 0, width: L, depth: W),
+            Room(kind: .cdu, x: 0, z: -(W / 2 + 6), width: L, depth: 12),
+            Room(kind: .electrical, x: 0, z: W / 2 + 6, width: L, depth: 12),
+            Room(kind: .chillerYard, x: L / 2 + 15, z: 0, width: 30, depth: W),
+        ]
+    }
+
     static let `default`: CampusSpec = {
         var s = CampusSpec()
         s.rooms = [

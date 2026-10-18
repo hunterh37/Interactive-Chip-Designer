@@ -15,3 +15,9 @@
 - CampusStats: rackCount, gpuCount, itMW, facilityMW, pue, wue, pflopsFP4, prefillTokS, decodeTokS, usdPerMTok, capexUSD, carbonTPerYr, latencyMs, cableKm, overBudget.
 - CampusMath.stats(spec, installedChips:, chip:) is the entry point for HUD.
 - Fab and Chip Workshop tiles currently open the Inspector only.
+
+## Design Studio (done)
+- Inspector edits site, budget, hall L/W/H, rows, racks per row (clamped by CampusSpec.maxRacksPerRow), rack preset, cooling, power. Autosaves via ProjectStore.persist(). Hall change calls CampusSpec.relayoutRooms().
+- CampusBuilder.build(spec, immersive:) is uncapped. Rows pair back to back around a hot aisle (rowZ, hotAisleZ). Contained pairs get roof and end doors; busway per row (accent); LED strips; CDU row; chiller yard grid.
+- TabletopView and WalkView rebuild with .task(id: campus). Walk spawns at hotAisleZ, HUD attachment at x=3 m.
+- .gitignore rewritten; Terawatt.xcodeproj untracked (regenerate with xcodegen generate).

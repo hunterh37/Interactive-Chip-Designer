@@ -47,3 +47,16 @@ struct CampusMathTests {
         #expect(w.layersDone == 1)
     }
 }
+
+struct LayoutTests {
+    @Test func roomsFollowHall() {
+        var s = CampusSpec.default
+        s.hall.length = 100; s.relayoutRooms()
+        #expect(s.rooms.first { $0.kind == .chillerYard }?.x == 65)
+    }
+    @Test func rackCapFitsHall() {
+        var s = CampusSpec.default
+        s.hall.length = 40
+        #expect(s.maxRacksPerRow == 56)
+    }
+}

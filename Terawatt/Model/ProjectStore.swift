@@ -41,6 +41,13 @@ final class ProjectStore {
         load()
     }
 
+    /// Writes the current project without reloading the list (autosave).
+    func persist() {
+        current.updated = .now
+        guard let data = try? JSONEncoder().encode(current) else { return }
+        try? data.write(to: dir.appendingPathComponent("\(current.id).json"), options: .atomic)
+    }
+
     func new() { current = Project(name: "Campus \(projects.count + 1)") }
     func open(_ p: Project) { current = p }
     func delete(_ p: Project) {

@@ -1,6 +1,6 @@
-l2 | foup | unsigned (auto only; vision gate not run) | 5048 | none
-l2 | wafer-300mm | unsigned (auto 0.959; vision gate not run) | 848 | none
-l2 | oht-vehicle | unsigned (lint size error 0.5 vs 0.6 width; gate not run) | 1552 | none
+l2 | foup | 0.678 fail (vision 0.540, materials 5, not signed) | 5000 | ~/dev/RealityHD-lib-l2/docs/assets/foup.png
+l2 | wafer-300mm | 0.790 fail (vision 0.699, wear 4, not signed) | 968 | ~/dev/RealityHD-lib-l2/docs/assets/wafer-300mm.png
+l2 | oht-vehicle | 0.593 fail (vision 0.406, silhouette 4, not signed) | 1552 | ~/dev/RealityHD-lib-l2/docs/assets/oht-vehicle.png
 l1 | materials metal.perforated copper.polished metal.nickel plastic.pcb | n/a | n/a | Sources/RealMaterials/Library/TerawattDC.swift
 l1 | cold-plate | UNGATED (WIP, 7128 tris over 3000 budget) | 7128 | none
 l1 | rack-ai-1mw | NOT BUILT (brief + scaffold only) | - | none
