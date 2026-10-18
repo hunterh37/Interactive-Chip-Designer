@@ -10,9 +10,13 @@ struct HomeView: View {
             Text("Terawatt").font(.extraLargeTitle2).fontWeight(.semibold)
             HStack(spacing: 16) {
                 tile("Design Studio", "building.2") {
+                    store.mode = .studio
                     openWindow(id: SceneID.tabletop); openWindow(id: SceneID.inspector)
                 }
-                tile("Fab", "circle.grid.cross") { openWindow(id: SceneID.inspector) }
+                tile("Fab", "circle.grid.cross") {
+                    store.mode = .fab
+                    openWindow(id: SceneID.tabletop); openWindow(id: SceneID.inspector)
+                }
                 tile("Chip Workshop", "cpu") { openWindow(id: SceneID.inspector) }
             }
             HStack {

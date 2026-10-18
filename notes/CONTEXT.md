@@ -21,3 +21,11 @@
 - CampusBuilder.build(spec, immersive:) is uncapped. Rows pair back to back around a hot aisle (rowZ, hotAisleZ). Contained pairs get roof and end doors; busway per row (accent); LED strips; CDU row; chiller yard grid.
 - TabletopView and WalkView rebuild with .task(id: campus). Walk spawns at hotAisleZ, HUD attachment at x=3 m.
 - .gitignore rewritten; Terawatt.xcodeproj untracked (regenerate with xcodegen generate).
+
+## Fab mode (done)
+- ProjectStore.mode (.studio/.fab, not persisted), sceneKey drives tabletop/walk rebuild. Home Fab tile sets .fab and opens tabletop + inspector.
+- Model/FabFlow: toolIDs (12), look(station) -> WaferLook (bare/oxide/patterned/metal), status(of:wafer:) -> ToolStatus, WaferState.at(_:).
+- Reality/FabBuilder (FabScene): two tool rows (stations 1-6 at z<0, 7-12 at z>0) around a 4 m OHT aisle, grate floor, rail y=4.3, status towers (amber waiting, green running), immersive adds yellow FFU ceiling, walls, point lights. apply(station, animated:) moves OHT, hoists FOUP, sets wafer material and lamps.
+- Placeholders: foup, oht-vehicle, 12 tool ids render as light boxes via PropFactory.sizes/fabIDs until RealityHD terawatt-fab merges; wafer is a cylinder entity with lookMaterial.
+- Scenes/FabInspector: step list (tap to jump), Next, Restart, Walk. Tabletop scales bay length to 1.1 m; Walk is 1:1 at tool 1.
+- Tests: TerawattTests/FabFlowTests.swift (16 tests total pass).

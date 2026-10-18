@@ -11,11 +11,18 @@ struct Project: Codable, Identifiable, Equatable, Sendable {
     var installedChips = 0
 }
 
+enum AppMode: Sendable { case studio, fab }
+
+/// Rebuild trigger for tabletop and walk scenes.
+struct SceneKey: Equatable { var mode: AppMode; var campus: CampusSpec? }
+
 @MainActor @Observable
 final class ProjectStore {
     var projects: [Project] = []
     var current = Project(name: "Campus 1")
     var selectedRow: UUID?
+    var mode = AppMode.studio
+    var sceneKey: SceneKey { SceneKey(mode: mode, campus: mode == .studio ? current.campus : nil) }
     private let dir: URL
 
     init(directory: URL? = nil) {
@@ -49,7 +56,7 @@ final class ProjectStore {
     }
 
     func new() { current = Project(name: "Campus \(projects.count + 1)") }
-    func open(_ p: Project) { current = p }
+    func open(_ p: Project) { current = p; mode = .studio }
     func delete(_ p: Project) {
         try? FileManager.default.removeItem(at: dir.appendingPathComponent("\(p.id).json")); load()
     }
