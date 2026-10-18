@@ -11,7 +11,9 @@ history.replaceState(null, '', `?mode=${mode}`);
 const { world, controls, tick } = stage(document.getElementById('view'));
 realityHDProps(world);
 tick.push(t => { const r = world.getObjectByName(mode); if (r && mode === 'chip') r.rotation.y = t / 6000; });
-let last;
+let last, wasLive = false;
+document.getElementById('start').onclick = () => net.send({ type: last?.started ? 'lobby.stop' : 'lobby.start' });
+document.getElementById('min').onclick = e => { const m = document.body.classList.toggle('min'); e.target.textContent = m ? 'Show' : 'Hide'; };
 
 function render() {
   if (!last) return;
@@ -31,6 +33,9 @@ function render() {
        ${last.chip.taped ? '<div class="row"><span>Taped out</span><b>✓</b></div>' : ''}`;
   document.getElementById('reset')?.addEventListener('click', () => confirm('Clear all racks and the die?') && net.send({ type: 'lobby.reset' }));
   const n = Object.values(last.racks).length; controls.target.x = 0; if (mode === 'rack') controls.object.position.set(0, 1.6, 2.2 + n * 0.45);
+  const live = !!last.started; document.body.classList.toggle('live', live);
+  const sb = document.getElementById('start'); sb.textContent = live ? 'End experience' : 'Start experience';
+  if (live !== wasLive) { wasLive = live; dispatchEvent(new Event('resize')); }
   const ps = Object.values(last.players);
   document.getElementById('players').textContent = `${ps.length} connected · ${ps.map(p => p.name).join(', ')}`;
 }

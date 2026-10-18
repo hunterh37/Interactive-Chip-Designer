@@ -29,7 +29,7 @@ function draw() {
   ui.innerHTML = '';
   const tabs = el('div', 'tabs');
   for (const m of ['rack', 'chip']) tabs.append(btn(m === 'rack' ? 'Server Rack' : 'Chip Design', () => { mode = m; draw(); }, mode === m ? 'on' : ''));
-  ui.append(tabs, el('div', 'err'));
+  ui.append(tabs, el('div', 'mute', s.started ? '● Live: your rack is in the server room on the big screen' : 'Lobby: design now, host starts the experience'), el('div', 'err'));
   mode === 'rack' ? rackUI() : chipUI();
 }
 

@@ -8,6 +8,7 @@ export function newState() {
     racks: {}, // playerId -> rack; one rack per phone player, all shown in one server room
     chip: { name: 'HACK-1', cells: Array(DIE.cols * DIE.rows).fill(null), taped: false },
     players: {},
+    started: null, // ms timestamp once the host starts the experience; joins stay open
     rev: 0,
   };
 }
@@ -43,7 +44,9 @@ export function apply(s, op, playerId) {
       if (op.cell < 0 || op.cell >= s.chip.cells.length) return 'bad cell';
       if (op.block !== null && !CHIP_BLOCKS.some(b => b.id === op.block)) return 'unknown block';
       s.chip.cells[op.cell] = op.block; s.chip.taped = false; break;
-    case 'lobby.reset': s.racks = {}; s.chip = newState().chip; break;
+    case 'lobby.reset': s.racks = {}; s.chip = newState().chip; s.started = null; break;
+    case 'lobby.start': s.started ??= Date.now(); break;
+    case 'lobby.stop': s.started = null; break;
     case 'chip.clear': s.chip.cells.fill(null); s.chip.taped = false; break;
     case 'chip.tapeout':
       if (!s.chip.cells.some(Boolean)) return 'empty die';

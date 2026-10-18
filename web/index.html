@@ -3,7 +3,17 @@
 <title>ChipDesigner</title><link rel="stylesheet" href="/src/style.css">
 <style>
   body { display:grid; grid-template-columns: 1fr 380px; height:100vh; overflow:hidden; }
-  aside { border-left:1px solid var(--line); padding:28px; display:flex; flex-direction:column; gap:18px; }
+  body > .view { grid-column:1; grid-row:1; width:100%; height:100%; min-width:0; }
+  aside { border-left:1px solid var(--line); padding:28px; display:flex; flex-direction:column; gap:18px; overflow-y:auto; min-height:0; }
+  #start { padding:14px; font-size:17px; font-weight:600; background:var(--accent,#00e0a4); color:#000; border:none; }
+  body.live { grid-template-columns:1fr; }
+  body.live aside { position:fixed; top:16px; right:16px; width:240px; max-height:calc(100vh - 32px); padding:16px; gap:10px;
+    background:color-mix(in srgb, var(--bg) 88%, transparent); border:1px solid var(--line); border-radius:16px; backdrop-filter:blur(12px); }
+  body.live h1, body.live #url, body.live .modes { display:none; }
+  body.live #code { font-size:24px; } body.live #start { padding:8px; font-size:13px; background:none; color:inherit; border:1px solid var(--line); }
+  body.live.min aside > :not(#bar) { display:none; }
+  #bar { display:none; justify-content:space-between; align-items:center; font-size:13px; } body.live #bar { display:flex; }
+  #bar button { padding:4px 10px; font-size:12px; }
   h1 { margin:0; font-size:28px; letter-spacing:-.02em; }
   #qr { background:#fff; border-radius:16px; padding:14px; width:100%; aspect-ratio:1; }
   #code { font-size:44px; font-weight:700; letter-spacing:.2em; text-align:center; }
@@ -13,7 +23,9 @@
 <body>
   <canvas class="view" id="view"></canvas>
   <aside>
+    <div id="bar"><b>● Live · scan to join</b><button id="min">Hide</button></div>
     <h1>ChipDesigner</h1>
+    <button id="start">Start experience</button>
     <div class="modes"><button data-mode="rack">Server Rack</button><button data-mode="chip">Chip Design</button></div>
     <canvas id="qr"></canvas>
     <div id="code">----</div>
