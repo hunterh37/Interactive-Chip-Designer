@@ -13,7 +13,7 @@ export function stage(canvas, { xr = false } = {}) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: xr });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.xr.enabled = xr;
+  renderer.xr.enabled = true; // host page can also enter immersive-vr on the same scene
   const scene = new THREE.Scene();
   if (!xr) scene.background = new THREE.Color('#000000');
   const pmrem = new THREE.PMREMGenerator(renderer);

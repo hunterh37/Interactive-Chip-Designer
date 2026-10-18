@@ -18,7 +18,20 @@ let st = Math.max(0, STAGES.indexOf(params.get('stage') || 'Join'));
 const cat = monoCatalog(await catalog());
 const room = (params.get('room') || 'DEMO').toUpperCase();
 
-const { world, controls, camera, tick } = stage($('view'));
+const { renderer, world, controls, camera, tick } = stage($('view'));
+// XR: same renderer + scene in immersive-vr at 1:1 metres; viewer starts 2.6 m back from the scene origin.
+{
+  const b = $('xrbtn'); let sess = null;
+  const ok = navigator.xr ? navigator.xr.isSessionSupported('immersive-vr').catch(() => false) : Promise.resolve(false);
+  b.onclick = async () => {
+    if (sess) return sess.end();
+    if (!(await ok)) { b.textContent = 'XR n/a'; b.disabled = true; return; }
+    sess = await navigator.xr.requestSession('immersive-vr', { optionalFeatures: ['local-floor'] });
+    renderer.xr.setReferenceSpaceType('local-floor');
+    await renderer.xr.setSession(sess); world.position.set(0, 0, -2.6); b.textContent = 'Exit XR';
+    sess.addEventListener('end', () => { sess = null; world.position.set(0, 0, 0); b.textContent = 'XR'; });
+  };
+}
 realityHDProps(world);
 const field = asciiField($('field'), { alpha: 0.16 });
 let localAt = 0, last = null, view = '', leader = null, seen = new Set(), t0 = 0;
