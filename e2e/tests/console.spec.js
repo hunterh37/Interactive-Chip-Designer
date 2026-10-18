@@ -8,7 +8,7 @@ test('no console errors on host, join, xr pages and reset', async ({ page }) => 
   await resetLobby(page);
   await page.locator('[data-mode=chip]').click();
   await page.waitForTimeout(1500);
-  for (const u of ['/join.html?room=DEMO&mode=rack', '/join.html?room=DEMO&mode=chip', '/xr.html?room=DEMO&mode=rack']) {
+  for (const u of ['/join.html?room=DEMO&mode=rack', '/join.html?room=DEMO&mode=chip', '/xr.html?room=DEMO']) {
     await page.goto(u);
     await page.waitForTimeout(2500);
   }

@@ -42,3 +42,21 @@ test('chip paint, tapeout, lobby reset', () => {
   assert.deepEqual(s.racks, {});
   assert.equal(s.chip.cells[0], null);
 });
+
+test('personal chip challenge: paint, score gates, tapeout locks, name propagates', async () => {
+  const { newState, apply, snapshot } = await import('./rooms.js');
+  const s = newState(); s.players.p1 = { name: 'x', kind: 'phone' };
+  assert.equal(apply(s, { type: 'player.name', name: 'Ada' }, 'p1'), null);
+  assert.equal(apply(s, { type: 'my.tapeout' }, 'p1'), 'empty die');
+  for (let i = 0; i < 10; i++) apply(s, { type: 'my.paint', cell: i, block: 'tensor' }, 'p1');
+  const before = snapshot(s).chips.p1.result;
+  assert.equal(before.effective, 0); // no memory bandwidth
+  apply(s, { type: 'my.paint', cell: 10, block: 'hbm' }, 'p1');
+  apply(s, { type: 'my.paint', cell: 11, block: 'io' }, 'p1');
+  apply(s, { type: 'my.paint', cell: 12, block: 'cpu' }, 'p1');
+  const r = snapshot(s).chips.p1.result;
+  assert.ok(r.score > 0 && r.checks.power && r.checks.io);
+  assert.equal(apply(s, { type: 'my.tapeout' }, 'p1'), null);
+  assert.equal(apply(s, { type: 'my.paint', cell: 20, block: 'sram' }, 'p1'), 'already taped out');
+  assert.equal(snapshot(s).chips.p1.owner, 'Ada');
+});

@@ -1,29 +1,144 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#000000">
 <title>ChipDesigner</title><link rel="stylesheet" href="/src/style.css">
 <style>
-  body { display:flex; flex-direction:column; height:100dvh; }
-  #view { height:42dvh; flex:none; }
-  header { display:flex; gap:8px; padding:10px 16px; border-bottom:1px solid var(--line); align-items:center; }
-  header .sp { flex:1; }
-  main { flex:1; overflow:auto; padding:12px 16px 24px; }
-  .tabs { display:flex; gap:8px; margin-bottom:12px; } .tabs button { flex:1; }
+  body { height:100dvh; overflow:hidden; }
+  #field { position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:0; }
+  .screen { position:fixed; inset:0; z-index:1; display:none; flex-direction:column; padding:max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom)); }
+  .screen.on { display:flex; animation:in .35s ease-out; }
+  @keyframes in { from { opacity:0; transform:translateY(6px); } }
+  .top { display:flex; justify-content:space-between; align-items:center; min-height:24px; }
+  .sp { flex:1; }
+  .logo { font-size:clamp(14px, 5vw, 22px); }
+  .big { font-size:clamp(40px, 16vw, 84px); font-weight:300; letter-spacing:-.04em; line-height:.95; font-variant-numeric:tabular-nums; }
+  .h { font-size:22px; font-weight:400; letter-spacing:-.01em; margin:0; }
+  .stack { display:flex; flex-direction:column; gap:10px; }
+  .opt { display:flex; justify-content:space-between; align-items:center; text-align:left; padding:22px 16px; font-size:13px; }
+  .opt b { font-weight:400; color:var(--mute); }
+  .actions { display:flex; gap:8px; flex:none; } .actions button { flex:1; padding:14px; }
+
+  /* design screen */
+  #s-design { padding-top:max(12px, env(safe-area-inset-top)); gap:8px; overflow-y:auto; }
+  #chipview { height:19dvh; margin:0 -20px; flex:none; position:relative; }
+  #chipview canvas { width:100%; height:100%; display:block; }
+  #timer { font-size:28px; font-weight:300; font-variant-numeric:tabular-nums; }
+  #timer.low { animation:blink .5s steps(1) infinite; }
+  .meters { display:grid; grid-template-columns:auto 1fr auto; gap:3px 10px; font-size:11px; align-items:center; }
+  .meters pre { font-size:10px; letter-spacing:0; color:var(--fg); }
+  .checks { display:flex; gap:12px; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--mute); flex-wrap:wrap; }
+  .checks .ok { color:var(--fg); }
+  .pal { display:grid; grid-template-columns:repeat(6, 1fr); gap:4px; }
+  .pal button { padding:6px 0; display:flex; flex-direction:column; align-items:center; gap:3px; font-size:9px; letter-spacing:.08em; }
+  .pal button i { font-style:normal; font-size:16px; letter-spacing:0; }
+  .grid { display:grid; grid-template-columns:repeat(8, 1fr); gap:2px; touch-action:none; user-select:none; flex:none; width:min(100%, 36dvh); align-self:center; }
+  .grid div { aspect-ratio:1; border:1px solid var(--line); display:grid; place-items:center; font-size:clamp(12px, 4vw, 20px); color:var(--dim); transition:background .12s; }
+  .grid div.f { color:#000; }
+  .grid div.pop { animation:pop .25s ease-out; }
+  @keyframes pop { 0% { transform:scale(.7); } 100% { transform:scale(1); } }
+
+  /* fab + result */
+  #fablog { font-size:12px; line-height:1.9; }
+  #fablog .done::after { content:'  OK'; color:var(--mute); }
+  pre.ascii.die { font-size:clamp(12px, 3.6vw, 16px); line-height:1.15; color:#cfcfcf; }
+  .kv { display:grid; grid-template-columns:1fr auto; gap:0; }
+
+  /* rack builder */
+  #s-rack, #s-room { padding:0; }
+  .full3d { position:absolute; inset:0; }
+  .sheet { position:absolute; left:0; right:0; bottom:0; max-height:62dvh; display:flex; flex-direction:column; background:rgba(0,0,0,.92);
+    border-top:1px solid var(--dim); backdrop-filter:blur(10px); transition:transform .3s cubic-bezier(.2,.8,.2,1); padding-bottom:env(safe-area-inset-bottom); }
+  .sheet.min { transform:translateY(calc(100% - 52px)); }
+  .handle { flex:none; height:52px; display:flex; align-items:center; justify-content:space-between; padding:0 20px; border:none; border-bottom:1px solid var(--line); width:100%; }
+  .handle::before { content:''; position:absolute; left:50%; top:7px; width:36px; height:3px; margin-left:-18px; background:var(--dim); }
+  #rackui, #roominfo { flex:1; overflow:auto; padding:12px 20px 24px; }
+  .hud { position:absolute; inset:max(12px, env(safe-area-inset-top)) 20px auto; display:flex; justify-content:space-between; align-items:center; z-index:2; }
   .item { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line); }
-  .item .sw { width:10px; height:28px; border-radius:3px; flex:none; }
-  .item .n { flex:1; font-size:14px; } .item .p { font-size:12px; }
-  .bar { position:sticky; bottom:0; background:var(--bg); padding-top:10px; display:flex; gap:8px; }
-  .bar button { flex:1; }
-  body.full main { display:none; } body.full #view { flex:1; height:auto; }
-  .grid { display:grid; grid-template-columns:repeat(8,1fr); gap:3px; margin:10px 0; }
-  .grid div { aspect-ratio:1; border-radius:4px; background:#2a2d33; }
-  .pal { display:flex; flex-wrap:wrap; gap:6px; } .pal button { padding:6px 10px; font-size:13px; }
-  input[type=color] { width:44px; height:36px; border:none; background:none; }
+  .item .n { flex:1; font-size:12px; } .item .p { font-size:10px; margin-top:2px; }
+  .chips { display:flex; flex-wrap:wrap; gap:4px; margin:10px 0; } .chips button { padding:7px 10px; font-size:10px; }
+  .bar { position:sticky; bottom:0; background:var(--bg); padding-top:10px; display:flex; gap:8px; } .bar button, .bar div { flex:1; padding:14px; }
+  input[type=color] { width:34px; height:28px; border:1px solid var(--dim); background:none; padding:0; }
 </style></head>
 <body>
-  <canvas class="view" id="view"></canvas>
-  <header><b id="room"></b><span class="mute stat" id="sum"></span><span class="sp"></span>
-    <button id="full">Full view</button><button id="ar">View in AR</button></header>
-  <main id="ui"></main>
-  <a id="ql" rel="ar" style="display:none"><img></a>
+  <canvas id="field"></canvas>
+
+  <section class="screen on" id="s-intro">
+    <div class="top"><span class="label" id="roomlbl">Room ----</span><span class="label" id="live"></span></div>
+    <div class="sp"></div>
+    <pre class="ascii logo" id="logo"></pre>
+    <div style="height:48px"></div>
+    <label class="label" for="name">Operator name</label>
+    <input type="text" id="name" maxlength="16" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ADA">
+    <div style="height:20px"></div>
+    <button class="primary" id="enter" style="padding:18px">Enter</button>
+  </section>
+
+  <section class="screen" id="s-menu">
+    <div class="top"><span class="label" id="who"></span><span class="label" id="live2"></span></div>
+    <div class="sp"></div>
+    <div class="stack">
+      <span class="label">Select program</span>
+      <button class="opt" id="go-chip"><span>01 / Chip challenge</span><b>→</b></button>
+      <button class="opt" id="go-rack"><span>02 / Rack builder</span><b>→</b></button>
+    </div>
+  </section>
+
+  <section class="screen" id="s-brief">
+    <div class="top"><button id="brief-back">←</button><span class="label">Brief</span></div>
+    <div class="sp"></div>
+    <h2 class="h">Tape out the fastest AI accelerator in the room.</h2>
+    <div style="height:24px"></div>
+    <div class="kv" id="spec"></div>
+    <div style="height:24px"></div>
+    <p class="mute" style="margin:0;line-height:1.6">Compute is capped by memory bandwidth. Feed tensor cores with HBM4 and SRAM. Stay inside the power budget.</p>
+    <div style="height:28px"></div>
+    <button class="primary" id="begin" style="padding:18px">Begin · 120 s</button>
+  </section>
+
+  <section class="screen" id="s-design">
+    <div class="top"><span class="label" id="dname">Die</span><span id="timer">2:00</span></div>
+    <div id="chipview"><canvas class="view" id="view"></canvas></div>
+    <div class="meters" id="meters"></div>
+    <div class="checks" id="checks"></div>
+    <div class="pal" id="pal"></div>
+    <div class="grid" id="grid"></div>
+    <div class="err" id="err"></div>
+    <div class="sp"></div>
+    <div class="actions"><button id="clear">Clear</button><button class="primary" id="tape">Tape out</button></div>
+  </section>
+
+  <section class="screen" id="s-fab">
+    <div class="top"><span class="label">Fab</span><span class="label">TSMC N2</span></div>
+    <div class="sp"></div>
+    <div id="fablog"></div>
+    <div class="sp"></div>
+  </section>
+
+  <section class="screen" id="s-result">
+    <div class="top"><span class="label">Result</span><span class="label" id="rank"></span></div>
+    <div style="height:24px"></div>
+    <span class="label">Score</span>
+    <div class="big" id="score">0</div>
+    <div style="height:20px"></div>
+    <pre class="ascii die" id="die"></pre>
+    <div style="height:16px"></div>
+    <div class="kv" id="stats"></div>
+    <div class="sp"></div>
+    <div class="actions"><button id="again">Again</button><button id="tomenu">Menu</button><button class="primary" id="toroom">Room</button></div>
+  </section>
+
+  <section class="screen" id="s-rack">
+    <canvas class="view full3d" id="rackview"></canvas>
+    <div class="hud"><button id="rack-back">←</button><span class="label stat" id="sum"></span><button id="rack-room">Room</button></div>
+    <div class="sheet" id="racksheet"><button class="handle" id="rackhandle"><span class="label">Configure</span><span class="label" id="rackhint">Hide ↓</span></button><div id="rackui"></div></div>
+    <a id="ql" rel="ar" style="display:none"><img></a>
+  </section>
+
+  <section class="screen" id="s-room">
+    <canvas class="view full3d" id="roomview"></canvas>
+    <div class="hud"><button id="room-back">←</button><span class="label" id="roomcount"></span><span></span></div>
+    <div class="sheet min" id="roomsheet"><button class="handle" id="roomhandle"><span class="label" id="roomtitle">Tap a rack</span><span class="label" id="roomhint">Show ↑</span></button><div id="roominfo"></div></div>
+  </section>
+
   <script type="module" src="/src/join.js"></script>
 </body></html>

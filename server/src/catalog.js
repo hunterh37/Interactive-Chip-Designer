@@ -45,6 +45,18 @@ export function rackTotals(state) {
   return { u, capacity: r.u, kw: +kw.toFixed(2), price };
 }
 
+/** Challenge score for a personal die. Compute is capped by memory bandwidth; power and I/O are hard gates. */
+export const CHALLENGE = { watts: 1000, bwPerHBM: 900, bwPerSRAM: 150 };
+export function chipScore(chip) {
+  const t = chipTotals(chip), n = id => chip.cells.filter(c => c === id).length;
+  const bw = n('hbm') * CHALLENGE.bwPerHBM + n('sram') * CHALLENGE.bwPerSRAM;
+  const effective = Math.min(t.tflops, bw);
+  const checks = { power: t.watts <= CHALLENGE.watts, memory: n('hbm') > 0, io: n('io') > 0, control: n('cpu') > 0 };
+  const passed = Object.values(checks).filter(Boolean).length;
+  const score = Math.round(effective * (checks.power ? 1 : 0.4) * (0.55 + 0.15 * (passed - (checks.power ? 1 : 0))));
+  return { ...t, bandwidth: bw, effective, checks, score };
+}
+
 export function chipTotals(chip) {
   const cell = DIE.reticleMM2 / (DIE.cols * DIE.rows);
   let tflops = 0, w = 0, used = 0;

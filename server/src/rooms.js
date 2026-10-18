@@ -1,4 +1,4 @@
-import { component, rack, rackTotals, chipTotals, DIE, CHIP_BLOCKS } from './catalog.js';
+import { component, rack, rackTotals, chipTotals, chipScore, DIE, CHIP_BLOCKS } from './catalog.js';
 
 const COLORS = /^#[0-9a-f]{6}$/i;
 export const newRoomCode = () => Array.from({ length: 4 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.floor(Math.random() * 24)]).join('');
@@ -8,6 +8,8 @@ export function newState() {
     racks: {}, // playerId -> rack; one rack per phone player, all shown in one server room
     chip: { name: 'HACK-1', cells: Array(DIE.cols * DIE.rows).fill(null), taped: false },
     players: {},
+    chips: {}, // playerId -> personal challenge die
+    show: { stage: 0, mode: 'chip' }, // presenter state shared by desktop host and WebXR
     started: null, // ms timestamp once the host starts the experience; joins stay open
     rev: 0,
   };
@@ -18,6 +20,8 @@ export const newRack = owner => ({ owner, rackId: 'apc-ar3300', frame: '#1c1d20'
 
 export function apply(s, op, playerId) {
   if (op.type.startsWith('rack.') && !s.racks[playerId]) s.racks[playerId] = newRack(s.players[playerId]?.name ?? 'guest');
+  if (op.type.startsWith('my.') && !s.chips[playerId]) s.chips[playerId] = { owner: s.players[playerId]?.name ?? 'guest', cells: Array(DIE.cols * DIE.rows).fill(null), taped: false, at: null };
+  const c = s.chips[playerId];
   const r = s.racks[playerId];
   switch (op.type) {
     case 'rack.add': {
@@ -44,9 +48,27 @@ export function apply(s, op, playerId) {
       if (op.cell < 0 || op.cell >= s.chip.cells.length) return 'bad cell';
       if (op.block !== null && !CHIP_BLOCKS.some(b => b.id === op.block)) return 'unknown block';
       s.chip.cells[op.cell] = op.block; s.chip.taped = false; break;
-    case 'lobby.reset': s.racks = {}; s.chip = newState().chip; s.started = null; break;
+    case 'player.name': {
+      const n = String(op.name || '').trim().slice(0, 16); if (!n) return 'name required';
+      if (s.players[playerId]) s.players[playerId].name = n;
+      if (s.racks[playerId]) s.racks[playerId].owner = n; if (s.chips[playerId]) s.chips[playerId].owner = n; break;
+    }
+    case 'my.paint':
+      if (c.taped) return 'already taped out';
+      if (op.cell < 0 || op.cell >= c.cells.length) return 'bad cell';
+      if (op.block !== null && !CHIP_BLOCKS.some(b => b.id === op.block)) return 'unknown block';
+      c.cells[op.cell] = op.block; break;
+    case 'my.clear': c.cells.fill(null); c.taped = false; c.at = null; break;
+    case 'my.tapeout':
+      if (!c.cells.some(Boolean)) return 'empty die';
+      c.taped = true; c.at = Date.now(); break;
+    case 'lobby.reset': s.chips = {}; s.racks = {}; s.chip = newState().chip; s.started = null; s.show = { stage: 0, mode: s.show?.mode ?? 'chip' }; break;
     case 'lobby.start': s.started ??= Date.now(); break;
     case 'lobby.stop': s.started = null; break;
+    case 'show.set': {
+      const st = Math.max(0, Math.min(2, op.stage | 0)), md = op.mode === 'rack' ? 'rack' : 'chip';
+      s.show = { stage: st, mode: md }; s.started = st > 0 ? (s.started ?? Date.now()) : null; break;
+    }
     case 'chip.clear': s.chip.cells.fill(null); s.chip.taped = false; break;
     case 'chip.tapeout':
       if (!s.chip.cells.some(Boolean)) return 'empty die';
@@ -61,5 +83,6 @@ export function snapshot(s) {
   const racks = Object.fromEntries(Object.entries(s.racks).map(([id, r]) => [id, { ...r, totals: rackTotals(r) }]));
   const all = Object.values(racks).map(r => r.totals);
   const room = { racks: all.length, kw: +all.reduce((a, t) => a + t.kw, 0).toFixed(2), price: all.reduce((a, t) => a + t.price, 0), ordered: Object.values(s.racks).filter(r => r.ordered).length };
-  return { ...s, racks, totals: { room, chip: chipTotals(s.chip) } };
+  const chips = Object.fromEntries(Object.entries(s.chips || {}).map(([id, c]) => [id, { ...c, result: chipScore(c) }]));
+  return { ...s, racks, chips, totals: { room, chip: chipTotals(s.chip) } };
 }
