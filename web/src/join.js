@@ -44,7 +44,7 @@ const enter = () => {
   field.pulse(); go('menu');
 };
 $('enter').onclick = enter;
-$('name').onkeydown = e => e.key === 'Enter' && enter();
+$('name').onkeydown = e => { if (e.key === 'Enter') enter(); };
 
 // ── menu
 $('go-chip').onclick = () => { me()?.taped ? go('result') : go('brief'); };
