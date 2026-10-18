@@ -162,7 +162,7 @@ $('toroom').onclick = () => go('room');
 // ── rack builder
 const rackStage = stage($('rackview'));
 rackStage.scene.background = null;
-$('rack-back').onclick = () => go('menu');
+$('rack-back').onclick = () => { rackFitted = false; go('menu'); };
 $('rack-room').onclick = () => go('room');
 const sheet = (id, hint, openTxt = 'Hide ↓', closedTxt = 'Show ↑') => {
   const el = $(id), set = min => { el.classList.toggle('min', min); $(hint).textContent = min ? closedTxt : openTxt; };
@@ -174,16 +174,20 @@ const sheet = (id, hint, openTxt = 'Hide ↓', closedTxt = 'Show ↑') => {
 };
 const rackSheet = sheet('racksheet', 'rackhint');
 // Keep the rack canvas in the open area above the sheet and frame the whole rack in it.
+let rackFitted = false;
 const fitRack = () => {
   const el = $('racksheet'), v = $('rackview');
-  v.style.bottom = (el.classList.contains('min') ? 52 : el.offsetHeight) + 'px';
-  const cam = rackStage.camera, w = v.clientWidth || 1, h = v.clientHeight || 1;
-  const half = THREE.MathUtils.degToRad(cam.fov / 2), need = 1.25; // half of rack height + margin, m
-  const d = Math.max(need / Math.tan(half), need / (Math.tan(half) * (w / h)) * 0.6) + 0.6;
-  const dir = cam.position.clone().sub(rackStage.controls.target).normalize();
-  if (!isFinite(dir.x)) dir.set(0.35, 0.15, 1).normalize();
-  cam.position.copy(rackStage.controls.target).addScaledVector(dir, d);
+  const open = el.classList.contains('min') ? 52 : el.offsetHeight;
+  v.style.top = '60px'; v.style.height = Math.max(120, innerHeight - open - 60) + 'px'; v.style.bottom = 'auto';
   dispatchEvent(new Event('resize'));
+  const obj = rackStage.world.getObjectByName('rack'); if (!obj) return;
+  const box = new THREE.Box3().setFromObject(obj), size = box.getSize(new THREE.Vector3()), c = box.getCenter(new THREE.Vector3());
+  const cam = rackStage.camera, half = THREE.MathUtils.degToRad(cam.fov / 2);
+  const r = size.length() / 2 * 1.15; // bounding sphere + margin
+  const d = Math.max(r / Math.sin(half), r / Math.sin(Math.atan(Math.tan(half) * cam.aspect)));
+  rackStage.controls.target.copy(c);
+  cam.position.copy(c).add(new THREE.Vector3(0.45, 0.2, 1).normalize().multiplyScalar(d));
+  cam.near = d / 100; cam.far = d * 10; cam.updateProjectionMatrix(); rackStage.controls.update?.();
 };
 new ResizeObserver(fitRack).observe($('racksheet'));
 $('racksheet').addEventListener('transitionend', fitRack);
@@ -294,7 +298,7 @@ function renderRoom(force) {
 
 function renderRack() {
   const r = mine(), ui = $('rackui');
-  replace(rackStage.world, 'rack', buildRack(r, cat)); if (rackStage.controls.target.y !== 1) { rackStage.controls.target.set(0, 1, 0); fitRack(); }
+  replace(rackStage.world, 'rack', buildRack(r, cat)); if (!rackFitted) { rackFitted = true; requestAnimationFrame(fitRack); }
   $('sum').textContent = `${r.totals?.u ?? 0}/${r.totals?.capacity ?? 42}U · ${money(r.totals?.price ?? 1890)}`;
   ui.innerHTML = '';
   const frames = el('div', 'chips'); cat.racks.forEach(f => frames.append(btn(f.name, () => send({ type: 'rack.frameType', id: f.id }), r.rackId === f.id ? 'on' : '')));
