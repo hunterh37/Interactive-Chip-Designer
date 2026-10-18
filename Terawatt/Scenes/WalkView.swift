@@ -16,10 +16,19 @@ struct WalkView: View {
                 content.add(hud)
             }
         } attachments: {
-            Attachment(id: "hud") { if store.mode != .fab && store.mode != .training { HUDStrip() } }
+            Attachment(id: "hud") { if store.mode == .twin { TwinHUD() } else if store.mode != .fab && store.mode != .training { HUDStrip() } }
         }
         .task(id: store.sceneKey) {
             training = nil
+            if store.mode == .twin, let tv = store.sceneKey.twin {
+                fab = nil
+                // Walk the focused hall 1:1, standing in the first cold aisle.
+                let h = TwinBuilder.hall(tv.scenario, tv.focus, tv.lens)
+                h.root.position = [0, 0, h.width / 2 - TwinBuilder.coldAisle / 2]
+                root.children.removeAll()
+                root.addChild(h.root)
+                return
+            }
             if store.mode == .training {
                 fab = nil
                 let t = TrainingScene()

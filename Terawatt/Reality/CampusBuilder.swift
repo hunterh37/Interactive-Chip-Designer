@@ -125,10 +125,10 @@ enum CampusBuilder {
 
     private static func shell(L: Float, W: Float, H: Float, roof: Bool) -> Entity {
         let e = Entity()
-        let floor = ModelEntity(mesh: .generateBox(size: [L, 0.1, W]), materials: [SimpleMaterial(color: .white, roughness: 0.9, isMetallic: false)])
+        let floor = ModelEntity(mesh: .generateBox(size: [L, 0.1, W]), materials: [roof ? UnlitMaterial(color: UIColor(white: 0.82, alpha: 1)) : SimpleMaterial(color: .white, roughness: 0.9, isMetallic: false)])
         floor.position.y = -0.05
         e.addChild(floor)
-        let m = SimpleMaterial(color: UIColor(white: 0.92, alpha: roof ? 1 : 0.25), roughness: 0.9, isMetallic: false)
+        let m: Material = roof ? UnlitMaterial(color: UIColor(white: 0.66, alpha: 1)) : SimpleMaterial(color: UIColor(white: 0.92, alpha: 0.25), roughness: 0.9, isMetallic: false)
         let t: Float = 0.3
         for (size, pos) in [
             (SIMD3<Float>(L, H, t), SIMD3<Float>(0, H / 2, -W / 2)), (SIMD3<Float>(L, H, t), SIMD3<Float>(0, H / 2, W / 2)),

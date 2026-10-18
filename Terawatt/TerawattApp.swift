@@ -32,6 +32,10 @@ struct TerawattApp: App {
             InspectorView().environment(store)
         }
         .defaultSize(width: 420, height: 640)
+        .defaultWindowPlacement { content, context in
+            if let home = context.windows.first(where: { $0.id == SceneID.home }) { return WindowPlacement(.trailing(home)) }
+            return WindowPlacement()
+        }
 
         WindowGroup(id: SceneID.tabletop) {
             TabletopView().environment(store)
