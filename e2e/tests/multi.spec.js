@@ -27,9 +27,10 @@ test('two guests: live count, chip dies on host, leaderboard, racks in shared ro
 
   await host.locator('[data-mode=rack]').click();
   for (const [p, c, n] of [[a, 'gpu', 'DGX B200'], [b, 'network', 'QM9700']]) {
-    await p.locator('#tomenu').click(); await p.locator('#go-rack').click(); await addPart(p, c, n);
+    await expect(p.locator('#s-rack.on')).toBeVisible(); await addPart(p, c, n);
   }
   await expect(statRow(host, 'Racks')).toHaveText('2');
+  await a.getByRole('button', { name: /Next · Paint/ }).click();
   await a.getByRole('button', { name: /^Purchase/ }).click();
   await expect(a.locator('#s-room.on')).toBeVisible();
   await expect(a.locator('#roomcount')).toContainText('2 racks');

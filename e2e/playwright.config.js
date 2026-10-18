@@ -16,6 +16,7 @@ export default defineConfig({
     { name: 'iphone-15', testMatch: /phone\.spec\.js/, use: { ...devices['iPhone 15'] } },
     { name: 'pixel-7', testMatch: /phone\.spec\.js/, use: { ...devices['Pixel 7'] } },
     { name: 'multi', testMatch: /multi\.spec\.js/, use: { ...devices['Desktop Chrome'] } },
+    { name: 'paint6', testMatch: /paint6\.spec\.js/, use: { ...devices['Desktop Chrome'] } },
     { name: 'console-desktop', testMatch: /console\.spec\.js/, use: { ...devices['Desktop Chrome'] } },
   ],
 });

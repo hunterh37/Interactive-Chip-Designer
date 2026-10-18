@@ -1,6 +1,7 @@
 import http from 'node:http';
 import { WebSocketServer } from 'ws';
 import { RACKS, COMPONENTS, CHIP_BLOCKS, DIE } from './catalog.js';
+import { PAINT_PARTS, DESIGNS } from './rooms.js';
 import { newState, apply, snapshot } from './rooms.js';
 
 const PORT = process.env.PORT || 8787;
@@ -22,7 +23,7 @@ const server = http.createServer((req, res) => {
   const url = new URL(req.url, 'http://x');
   if (req.method === 'OPTIONS') return json(res, 204, {});
   if (url.pathname === '/healthz') return json(res, 200, { ok: true, rooms: rooms.size });
-  if (url.pathname === '/api/catalog') return json(res, 200, { racks: RACKS, components: COMPONENTS, chipBlocks: CHIP_BLOCKS, die: DIE });
+  if (url.pathname === '/api/catalog') return json(res, 200, { racks: RACKS, components: COMPONENTS, chipBlocks: CHIP_BLOCKS, die: DIE, paintParts: PAINT_PARTS, designs: DESIGNS });
   if (url.pathname === '/api/rooms' && req.method === 'POST') {
     const code = 'DEMO'; room(code);
     return json(res, 200, { code, joinUrl: `${WEB_URL}/join.html?room=${code}` });

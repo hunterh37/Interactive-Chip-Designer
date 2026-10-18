@@ -60,3 +60,17 @@ test('personal chip challenge: paint, score gates, tapeout locks, name propagate
   assert.equal(apply(s, { type: 'my.paint', cell: 20, block: 'sram' }, 'p1'), 'already taped out');
   assert.equal(snapshot(s).chips.p1.owner, 'Ada');
 });
+
+test('paint parts and side design sync into rack state', () => {
+  const s = newState(); join(s, 'a');
+  assert.equal(apply(s, { type: 'rack.paint', parts: { sides: '#FF0000', door: '#00ff00' } }, 'a'), null);
+  assert.equal(s.racks.a.paint.sides, '#ff0000');
+  assert.equal(apply(s, { type: 'rack.paint', part: 'frame', color: '#123456' }, 'a'), null);
+  assert.equal(s.racks.a.frame, '#123456');
+  assert.equal(apply(s, { type: 'rack.paint', part: 'bogus', color: '#123456' }, 'a'), 'unknown part');
+  assert.equal(apply(s, { type: 'rack.paint', part: 'top', color: 'red' }, 'a'), 'bad color');
+  assert.equal(apply(s, { type: 'rack.paint', part: 'bezel', color: '' }, 'a'), null);
+  assert.equal(apply(s, { type: 'rack.design', design: 'flames', ink: '#ff8800' }, 'a'), null);
+  assert.equal(snapshot(s).racks.a.paint.design, 'flames');
+  assert.equal(apply(s, { type: 'rack.design', design: 'skulls' }, 'a'), 'unknown design');
+});

@@ -1,6 +1,6 @@
 import { catalog, connect } from './net.js';
 import * as THREE from 'three';
-import { stage, buildRack, buildChip, buildRoom, replace, emptyRack, realityHDProps } from './scene.js';
+import { stage, buildRack, buildChip, buildRoom, replace, emptyRack, realityHDProps, paintOf } from './scene.js';
 import { monoCatalog, BLOCK_STYLE, bar, scramble, asciiField, asciiDie, LOGO } from './ascii.js';
 import { USDZExporter } from 'three/examples/jsm/exporters/USDZExporter.js';
 
@@ -162,7 +162,7 @@ $('toroom').onclick = () => go('room');
 // ── rack builder
 const rackStage = stage($('rackview'));
 rackStage.scene.background = null;
-$('rack-back').onclick = () => { rackFitted = false; lastSlots = -1; go('menu'); };
+$('rack-back').onclick = () => { rackFitted = false; lastSlots = -1; rackUiSig = ''; go('menu'); };
 $('rack-room').onclick = () => go('room');
 const sheet = (id, hint, openTxt = 'Hide ↓', closedTxt = 'Show ↑') => {
   const el = $(id), set = min => { el.classList.toggle('min', min); $(hint).textContent = min ? closedTxt : openTxt; };
@@ -231,7 +231,28 @@ $('roomview').addEventListener('pointerup', e => {
 });
 const mine = () => s?.racks?.[pid] ?? emptyRack();
 
+// Host owns the active program (s.show.mode). Guests see only that one and follow switches.
+const CHIP_SCREENS = ['brief', 'design', 'fab', 'result'], RACK_SCREENS = ['rack', 'room'];
+let shownMode = null;
+function followMode() {
+  const m = s?.show?.mode === 'rack' ? 'rack' : 'chip';
+  $('go-chip').hidden = m !== 'chip'; $('go-rack').hidden = m !== 'rack';
+  if ($('toroom')) $('toroom').hidden = m !== 'rack';
+  $('menulbl') && ($('menulbl').textContent = m === 'rack' ? 'Now playing · Rack builder' : 'Now playing · Chip challenge');
+  if (m === shownMode) return false;
+  const first = shownMode === null; shownMode = m;
+  if (screen === 'intro') return false;
+  const wrong = m === 'rack' ? CHIP_SCREENS.includes(screen) : RACK_SCREENS.includes(screen);
+  if (wrong || (screen === 'menu' && !first)) {
+    if (screen === 'fab') return false; // let the tape-out animation finish
+    if (m === 'rack') { rackFitted = false; lastSlots = -1; rackUiSig = ''; go('rack'); } else go(me()?.taped ? 'result' : 'brief');
+    return true;
+  }
+  return false;
+}
+
 function render() {
+  if (followMode()) return;
   const live = s?.started ? '● Live' : 'Lobby';
   $('live').textContent = live; $('live2').textContent = live;
   $('who').textContent = name || '';
@@ -312,30 +333,71 @@ function renderRoom(force) {
     + (Object.entries(comp).map(([id, k]) => `<div class="row"><span>${cat.components.find(c => c.id === id)?.name ?? id}</span><span class="stat">× ${k}</span></div>`).join('') || '<div class="row mute"><span>Empty</span></div>');
 }
 
+// Rack customizer: step 1 components, step 2 paint. Paint UI is rebuilt only when its structure changes so
+// color pickers stay open while other players' updates stream in.
+const SWATCHES = ['#1c1d20', '#f2f2f2', '#8a8f98', '#ff3b30', '#ff9500', '#ffd60a', '#34c759', '#00e0a4', '#0a84ff', '#5e5ce6', '#bf5af2', '#ff2d92'];
+const PARTS = [['frame', 'Frame'], ['sides', 'Sides'], ['top', 'Top'], ['door', 'Door'], ['rails', 'Rails'], ['chassis', 'Chassis'], ['bezel', 'Bezels'], ['led', 'LEDs']];
+const DESIGNS = ['none', 'stripes', 'chevron', 'circuit', 'flames', 'grid', 'dots'];
+let rackStep = 'parts', paintPart = 'sides', rackUiSig = '';
+const throttle = (fn, ms = 70) => { let t = 0, last; return v => { last = v; if (t) return; t = setTimeout(() => { t = 0; fn(last); }, ms); }; };
+const sendPaint = throttle(([part, color]) => send({ type: 'rack.paint', part, color }));
+const sendInk = throttle(ink => send({ type: 'rack.design', ink }));
+
 function renderRack() {
-  const r = mine(), ui = $('rackui');
+  const r = mine(), ui = $('rackui'), p = paintOf(r);
   const built = buildRack(r, cat); replace(rackStage.world, 'rack', built);
   if (r.slots.length > lastSlots && lastSlots >= 0) slideIn(built.children.find(o => o.userData.slot === r.slots.length - 1));
   lastSlots = r.slots.length;
   if (!rackFitted) { rackFitted = true; requestAnimationFrame(fitRack); }
   $('sum').textContent = `${r.totals?.u ?? 0}/${r.totals?.capacity ?? 42}U · ${money(r.totals?.price ?? 1890)}`;
+  const sig = JSON.stringify([rackStep, tab, paintPart, r.rackId, r.slots.map(x => x.id), !!r.ordered, r.totals?.price, rackStep === 'paint' ? p : 0]);
+  if (sig === rackUiSig) return; rackUiSig = sig;
   ui.innerHTML = '';
+  const steps = el('div', 'steps');
+  steps.append(btn('1 · Components', () => { rackStep = 'parts'; render(); }, rackStep === 'parts' ? 'on' : ''), btn('2 · Paint', () => { rackStep = 'paint'; render(); }, rackStep === 'paint' ? 'on' : ''));
+  ui.append(steps, Object.assign(el('div', 'err'), { id: 'rerr' }));
+  if (rackStep === 'paint') renderPaint(ui, p); else renderParts(ui, r);
+  const b = el('div', 'bar');
+  b.append(btn('AR', ar), rackStep === 'parts' ? btn('Next · Paint →', () => { rackStep = 'paint'; render(); })
+    : r.ordered ? btn('View room', () => go('room'), 'primary') : btn(`Purchase ${money(r.totals?.price ?? 1890)}`, () => { send({ type: 'rack.order' }); pendingRoom = true; }, 'primary'));
+  if (pendingRoom && r.ordered) { pendingRoom = false; picked = pid; setTimeout(() => go('room'), 700); }
+  ui.append(b);
+}
+
+function renderParts(ui, r) {
   const frames = el('div', 'chips'); cat.racks.forEach(f => frames.append(btn(f.name, () => send({ type: 'rack.frameType', id: f.id }), r.rackId === f.id ? 'on' : '')));
-  const colors = el('div', 'item');
-  colors.append(el('span', 'n', 'Frame / accent'), colorIn(r.frame, v => send({ type: 'rack.color', frame: v })), colorIn(r.accent, v => send({ type: 'rack.color', accent: v })));
   const cats = el('div', 'chips');
   [...new Set(cat.components.map(c => c.cat))].forEach(c => cats.append(btn(c, () => { tab = c; render(); }, tab === c ? 'on' : '')));
-  ui.append(frames, colors, cats, Object.assign(el('div', 'err'), { id: 'rerr' }));
+  ui.append(frames, cats);
   cat.components.filter(c => c.cat === tab).forEach(c => {
     const it = el('div', 'item'); const n = el('div', 'n', c.name); n.append(el('div', 'p mute', `${c.u}U · ${c.kw} kW · ${money(c.price)}`));
     it.append(n, btn('Add', () => send({ type: 'rack.add', id: c.id }))); ui.append(it);
   });
   ui.append(Object.assign(el('div', 'label', `In rack · ${r.slots.length}`), { style: 'margin-top:16px' }));
   r.slots.forEach((sl, i) => { const c = cat.components.find(x => x.id === sl.id); const it = el('div', 'item'); it.append(el('span', 'n', c.name), btn('Remove', () => send({ type: 'rack.remove', index: i }))); ui.append(it); });
-  const b = el('div', 'bar');
-  b.append(btn('AR', ar), r.ordered ? btn('View room', () => go('room'), 'primary') : btn(`Purchase ${money(r.totals?.price ?? 1890)}`, () => { send({ type: 'rack.order' }); pendingRoom = true; }, 'primary'));
-  if (pendingRoom && r.ordered) { pendingRoom = false; picked = pid; setTimeout(() => go('room'), 700); }
-  ui.append(b);
+}
+
+function swatchRow(current, pick, extra) {
+  const row = el('div', 'swatches');
+  if (extra) row.append(extra);
+  SWATCHES.forEach(c => { const b = btn('', () => pick(c), current === c ? 'sw on' : 'sw'); b.style.background = c; b.dataset.c = c; b.setAttribute('aria-label', c); row.append(b); });
+  const custom = colorIn(current || '#888888', pick); custom.oninput = () => pick(custom.value, true); custom.className = 'swc'; row.append(custom);
+  return row;
+}
+
+function renderPaint(ui, p) {
+  ui.append(el('div', 'label', 'Part'));
+  const parts = el('div', 'chips parts');
+  PARTS.forEach(([k, l]) => { const b = btn('', () => { paintPart = k; render(); }, paintPart === k ? 'on' : ''); b.dataset.part = k;
+    const dot = el('i', 'dot'); dot.style.background = p[k] || '#888'; b.append(dot, document.createTextNode(l)); parts.append(b); });
+  const live = (c, drag) => { if (drag) sendPaint([paintPart, c]); else send({ type: 'rack.paint', part: paintPart, color: c }); };
+  const orig = paintPart === 'bezel' ? btn('Orig', () => send({ type: 'rack.paint', part: 'bezel', color: '' }), p.bezel === '' ? 'sw txt on' : 'sw txt') : null;
+  ui.append(parts, swatchRow(p[paintPart], live, orig));
+  const all = el('div', 'chips');
+  all.append(btn('Body all this color', () => { const c = p[paintPart] || '#1c1d20'; send({ type: 'rack.paint', parts: { frame: c, sides: c, top: c, door: c } }); }));
+  ui.append(all, Object.assign(el('div', 'label', 'Side design'), { style: 'margin-top:14px' }));
+  const ds = el('div', 'chips designs'); DESIGNS.forEach(d => { const b = btn(d, () => send({ type: 'rack.design', design: d }), p.design === d ? 'on' : ''); b.dataset.design = d; ds.append(b); });
+  ui.append(ds, el('div', 'label', 'Design ink'), swatchRow(p.ink, (c, drag) => drag ? sendInk(c) : send({ type: 'rack.design', ink: c })));
 }
 
 async function ar() {
@@ -357,5 +419,5 @@ function btn(label, fn, cls = '') { const b = el('button', cls, label); b.onclic
 function colorIn(v, fn) { const i = el('input'); i.type = 'color'; i.value = v; i.onchange = () => fn(i.value); return i; }
 
 // Deep links: ?mode=rack opens the builder directly once a name exists.
-if (name) { send({ type: 'player.name', name }); go(q.get('mode') === 'rack' ? 'rack' : 'menu'); }
+if (name) { send({ type: 'player.name', name }); go('menu'); }
 else setTimeout(() => $('name').focus(), 300);

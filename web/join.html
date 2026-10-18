@@ -67,6 +67,12 @@
   .hud { position:absolute; inset:max(12px, env(safe-area-inset-top)) 20px auto; display:flex; justify-content:space-between; align-items:center; z-index:2; }
   .item { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line); }
   .item .n { flex:1; font-size:12px; } .item .p { font-size:10px; margin-top:2px; }
+  [hidden] { display:none !important; }
+  .steps { display:grid; grid-template-columns:1fr 1fr; gap:4px; margin:4px 0 8px; } .steps button { padding:10px; font-size:11px; }
+  .swatches { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0; align-items:center; }
+  .sw { width:30px; height:30px; padding:0; border:1px solid var(--dim); } .sw.on { outline:2px solid #fff; outline-offset:2px; }
+  .sw.txt { width:auto; padding:0 8px; font-size:10px; } .swc { width:38px; height:32px; padding:0; border:1px solid var(--dim); background:none; }
+  .parts .dot { display:inline-block; width:9px; height:9px; margin-right:6px; border:1px solid var(--dim); vertical-align:-1px; }
   .chips { display:flex; flex-wrap:wrap; gap:4px; margin:10px 0; } .chips button { padding:7px 10px; font-size:10px; }
   .bar { position:sticky; bottom:0; background:var(--bg); padding-top:10px; display:flex; gap:8px; } .bar button, .bar div { flex:1; padding:14px; }
   input[type=color] { width:34px; height:28px; border:1px solid var(--dim); background:none; padding:0; }
@@ -89,7 +95,7 @@
     <div class="top"><span class="label" id="who"></span><span class="label" id="live2"></span></div>
     <div class="sp"></div>
     <div class="stack">
-      <span class="label">Select program</span>
+      <span class="label" id="menulbl">Now playing</span>
       <button class="opt" id="go-chip"><span>01 / Chip challenge</span><b>→</b></button>
       <button class="opt" id="go-rack"><span>02 / Rack builder</span><b>→</b></button>
     </div>

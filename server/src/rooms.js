@@ -16,7 +16,11 @@ export function newState() {
 }
 
 /** Applies one client op to state. Returns error string or null. Pure aside from mutation of `s`. */
-export const newRack = owner => ({ owner, rackId: 'apc-ar3300', frame: '#1c1d20', accent: '#00e0a4', slots: [], ordered: null });
+/** Paintable rack parts and side-panel designs. Colors live in rack.paint; frame/accent mirror paint.frame/paint.led. */
+export const PAINT_PARTS = ['frame', 'sides', 'top', 'door', 'rails', 'chassis', 'bezel', 'led'];
+export const DESIGNS = ['none', 'stripes', 'chevron', 'circuit', 'flames', 'grid', 'dots'];
+export const newPaint = () => ({ frame: '#1c1d20', sides: '#1c1d20', top: '#1c1d20', door: '#1c1d20', rails: '#3a3d44', chassis: '#2a2c31', bezel: '', led: '#00e0a4', design: 'none', ink: '#00e0a4' });
+export const newRack = owner => ({ owner, rackId: 'apc-ar3300', frame: '#1c1d20', accent: '#00e0a4', slots: [], ordered: null, paint: newPaint() });
 
 export function apply(s, op, playerId) {
   if (op.type.startsWith('rack.') && !s.racks[playerId]) s.racks[playerId] = newRack(s.players[playerId]?.name ?? 'guest');
@@ -33,8 +37,23 @@ export function apply(s, op, playerId) {
       if (op.index < 0 || op.index >= r.slots.length) return 'bad index';
       r.slots.splice(op.index, 1); r.ordered = null; break;
     case 'rack.color':
-      if (op.frame && COLORS.test(op.frame)) r.frame = op.frame;
-      if (op.accent && COLORS.test(op.accent)) r.accent = op.accent;
+      r.paint ??= newPaint();
+      if (op.frame && COLORS.test(op.frame)) r.frame = r.paint.frame = op.frame;
+      if (op.accent && COLORS.test(op.accent)) r.accent = r.paint.led = op.accent;
+      break;
+    case 'rack.paint': { // { parts: { sides: '#ff0000', ... } } or { part, color }; bezel '' = per-component color
+      r.paint ??= newPaint();
+      const parts = op.parts ?? { [op.part]: op.color };
+      const keys = Object.keys(parts);
+      if (!keys.length || keys.some(k => !PAINT_PARTS.includes(k))) return 'unknown part';
+      if (keys.some(k => !(COLORS.test(parts[k]) || (k === 'bezel' && parts[k] === '')))) return 'bad color';
+      for (const k of keys) r.paint[k] = parts[k].toLowerCase();
+      r.frame = r.paint.frame; r.accent = r.paint.led; break;
+    }
+    case 'rack.design':
+      r.paint ??= newPaint();
+      if (op.design != null) { if (!DESIGNS.includes(op.design)) return 'unknown design'; r.paint.design = op.design; }
+      if (op.ink != null) { if (!COLORS.test(op.ink)) return 'bad color'; r.paint.ink = op.ink.toLowerCase(); }
       break;
     case 'rack.frameType':
       r.rackId = rack(op.id).id;
