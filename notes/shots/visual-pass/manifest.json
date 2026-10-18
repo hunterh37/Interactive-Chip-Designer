@@ -1,11 +1,11 @@
 {
   "job": "visual-pass",
   "project": "Terawatt",
-  "round": 4,
+  "round": 6,
   "stages": [
     {
       "angle": null,
-      "capturedAt": 1792339292,
+      "capturedAt": 1792339493,
       "file": "01-home.png",
       "flags": [
         "edge-content"
@@ -15,7 +15,7 @@
       "issues": [],
       "params": {},
       "route": "home",
-      "sha": "d345fd497e",
+      "sha": "09fa10013f",
       "stage": "01-home",
       "thumb": ".thumbs/01-home.jpg",
       "title": "home",
@@ -23,7 +23,7 @@
     },
     {
       "angle": null,
-      "capturedAt": 1792339298,
+      "capturedAt": 1792339579,
       "file": "02-inspector.png",
       "flags": [
         "edge-content"
@@ -33,7 +33,7 @@
       "issues": [],
       "params": {},
       "route": "studio/inspector",
-      "sha": "1fae80b0ef",
+      "sha": "0b5dfbe146",
       "stage": "02-inspector",
       "thumb": ".thumbs/02-inspector.jpg",
       "title": "studio/inspector",
@@ -41,7 +41,7 @@
     },
     {
       "angle": null,
-      "capturedAt": 1792339381,
+      "capturedAt": 1792339585,
       "file": "03-tabletop.png",
       "flags": [
         "edge-content"
@@ -51,7 +51,7 @@
       "issues": [],
       "params": {},
       "route": "studio/tabletop",
-      "sha": "2528bc5b98",
+      "sha": "b5fee725b2",
       "stage": "03-tabletop",
       "thumb": ".thumbs/03-tabletop.jpg",
       "title": "studio/tabletop",
@@ -59,7 +59,7 @@
     },
     {
       "angle": null,
-      "capturedAt": 1792339478,
+      "capturedAt": 1792339513,
       "file": "04-walk.png",
       "flags": [
         "crushed-black"
@@ -77,7 +77,7 @@
     },
     {
       "angle": null,
-      "capturedAt": 1792339394,
+      "capturedAt": 1792339522,
       "file": "05-fab1.png",
       "flags": [
         "edge-content"
@@ -87,7 +87,7 @@
       "issues": [],
       "params": {},
       "route": "fab/station/1",
-      "sha": "03be534fe1",
+      "sha": "7192fe94e5",
       "stage": "05-fab1",
       "thumb": ".thumbs/05-fab1.jpg",
       "title": "fab/station/1",
@@ -95,7 +95,7 @@
     },
     {
       "angle": null,
-      "capturedAt": 1792339321,
+      "capturedAt": 1792339527,
       "file": "06-fab6.png",
       "flags": [
         "edge-content"
@@ -105,7 +105,7 @@
       "issues": [],
       "params": {},
       "route": "fab/station/6",
-      "sha": "32d16e284d",
+      "sha": "ad9fc00411",
       "stage": "06-fab6",
       "thumb": ".thumbs/06-fab6.jpg",
       "title": "fab/station/6",
@@ -113,7 +113,7 @@
     },
     {
       "angle": null,
-      "capturedAt": 1792339326,
+      "capturedAt": 1792339533,
       "file": "07-fab12.png",
       "flags": [
         "edge-content"
@@ -123,7 +123,7 @@
       "issues": [],
       "params": {},
       "route": "fab/station/12",
-      "sha": "b84de1ae97",
+      "sha": "a4500fc86c",
       "stage": "07-fab12",
       "thumb": ".thumbs/07-fab12.jpg",
       "title": "fab/station/12",
@@ -131,7 +131,7 @@
     },
     {
       "angle": null,
-      "capturedAt": 1792339332,
+      "capturedAt": 1792339539,
       "file": "08-floorplan.png",
       "flags": [
         "edge-content"
@@ -141,7 +141,7 @@
       "issues": [],
       "params": {},
       "route": "chip/floorplan",
-      "sha": "71e5de257d",
+      "sha": "5fa891e4ae",
       "stage": "08-floorplan",
       "thumb": ".thumbs/08-floorplan.jpg",
       "title": "chip/floorplan",
@@ -149,7 +149,7 @@
     },
     {
       "angle": null,
-      "capturedAt": 1792339337,
+      "capturedAt": 1792339545,
       "file": "09-package.png",
       "flags": [
         "edge-content"
@@ -159,7 +159,7 @@
       "issues": [],
       "params": {},
       "route": "chip/package",
-      "sha": "3cbff5a7a0",
+      "sha": "dd22fab02c",
       "stage": "09-package",
       "thumb": ".thumbs/09-package.jpg",
       "title": "chip/package",
@@ -167,7 +167,7 @@
     },
     {
       "angle": null,
-      "capturedAt": 1792339450,
+      "capturedAt": 1792339550,
       "file": "10-hud.png",
       "flags": [
         "crushed-black"
@@ -185,6 +185,6 @@
     }
   ],
   "title": "Visual pass",
-  "updated": 1792339478,
+  "updated": 1792339585,
   "version": 1
 }

@@ -10,7 +10,6 @@ struct WalkView: View {
     var body: some View {
         RealityView { content, attachments in
             content.add(root)
-            let t = ModelEntity(mesh: .generateSphere(radius: 0.3), materials: [UnlitMaterial(color: .red)]); t.position = [0, 1.5, -2]; content.add(t)
             if let hud = attachments.entity(for: "hud") {
                 hud.position = [3, 1.5, 0]
                 hud.orientation = simd_quatf(angle: -.pi / 2, axis: [0, 1, 0])

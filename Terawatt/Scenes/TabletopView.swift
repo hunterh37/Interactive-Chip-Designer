@@ -62,7 +62,7 @@ struct TabletopView: View {
             let spec = store.current.campus
             let campus = await CampusBuilder.build(spec, immersive: false)
             guard !Task.isCancelled else { return }
-            let span = Float(max(spec.hall.length + 30, spec.hall.width + 12) + 30)
+            let span = Float(max(spec.hall.length, spec.hall.width * 2) + 12)
             campus.scale = .init(repeating: 1.1 / span)
             campus.position.y = -0.28
             root.children.removeAll()

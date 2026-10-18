@@ -7,7 +7,7 @@ Order: what the first demo shows (walk a hot aisle, follow a wafer, build a chip
 - [ ] rack-ai-1mw
 - [~] cold-plate (7128 tris vs 3000 budget)
 - [~] compute-tray-gpu (built, unsigned, 11992 tris)
-- [ ] hot-aisle-containment
+- [~] hot-aisle-containment (0.815, 7308 tris)
 - [ ] raised-floor-tile
 - [ ] overhead-busway
 - [ ] cable-tray-ladder

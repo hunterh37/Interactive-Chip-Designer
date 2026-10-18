@@ -11,3 +11,4 @@ l3 | chip-package-final | 0.822 (fail, no signoff) | 12164 | docs/assets/chip-pa
 l2 | wafer-300mm | 0.832 (fail, no signoff) | 1282 | docs/assets/wafer-300mm.png
 l1 | compute-tray-gpu | auto 0.98, vision unscored (unsigned) | 11992 | docs/assets/compute-tray-gpu.png
 l2 | euv-scanner-highna | 0.721 (fail, no signoff) | 14820 | docs/assets/euv-scanner-highna.png
+l1 | hot-aisle-containment | 0.815 (fail, no signoff) | 7308 | docs/assets/hot-aisle-containment.png

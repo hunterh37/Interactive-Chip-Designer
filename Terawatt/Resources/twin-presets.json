@@ -1,0 +1,35 @@
+{
+  "source": "docs/Rack-to-the-Future-Technical-Spec.pdf (SundAI MIT AI Hackathon challenge slides). 2030 points are projections; values between points are interpolated.",
+  "racks": [
+    { "id": "gpu", "title": "GPU rack", "role": "Prefill (3 TB memory GPU)", "points": [
+      { "year": 2025, "kW": 132, "chips": 72, "costUSD": 4.0e6 },
+      { "year": 2030, "kW": 400, "chips": 108, "costUSD": 12.0e6 },
+      { "year": 2035, "kW": 792, "chips": 144, "costUSD": 23.8e6 } ],
+      "prefillTokPerChip": 120000, "decodeTokPerChip": 8000, "massKg": 3000, "leadTimeWeeks": 40 },
+    { "id": "lpu", "title": "LPU rack", "role": "Fast decode", "points": [
+      { "year": 2030, "kW": 300, "chips": 192, "costUSD": 9.0e6 },
+      { "year": 2035, "kW": 516, "chips": 256, "costUSD": 14.3e6 } ],
+      "prefillTokPerChip": 20000, "decodeTokPerChip": 15000, "massKg": 2200, "leadTimeWeeks": 30 },
+    { "id": "air", "title": "Air rack", "role": "Low-cost air cards", "points": [
+      { "year": 2025, "kW": 20, "chips": 16, "costUSD": 0.3e6 },
+      { "year": 2035, "kW": 37, "chips": 32, "costUSD": 0.5e6 } ],
+      "prefillTokPerChip": 4000, "decodeTokPerChip": 1500, "massKg": 900, "leadTimeWeeks": 12 },
+    { "id": "nvl72", "title": "GB200 NVL72", "role": "2025 baseline", "points": [
+      { "year": 2025, "kW": 132, "chips": 72, "costUSD": 4.0e6 },
+      { "year": 2035, "kW": 132, "chips": 72, "costUSD": 4.0e6 } ],
+      "prefillTokPerChip": 20000, "decodeTokPerChip": 1200, "massKg": 1400, "leadTimeWeeks": 26 }
+  ],
+  "userCases": [
+    { "id": "A", "title": "Prompters", "targetUsers": 4.0e9, "readsPerUserPerDay": 1.9e6, "peakOutTokS": 2.4, "peakInTokS": 5.6 },
+    { "id": "B", "title": "Agent developers", "targetUsers": 5.0e7, "readsPerUserPerDay": 8.6e8, "peakOutTokS": 28, "peakInTokS": 333 },
+    { "id": "C", "title": "Knowledge workers", "targetUsers": 4.0e8, "readsPerUserPerDay": 1.04e8, "peakOutTokS": 4.6, "peakInTokS": 40 }
+  ],
+  "sentiment": [
+    { "site": "texas", "pro": 0.62, "con": 0.38, "note": "Jobs welcome; grid strain after 2021 outage" },
+    { "site": "quebec", "pro": 0.55, "con": 0.45, "note": "Hydro surplus; water and land use debate" },
+    { "site": "iceland", "pro": 0.70, "con": 0.30, "note": "Geothermal fit; small labor pool" },
+    { "site": "norway", "pro": 0.58, "con": 0.42, "note": "Clean power; crypto-era backlash" },
+    { "site": "uae", "pro": 0.80, "con": 0.20, "note": "State-backed build-out" },
+    { "site": "singapore", "pro": 0.35, "con": 0.65, "note": "Moratorium history; land and power scarce" }
+  ]
+}
