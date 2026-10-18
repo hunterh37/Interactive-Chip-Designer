@@ -17,3 +17,4 @@ Builds filtered: 2>&1 | grep -E "error:|warning:|BUILD" | head -40.
 Shared-file edits (MaterialSpec.swift, ShaderSource.swift): one-line appends only; l1 already touched both.
 Queue: notes/PROP_QUEUE.md. On finish mark the prop [x] (signed off) or [~] (built, unsigned + score).
 verdict.json: scores are integers 0-10 (decimals fail to decode); format {"scores":{...},"notes":{...},"fixes":[...],"judge":"agent"} decodes (blanking-panel).
+- l3 after ChipLab: off-world + structures section of PROPS.md, folder Props/DataCenterSite, materials Library/TerawattSite.swift (same branch terawatt-chip).

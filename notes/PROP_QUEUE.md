@@ -13,8 +13,8 @@ Order: what the first demo shows (walk a hot aisle, follow a wafer, build a chip
 - [~] cable-tray-ladder (built, unsigned, 0.752, 8584 tris)
 - [~] led-row-light (built, unsigned, 0.649, 1192 tris)
 - [~] rack-lpu (built, unsigned, 0.722, 14937 tris)
-- [ ] rack-air-42u
-- [ ] rack-nvl72-2025
+- [~] rack-air-42u (built, unsigned, 0.745, 14949 tris)
+- [~] rack-nvl72-2025 (built, unsigned, 0.733, 13765 tris)
 - [ ] gpu-module-2035
 - [ ] rack-manifold
 - [ ] cdu-liquid
@@ -119,15 +119,15 @@ Order: what the first demo shows (walk a hot aisle, follow a wafer, build a chip
 - [~] design-workbench-2035 (0.779, 6734 tris, unsigned)
 - [~] transistor-gaa-cutaway 0.743
 - [~] interconnect-stack-cutaway 0.748
-- [ ] wafer-display-stand
-- [ ] bond-wire-macro
+- [~] wafer-display-stand (0.725, 8364 tris, unsigned)
+- [~] bond-wire-macro (0.797, 10112 tris, unsigned)
 
 ## l1 Training (after rack-ai-1mw)
 - [~] server-lift 0.76
 - [~] blanking-panel 0.777
 - [~] crash-cart-kvm 0.792 (unsigned)
 - [x] aisle-sign
-- [ ] power-cord-c19
+- [~] power-cord-c19 (0.812, unsigned)
 - [ ] quick-disconnect
 - [ ] fiber-patch-lc
 - [ ] loto-tag

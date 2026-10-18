@@ -38,3 +38,8 @@ l3 | interconnect-stack-cutaway | 0.748 fail (edges 4, not signed) | 3444 | ~/de
 l2 | diffusion-furnace | 0.711 [~] | 9526 | /Users/hunter/dev/RealityHD-lib-l2/docs/assets/diffusion-furnace.png
 l2 | wet-bench | 0.732 [~] | 4334 | /Users/hunter/dev/RealityHD-lib-l2/docs/assets/wet-bench.png
 l1 | aisle-sign | 0.852 | 1292 | /Users/hunter/dev/RealityHD-lib-l1/docs/assets/aisle-sign.png
+l1 | rack-air-42u | 0.745 [~] | 14949 | /Users/hunter/dev/RealityHD-lib-l1/docs/assets/rack-air-42u.png
+l1 | rack-nvl72-2025 | 0.733 [~] | 13765 | /Users/hunter/dev/RealityHD-lib-l1/docs/assets/rack-nvl72-2025.png
+l3 | wafer-display-stand | 0.725 | 8364 | docs/assets/wafer-display-stand.png
+l3 | bond-wire-macro | 0.797 | 10112 | docs/assets/bond-wire-macro.png
+l1 | power-cord-c19 | 0.812 | 1664 | /Users/hunter/dev/RealityHD-lib-l1/docs/assets/power-cord-c19.png
