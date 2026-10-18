@@ -24,6 +24,7 @@ struct SceneKey: Equatable { var mode: AppMode; var campus: CampusSpec?; var chi
 
 @MainActor @Observable
 final class ProjectStore {
+    static let shared = ProjectStore()
     var projects: [Project] = []
     var current = Project(name: "Campus 1")
     var selectedRow: UUID?

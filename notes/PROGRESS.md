@@ -7,5 +7,6 @@ l1 | rack-ai-1mw | 0.792 FAIL (threshold 0.90, 1 iter after first gate) | 14491 
 l1 | compute-tray-gpu | NOT BUILT (brief + scaffold only) | - | none
 l3 | package-substrate | 0.563 (fail, no signoff) | 2088 | docs/assets/package-substrate.png
 l3 | hbm-stack | not built | - | -
-l3 | chip-package-final | not built | - | -
+l3 | chip-package-final | 0.822 (fail, no signoff) | 12164 | docs/assets/chip-package-final.png
 l2 | wafer-300mm | 0.832 (fail, no signoff) | 1282 | docs/assets/wafer-300mm.png
+l1 | compute-tray-gpu | auto 0.98, vision unscored (unsigned) | 11992 | docs/assets/compute-tray-gpu.png

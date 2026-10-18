@@ -1,0 +1,8 @@
+{
+ "bundleId": "org.dicyaninlabs.terawatt",
+ "scheme": "Terawatt",
+ "device": "Apple Vision Pro",
+ "settleSeconds": 1.0,
+ "timeoutSeconds": 60,
+ "shots": []
+}

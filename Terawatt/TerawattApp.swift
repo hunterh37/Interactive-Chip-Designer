@@ -10,7 +10,7 @@ enum SceneID {
 
 @main
 struct TerawattApp: App {
-    @State private var store = ProjectStore()
+    @State private var store = ProjectStore.shared
 
     init() {
         #if DEBUG

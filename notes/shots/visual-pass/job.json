@@ -1,0 +1,59 @@
+{
+ "title": "Visual pass",
+ "settleSeconds": 1.0,
+ "timeoutSeconds": 60,
+ "bundleId": "org.dicyaninlabs.terawatt",
+ "scheme": "Terawatt",
+ "stages": [
+  {
+   "id": "01-home",
+   "title": "home",
+   "route": "home"
+  },
+  {
+   "id": "02-inspector",
+   "title": "studio/inspector",
+   "route": "studio/inspector"
+  },
+  {
+   "id": "03-tabletop",
+   "title": "studio/tabletop",
+   "route": "studio/tabletop"
+  },
+  {
+   "id": "04-walk",
+   "title": "studio/walk",
+   "route": "studio/walk"
+  },
+  {
+   "id": "05-fab1",
+   "title": "fab/station/1",
+   "route": "fab/station/1"
+  },
+  {
+   "id": "06-fab6",
+   "title": "fab/station/6",
+   "route": "fab/station/6"
+  },
+  {
+   "id": "07-fab12",
+   "title": "fab/station/12",
+   "route": "fab/station/12"
+  },
+  {
+   "id": "08-floorplan",
+   "title": "chip/floorplan",
+   "route": "chip/floorplan"
+  },
+  {
+   "id": "09-package",
+   "title": "chip/package",
+   "route": "chip/package"
+  },
+  {
+   "id": "10-hud",
+   "title": "campus/hud",
+   "route": "campus/hud"
+  }
+ ]
+}

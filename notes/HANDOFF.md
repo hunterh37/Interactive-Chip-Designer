@@ -16,3 +16,4 @@ Per batch: commit to lane branch, push, append to /Users/hunter/Dev/Terawatt/not
 Builds filtered: 2>&1 | grep -E "error:|warning:|BUILD" | head -40.
 Shared-file edits (MaterialSpec.swift, ShaderSource.swift): one-line appends only; l1 already touched both.
 Queue: notes/PROP_QUEUE.md. On finish mark the prop [x] (signed off) or [~] (built, unsigned + score).
+verdict.json: write scores as plain decimals with <=2 digits (e.g. 0.88); gate rejected "0.9" formatting once; validate with python3 -m json.tool before gating.

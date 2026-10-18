@@ -6,7 +6,7 @@ Order: what the first demo shows (walk a hot aisle, follow a wafer, build a chip
 ## l1 DataCenter
 - [ ] rack-ai-1mw
 - [~] cold-plate (7128 tris vs 3000 budget)
-- [ ] compute-tray-gpu
+- [~] compute-tray-gpu (built, unsigned, 11992 tris)
 - [ ] hot-aisle-containment
 - [ ] raised-floor-tile
 - [ ] overhead-busway
@@ -110,7 +110,7 @@ Order: what the first demo shows (walk a hot aisle, follow a wafer, build a chip
 
 ## l3 ChipLab
 - [~] package-substrate (0.563)
-- [ ] chip-package-final
+- [~] chip-package-final (0.822, 12164 tris, unsigned)
 - [ ] hbm-stack
 - [ ] die-blank-reticle
 - [ ] die-block-tile
