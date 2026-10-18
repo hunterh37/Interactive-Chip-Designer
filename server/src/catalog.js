@@ -30,6 +30,7 @@ export const CHIP_BLOCKS = [
   { id: 'io', name: 'NVLink / CPO I/O', color: '#b366e6', mm2: 20, tflops: 0, w: 20 },
 ];
 export const DIE = { cols: 8, rows: 8, reticleMM2: 858 };
+export const isEdge = i => { const x = i % DIE.cols, y = Math.floor(i / DIE.cols); return x === 0 || y === 0 || x === DIE.cols - 1 || y === DIE.rows - 1; };
 
 const byId = new Map(COMPONENTS.map(c => [c.id, c]));
 export const component = id => byId.get(id);
@@ -49,12 +50,14 @@ export function rackTotals(state) {
 export const CHALLENGE = { watts: 1000, bwPerHBM: 900, bwPerSRAM: 150 };
 export function chipScore(chip) {
   const t = chipTotals(chip), n = id => chip.cells.filter(c => c === id).length;
-  const bw = n('hbm') * CHALLENGE.bwPerHBM + n('sram') * CHALLENGE.bwPerSRAM;
+  // HBM PHYs and I/O SerDes sit on the die edge (shoreline) in real floorplans; interior ones do not connect.
+  const edge = id => chip.cells.filter((c, i) => c === id && isEdge(i)).length;
+  const bw = edge('hbm') * CHALLENGE.bwPerHBM + n('sram') * CHALLENGE.bwPerSRAM;
   const effective = Math.min(t.tflops, bw);
-  const checks = { power: t.watts <= CHALLENGE.watts, memory: n('hbm') > 0, io: n('io') > 0, control: n('cpu') > 0 };
+  const checks = { power: t.watts <= CHALLENGE.watts, memory: edge('hbm') > 0, io: edge('io') > 0, control: n('cpu') > 0 };
   const passed = Object.values(checks).filter(Boolean).length;
   const score = Math.round(effective * (checks.power ? 1 : 0.4) * (0.55 + 0.15 * (passed - (checks.power ? 1 : 0))));
-  return { ...t, bandwidth: bw, effective, checks, score };
+  return { ...t, bandwidth: bw, effective, checks, score, misplaced: n('hbm') + n('io') - edge('hbm') - edge('io') };
 }
 
 export function chipTotals(chip) {

@@ -37,6 +37,18 @@
   .grid div.pop { animation:pop .25s ease-out; }
   @keyframes pop { 0% { transform:scale(.7); } 100% { transform:scale(1); } }
 
+  .grid div.e { border-style:dashed; border-color:var(--dim); }
+  .grid div.bad { outline:1px solid #ff4d4d; outline-offset:-3px; }
+  #help { padding:2px 10px; font-size:13px; }
+  .hint { font-size:11px; min-height:15px; letter-spacing:.04em; }
+  .binfo { font-size:10px; min-height:13px; line-height:1.4; }
+  .tip { position:fixed; inset:0; z-index:10; background:rgba(0,0,0,.82); display:grid; place-items:center; padding:20px; }
+  .tip[hidden] { display:none; }
+  .tipcard { width:min(100%, 360px); border:1px solid var(--dim); background:var(--bg); padding:16px; display:flex; flex-direction:column; gap:14px; }
+  .tipcard .grid { width:70%; }
+  .tipcard p { margin:0; font-size:12px; line-height:1.55; min-height:56px; }
+  .tipcard button { padding:14px; }
+
   /* fab + result */
   #fablog { font-size:12px; line-height:1.9; }
   #fablog .done::after { content:'  OK'; color:var(--mute); }
@@ -96,11 +108,13 @@
   </section>
 
   <section class="screen" id="s-design">
-    <div class="top"><span class="label" id="dname">Die</span><span id="timer">2:00</span></div>
+    <div class="top"><span class="label" id="dname">Die</span><button id="help" aria-label="How to play">?</button><span id="timer">2:00</span></div>
     <div id="chipview"><canvas class="view" id="view"></canvas></div>
     <div class="meters" id="meters"></div>
     <div class="checks" id="checks"></div>
+    <div class="hint" id="hint"></div>
     <div class="pal" id="pal"></div>
+    <div class="binfo mute" id="binfo"></div>
     <div class="grid" id="grid"></div>
     <div class="err" id="err"></div>
     <div class="sp"></div>
@@ -139,6 +153,15 @@
     <div class="hud"><button id="room-back">←</button><span class="label" id="roomcount"></span><span></span></div>
     <div class="sheet min" id="roomsheet"><button class="handle" id="roomhandle"><span class="label" id="roomtitle">Tap a rack</span><span class="label" id="roomhint">Show ↑</span></button><div id="roominfo"></div></div>
   </section>
+
+  <div class="tip" id="tip" hidden>
+    <div class="tipcard">
+      <div class="top"><span class="label">How to design</span><span class="label" id="tipstep"></span></div>
+      <div class="grid demo" id="demo"></div>
+      <p id="tipcap"></p>
+      <button class="primary" id="tipok">Got it</button>
+    </div>
+  </div>
 
   <script type="module" src="/src/join.js"></script>
 </body></html>

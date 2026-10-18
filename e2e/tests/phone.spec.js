@@ -13,7 +13,7 @@ test('chip challenge: name → brief → design → tape out → result rank', a
   await page.locator('#begin').click();
   await paint(page, 'tensor', [0, 1, 2, 3]);
   await paint(page, 'hbm', [8]);
-  await paint(page, 'io', [9]);
+  await paint(page, 'io', [15]);
   await paint(page, 'cpu', [10]);
   await expect(page.locator('#checks .ok')).toHaveCount(4);
   await page.locator('#tape').click();

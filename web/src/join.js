@@ -53,9 +53,12 @@ $('go-rack').onclick = () => go('rack');
 // ── brief
 $('brief-back').onclick = () => go('menu');
 $('spec').innerHTML = [
-  ['Power budget', `≤ ${POWER} W`], ['Memory', '≥ 1 × HBM4'], ['Interconnect', '≥ 1 × I/O'], ['Control', '≥ 1 × CPU'], ['Die', `${cat.die.cols}×${cat.die.rows} · ${cat.die.reticleMM2} mm²`],
+  ['Power budget', `≤ ${POWER} W`], ['Memory', '≥ 1 × HBM4 · edge'], ['Interconnect', '≥ 1 × I/O · edge'], ['Control', '≥ 1 × CPU'], ['Die', `${cat.die.cols}×${cat.die.rows} · ${cat.die.reticleMM2} mm²`],
 ].map(([k, v]) => `<div class="row"><span class="mute">${k}</span><span>${v}</span></div>`).join('');
-$('begin').onclick = () => { send({ type: 'my.clear' }); deadline = Date.now() + DURATION * 1000; go('design'); };
+$('begin').onclick = () => {
+  send({ type: 'my.clear' }); deadline = Date.now() + DURATION * 1000; go('design'); $('binfo').textContent = INFO[brush];
+  if (!store.get('cd-tip')) { tipHeld = Date.now(); showTip(); }
+};
 
 // ── design
 const chipStage = stage($('view'));
@@ -65,11 +68,50 @@ chipStage.tick.push(t => { const c = chipStage.world.getObjectByName('chip'); if
 $('pal').innerHTML = '';
 cat.chipBlocks.forEach(b => {
   const x = document.createElement('button'); x.dataset.id = b.id;
-  x.innerHTML = `<i>${b.glyph}</i>${b.short}`; x.onclick = () => { brush = b.id; render(); };
+  x.innerHTML = `<i>${b.glyph}</i>${b.short}`; x.onclick = () => { brush = b.id; $('binfo').textContent = INFO[b.id] ?? ''; render(); };
   $('pal').append(x);
 });
 const grid = $('grid');
+const isEdge = i => { const x = i % cat.die.cols, y = Math.floor(i / cat.die.cols); return !x || !y || x === cat.die.cols - 1 || y === cat.die.rows - 1; };
 for (let i = 0; i < cat.die.cols * cat.die.rows; i++) { const d = document.createElement('div'); d.dataset.i = i; grid.append(d); }
+const INFO = {
+  tensor: 'Tensor cores: matrix math. All the compute, most of the power (~20 W/cell).',
+  sram: 'SRAM cache: on-die memory. +150 TF of bandwidth, low power.',
+  hbm: 'HBM4 PHY: stacked DRAM link. +900 TF of bandwidth. Edge cells only.',
+  cpu: 'Arm CPU cluster: control. At least 1 required.',
+  noc: 'Network-on-chip: wiring between blocks. No score.',
+  io: 'NVLink / CPO I/O: chip-to-chip link. At least 1, edge cells only.',
+};
+
+// ── how-to popover: loops a demo floorplan being drawn
+const DEMO = [
+  ['Pick a block below, then tap or drag on the die to place it. Tap again to erase.', 'tensor', [27, 28, 35, 36]],
+  ['Tensor cores make compute. Fill the middle of the die with them.', 'tensor', [18, 19, 20, 21, 26, 29, 34, 37, 42, 43, 44, 45]],
+  ['Compute is capped by memory bandwidth. Put HBM4 on the dashed edge cells to feed it.', 'hbm', [8, 16, 24, 15, 23, 31]],
+  ['SRAM next to the cores adds a little more bandwidth.', 'sram', [10, 13, 50, 53]],
+  ['Add 1 CPU and 1 I/O (edge) to pass the checks. Stay under 1000 W.', 'cpu', [2], 'io', [60]],
+  ['Highest effective TFLOPS wins. Tape out before the timer hits 0.', null, []],
+];
+const demo = $('demo');
+for (let i = 0; i < cat.die.cols * cat.die.rows; i++) { const d = document.createElement('div'); if (isEdge(i)) d.className = 'e'; d.textContent = '·'; demo.append(d); }
+let demoT = null;
+function showTip() {
+  $('tip').hidden = false; clearTimeout(demoT);
+  const put = (i, id) => { const d = demo.children[i], st = BLOCK_STYLE[id]; d.textContent = st.g; d.className = 'f pop'; d.style.background = st.c; };
+  const run = (step, k) => {
+    if ($('tip').hidden) return;
+    if (step === 0 && k === 0) [...demo.children].forEach((d, i) => { d.textContent = '·'; d.className = isEdge(i) ? 'e' : ''; d.style.background = ''; });
+    const [cap, ...pairs] = DEMO[step];
+    const todo = []; for (let p = 0; p < pairs.length; p += 2) if (pairs[p]) pairs[p + 1].forEach(i => todo.push([i, pairs[p]]));
+    $('tipcap').textContent = cap; $('tipstep').textContent = `${step + 1} / ${DEMO.length}`;
+    if (k < todo.length) { put(...todo[k]); demoT = setTimeout(() => run(step, k + 1), 160); }
+    else demoT = setTimeout(() => run((step + 1) % DEMO.length, 0), 1900);
+  };
+  run(0, 0);
+}
+let tipHeld = 0;
+$('help').onclick = () => { tipHeld = Date.now(); showTip(); };
+$('tipok').onclick = () => { $('tip').hidden = true; clearTimeout(demoT); store.set('cd-tip', '1'); deadline += Date.now() - tipHeld; };
 let painting = false, lastCell = -1;
 const paintAt = e => {
   const t = document.elementFromPoint(e.clientX, e.clientY); if (!t?.dataset?.i || !grid.contains(t)) return;
@@ -93,7 +135,7 @@ function tapeout() {
 }
 
 setInterval(() => {
-  if (screen !== 'design') return;
+  if (screen !== 'design' || !$('tip').hidden) return;
   const left = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
   $('timer').textContent = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
   $('timer').classList.toggle('low', left <= 10);
@@ -180,11 +222,26 @@ function renderDesign() {
   const ck = r.checks || {};
   $('checks').innerHTML = [['power', `≤${POWER}W`], ['memory', 'HBM'], ['io', 'I/O'], ['control', 'CPU']]
     .map(([k, l]) => `<span class="${ck[k] ? 'ok' : ''}">${ck[k] ? '■' : '□'} ${l}</span>`).join('');
+  $('hint').textContent = hintFor(r, c);
   $('pal').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.id === brush));
   [...grid.children].forEach((d, i) => {
     const st = BLOCK_STYLE[c[i]];
-    d.textContent = st ? st.g : '·'; d.className = st ? 'f' : ''; d.style.background = st ? st.c : '';
+    d.textContent = st ? st.g : '·'; d.style.background = st ? st.c : '';
+    d.className = [st ? 'f' : '', isEdge(i) ? 'e' : '', (c[i] === 'hbm' || c[i] === 'io') && !isEdge(i) ? 'bad' : ''].join(' ').trim();
   });
+}
+
+function hintFor(r, c) {
+  const has = id => c.includes(id), ck = r.checks || {};
+  if (!has('tensor')) return '→ Place tensor cores. They make the compute.';
+  if (r.misplaced) return '✕ HBM4 and I/O only work on the dashed edge cells.';
+  if (!ck.memory) return '→ Add HBM4 on the edge. Compute is 0 without bandwidth.';
+  if (!ck.power) return `✕ ${r.watts} W is over budget. Remove tensor cores.`;
+  if (r.bandwidth < r.tflops) return `→ Memory-bound: ${(r.tflops - r.bandwidth).toLocaleString()} TF idle. Add HBM4 or SRAM.`;
+  if (!ck.io) return '→ Add an I/O block on the edge.';
+  if (!ck.control) return '→ Add a CPU cluster.';
+  if (r.tflops < r.bandwidth && r.watts < POWER - 20) return `→ Compute-bound: ${POWER - r.watts} W left. Add tensor cores.`;
+  return '■ Balanced. Tape out, or trade cells for more.';
 }
 
 function renderResult() {

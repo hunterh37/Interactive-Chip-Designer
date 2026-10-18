@@ -37,6 +37,7 @@ export const parseMoney = t => Number(t.match(/\$([\d,]+)/)[1].replace(/,/g, '')
 
 /** Guest onboarding: name screen → menu. */
 export async function joinAs(page, name, path = '/join.html?room=DEMO') {
+  await page.addInitScript(() => { try { localStorage.setItem('cd-tip', '1'); } catch {} });
   await page.goto(path);
   await page.locator('#name').fill(name);
   await page.locator('#enter').click();

@@ -51,8 +51,8 @@ test('personal chip challenge: paint, score gates, tapeout locks, name propagate
   for (let i = 0; i < 10; i++) apply(s, { type: 'my.paint', cell: i, block: 'tensor' }, 'p1');
   const before = snapshot(s).chips.p1.result;
   assert.equal(before.effective, 0); // no memory bandwidth
-  apply(s, { type: 'my.paint', cell: 10, block: 'hbm' }, 'p1');
-  apply(s, { type: 'my.paint', cell: 11, block: 'io' }, 'p1');
+  apply(s, { type: 'my.paint', cell: 15, block: 'hbm' }, 'p1');
+  apply(s, { type: 'my.paint', cell: 16, block: 'io' }, 'p1');
   apply(s, { type: 'my.paint', cell: 12, block: 'cpu' }, 'p1');
   const r = snapshot(s).chips.p1.result;
   assert.ok(r.score > 0 && r.checks.power && r.checks.io);

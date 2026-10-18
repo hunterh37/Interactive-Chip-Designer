@@ -14,7 +14,7 @@ test('two guests: live count, chip dies on host, leaderboard, racks in shared ro
   await host.locator('#next').click();
   for (const [p, n] of [[a, 6], [b, 3]]) {
     await p.locator('#go-chip').click(); await p.locator('#begin').click();
-    await paint(p, 'tensor', [...Array(n).keys()]); await paint(p, 'hbm', [20]); await paint(p, 'io', [21]); await paint(p, 'cpu', [22]);
+    await paint(p, 'tensor', [...Array(n).keys()]); await paint(p, 'hbm', [23]); await paint(p, 'io', [24]); await paint(p, 'cpu', [22]);
   }
   await expect(statRow(host, 'Designing')).toHaveText('2');
   await a.locator('#tape').click(); await b.locator('#tape').click();
