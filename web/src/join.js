@@ -162,7 +162,7 @@ $('toroom').onclick = () => go('room');
 // ── rack builder
 const rackStage = stage($('rackview'));
 rackStage.scene.background = null;
-$('rack-back').onclick = () => { rackFitted = false; go('menu'); };
+$('rack-back').onclick = () => { rackFitted = false; lastSlots = -1; go('menu'); };
 $('rack-room').onclick = () => go('room');
 const sheet = (id, hint, openTxt = 'Hide ↓', closedTxt = 'Show ↑') => {
   const el = $(id), set = min => { el.classList.toggle('min', min); $(hint).textContent = min ? closedTxt : openTxt; };
@@ -174,7 +174,23 @@ const sheet = (id, hint, openTxt = 'Hide ↓', closedTxt = 'Show ↑') => {
 };
 const rackSheet = sheet('racksheet', 'rackhint');
 // Keep the rack canvas in the open area above the sheet and frame the whole rack in it.
-let rackFitted = false;
+let rackFitted = false, lastSlots = -1, slideAnim = null;
+// New server slides in on its rails from the front, eases out with a small overshoot, then the LED flashes.
+function slideIn(srv) {
+  if (!srv) return;
+  const z0 = srv.position.z, t0 = performance.now(), dur = 650;
+  const led = srv.children[srv.children.length - 1];
+  srv.position.z = z0 + 1.1; srv.scale.setScalar(0.96);
+  slideAnim = t => {
+    const k = Math.min(1, (t - t0) / dur), c = 1.4;
+    const e = 1 + (c + 1) * Math.pow(k - 1, 3) + c * Math.pow(k - 1, 2); // easeOutBack
+    srv.position.z = z0 + 1.1 * (1 - e); srv.scale.setScalar(0.96 + 0.04 * Math.min(1, k * 1.5));
+    if (led) led.visible = k < 1 || Math.floor((t - t0 - dur) / 90) % 2 === 0 || t - t0 > dur + 540;
+    if (k >= 1 && t - t0 > dur + 540) { led && (led.visible = true); slideAnim = null; }
+  };
+  if (navigator.vibrate) setTimeout(() => navigator.vibrate(12), dur * 0.8);
+}
+rackStage.tick.push(t => slideAnim?.(t));
 const fitRack = () => {
   const el = $('racksheet'), v = $('rackview');
   const open = el.classList.contains('min') ? 52 : el.offsetHeight;
@@ -298,7 +314,10 @@ function renderRoom(force) {
 
 function renderRack() {
   const r = mine(), ui = $('rackui');
-  replace(rackStage.world, 'rack', buildRack(r, cat)); if (!rackFitted) { rackFitted = true; requestAnimationFrame(fitRack); }
+  const built = buildRack(r, cat); replace(rackStage.world, 'rack', built);
+  if (r.slots.length > lastSlots && lastSlots >= 0) slideIn(built.children.find(o => o.userData.slot === r.slots.length - 1));
+  lastSlots = r.slots.length;
+  if (!rackFitted) { rackFitted = true; requestAnimationFrame(fitRack); }
   $('sum').textContent = `${r.totals?.u ?? 0}/${r.totals?.capacity ?? 42}U · ${money(r.totals?.price ?? 1890)}`;
   ui.innerHTML = '';
   const frames = el('div', 'chips'); cat.racks.forEach(f => frames.append(btn(f.name, () => send({ type: 'rack.frameType', id: f.id }), r.rackId === f.id ? 'on' : '')));
