@@ -24,6 +24,19 @@ enum CampusBuilder {
         let n = s.rows.count
 
         root.addChild(shell(L: L, W: W, H: H, roof: immersive))
+        if immersive {
+            let sun = Entity()
+            sun.components.set(DirectionalLightComponent(color: .white, intensity: 4000))
+            sun.orientation = simd_quatf(angle: -.pi / 2.3, axis: [1, 0, 0])
+            root.addChild(sun)
+            let nx = min(4, max(1, Int(L / 12))), nz = min(2, max(1, Int(W / 12)))
+            for ix in 0..<nx { for iz in 0..<nz {
+                let l = Entity()
+                l.components.set(PointLightComponent(color: .white, intensity: 30000, attenuationRadius: 9))
+                l.position = [(Float(ix) + 0.5) / Float(nx) * L - L / 2, max(1.5, H - 0.8), (Float(iz) + 0.5) / Float(nz) * W - W / 2]
+                root.addChild(l)
+            } }
+        }
 
         // Racks, containment, busway, lights.
         var protos: [RackPresetID: Entity] = [:]

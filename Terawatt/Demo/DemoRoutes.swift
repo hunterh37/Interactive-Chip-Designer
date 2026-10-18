@@ -47,6 +47,23 @@ enum DemoRoutes {
                 }
             }
         }
+        book.group("training") { b in
+            for s in TrainStep.allCases {
+                b.route("step/\(s.rawValue + 1)", "Training: \(s.title)") { t in
+                    var st = TrainingState()
+                    while st.step != s { st.complete() }
+                    store.training = st
+                    store.mode = .training
+                    await show(t, [SceneID.tabletop, SceneID.inspector])
+                }
+            }
+            b.route("walk", "Training rack walk") { t in
+                store.training = TrainingState(step: .tray)
+                store.mode = .training
+                await t.openImmersive(SceneID.walk)
+                await t.wait(2); await t.ready(); await t.wait(3); t.done()
+            }
+        }
         book.group("chip") { b in
             b.route("floorplan", "Chip floorplan") { t in
                 store.openChip(.floorplan)

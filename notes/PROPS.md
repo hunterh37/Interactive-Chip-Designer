@@ -161,3 +161,20 @@ dc-hall-ai (parametric), dc-cdu-room, dc-electrical-room, dc-noc, dc-yard, fab-l
 ## Count
 
 DC IT 20, DC facility 35, DC structures 5, off-world 7, Fab 34, Chip 12: 113 new props, 15 reused, 19 materials, 10 scenes.
+
+## Training (rack install)
+
+| id | size | budget | articulated | materials |
+|---|---|---|---|---|
+| server-lift | 0.6 x 1.2 x 0.9 | 6000 | platform raises | metal.powdercoat:E8C21A, rubber |
+| crash-cart-kvm | 0.5 x 1.0 x 0.45 | 6000 | drawer | metal.powdercoat, plastic.matte, glass.screen |
+| aisle-sign | 0.6 x 0.25 x 0.02 | 600 | none | plastic.matte:F2F2F2, decal text "HALL A ROW 07" |
+| loto-tag | 0.075 x 0.14 x 0.004 | 600 | handheld | plastic.matte:D62A1E, metal.steel padlock |
+| esd-wrist-strap | 0.08 x 0.02 x 0.08 | 1500 | handheld | fabric.elastic:1A1A1A, metal.steel snap, coil cord |
+| power-cord-c19 | 0.06 x 0.03 x 1.5 | 2000 | handheld | rubber:111111, plastic.matte connector |
+| quick-disconnect | 0.03 x 0.03 x 0.08 | 1500 | handheld | metal.steel, plastic.matte blue/red ring |
+| leak-detection-cable | 2.0 x 0.006 x 0.006 | 800 | none | plastic.jacket:E8C21A |
+| fiber-patch-lc | 0.02 x 0.01 x 2.0 | 2000 | handheld | plastic.jacket:2CC7D6, LC duplex |
+| fiber-cleaner | 0.03 x 0.18 x 0.03 | 1200 | handheld | plastic.matte:2A6BD6 |
+| cable-label | 0.03 x 0.012 x 0.001 | 100 | none | plastic.matte:FFFFFF |
+| velcro-tie | 0.2 x 0.012 x 0.002 | 200 | none | fabric.hook:1A1A1A |

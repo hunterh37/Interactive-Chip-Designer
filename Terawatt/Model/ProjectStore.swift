@@ -16,11 +16,11 @@ struct Project: Codable, Identifiable, Equatable, Sendable {
     var chipStep: ChipStep { get { chipStepRaw ?? .spec } set { chipStepRaw = newValue } }
 }
 
-enum AppMode: Sendable { case studio, fab, chip }
+enum AppMode: Sendable { case studio, fab, chip, training }
 
 /// Rebuild trigger for tabletop and walk scenes.
 struct ChipView: Equatable { var chip: ChipSpec; var step: ChipStep; var micro: MicroLevel; var installed: Bool; var packaged: Bool }
-struct SceneKey: Equatable { var mode: AppMode; var campus: CampusSpec?; var chip: ChipView? = nil }
+struct SceneKey: Equatable { var mode: AppMode; var campus: CampusSpec?; var chip: ChipView? = nil; var zoom: TrainZoom? = nil }
 
 @MainActor @Observable
 final class ProjectStore {
@@ -31,10 +31,13 @@ final class ProjectStore {
     var mode = AppMode.studio
     var micro = MicroLevel.off
     var explode = false
+    /// Session-only; a trainee restarts the procedure per session.
+    var training = TrainingState()
     var sceneKey: SceneKey {
-        SceneKey(mode: mode, campus: mode == .studio ? current.campus : nil,
+        SceneKey(mode: mode, campus: mode == .studio || mode == .training ? current.campus : nil,
                  chip: mode == .chip ? ChipView(chip: current.chip, step: current.chipStep, micro: micro,
-                                                installed: current.installedChips > 0, packaged: current.packaged ?? false) : nil)
+                                                installed: current.installedChips > 0, packaged: current.packaged ?? false) : nil,
+                 zoom: mode == .training ? training.step.zoom : nil)
     }
     var delta: CampusDelta { ChipLoop.delta(current.campus, chip: current.chip, installed: current.installedChips) }
 

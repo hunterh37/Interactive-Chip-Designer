@@ -17,6 +17,10 @@ struct HomeView: View {
                     store.mode = .fab
                     openWindow(id: SceneID.tabletop); openWindow(id: SceneID.inspector)
                 }
+                tile("Training", "graduationcap") {
+                    store.mode = .training; store.training = TrainingState()
+                    openWindow(id: SceneID.tabletop); openWindow(id: SceneID.inspector)
+                }
                 tile("Chip Workshop", "cpu") {
                     store.openChip()
                     openWindow(id: SceneID.tabletop); openWindow(id: SceneID.inspector)

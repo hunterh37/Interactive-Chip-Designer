@@ -38,3 +38,10 @@
 - Scenes/ChipInspector: steps, controls, readout, micro picker. FabInspector shows Package when wafer finished and chip taped out. HUDStrip shows delta row when installed.
 - Placeholder prop ids: hbm-stack, gpu-module-2035, compute-tray-gpu.
 - Tests: TerawattTests/ChipLoopTests.swift (24 total pass). No StageDirector chip routes yet.
+
+## Training mode
+- AppMode.training; store.training: TrainingState (session only). SceneKey.zoom rebuilds on zoom change; step changes call TrainingScene.apply.
+- Model/TrainingFlow: TrainStep (18, ppe..campus), focus child name, zoom (rack/row/hall/campus), props; RackU (44.45 mm, slotU).
+- Reality/TrainingBuilder: TrainingScene. Rack-local anchors (anchors table) for highlight outline + stand-here ring; tray slides to slot 9; power/hose/fiber cables as cylinder polylines; LEDs green on powerOn. Hall/campus reuse CampusBuilder.
+- Scenes/TrainingInspector; Home tile Training; routes training/step/1..18, training/walk.
+- Tests: TrainingFlowTests (29 total pass). Prop queue: notes/PROP_QUEUE.md "l1 Training".

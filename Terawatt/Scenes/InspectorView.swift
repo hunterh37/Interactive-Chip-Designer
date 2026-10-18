@@ -8,6 +8,7 @@ struct InspectorView: View {
         switch store.mode {
         case .fab: FabInspector()
         case .chip: ChipInspector()
+        case .training: TrainingInspector()
         case .studio: studio
         }
     }

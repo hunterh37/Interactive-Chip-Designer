@@ -6,12 +6,32 @@ struct TabletopView: View {
     @State private var root = Entity()
     @State private var fab: FabScene?
     @State private var chipScene: ChipScene?
+    @State private var training: TrainingScene?
 
     var body: some View {
         RealityView { content in
             content.add(root)
         }
         .task(id: store.sceneKey) {
+            training = nil
+            if store.mode == .training {
+                fab = nil; chipScene = nil
+                let t = TrainingScene()
+                let spec = store.current.campus
+                await t.build(state: store.training, campus: spec, immersive: false)
+                guard !Task.isCancelled else { return }
+                let span: Float = switch t.zoom {
+                case .rack, .row: t.zoom.span
+                case .hall: Float(max(spec.hall.length, spec.hall.width) + 4)
+                case .campus: Float(max(spec.hall.length + 30, spec.hall.width + 12) + 30)
+                }
+                t.root.scale = .init(repeating: 1.1 / span)
+                t.root.position.y = -0.28
+                training = t
+                root.children.removeAll()
+                root.addChild(t.root)
+                return
+            }
             if store.mode == .chip {
                 fab = nil
                 let c = ChipScene()
@@ -48,8 +68,9 @@ struct TabletopView: View {
             root.children.removeAll()
             root.addChild(campus)
         }
+        .onChange(of: store.training) { _, s in training?.apply(s, animated: true) }
         .onChange(of: store.explode) { _, e in chipScene?.setExplode(e, animated: true) }
         .onChange(of: store.current.wafer.station) { _, s in fab?.apply(s, animated: true) }
-        .ornament(attachmentAnchor: .scene(.bottomFront)) { if store.mode != .fab { HUDStrip() } }
+        .ornament(attachmentAnchor: .scene(.bottomFront)) { if store.mode != .fab && store.mode != .training { HUDStrip() } }
     }
 }

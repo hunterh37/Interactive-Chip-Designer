@@ -1,0 +1,190 @@
+{
+  "job": "visual-pass",
+  "project": "Terawatt",
+  "round": 4,
+  "stages": [
+    {
+      "angle": null,
+      "capturedAt": 1792339292,
+      "file": "01-home.png",
+      "flags": [
+        "edge-content"
+      ],
+      "h": 2160,
+      "id": "01-home",
+      "issues": [],
+      "params": {},
+      "route": "home",
+      "sha": "d345fd497e",
+      "stage": "01-home",
+      "thumb": ".thumbs/01-home.jpg",
+      "title": "home",
+      "w": 3840
+    },
+    {
+      "angle": null,
+      "capturedAt": 1792339298,
+      "file": "02-inspector.png",
+      "flags": [
+        "edge-content"
+      ],
+      "h": 2160,
+      "id": "02-inspector",
+      "issues": [],
+      "params": {},
+      "route": "studio/inspector",
+      "sha": "1fae80b0ef",
+      "stage": "02-inspector",
+      "thumb": ".thumbs/02-inspector.jpg",
+      "title": "studio/inspector",
+      "w": 3840
+    },
+    {
+      "angle": null,
+      "capturedAt": 1792339381,
+      "file": "03-tabletop.png",
+      "flags": [
+        "edge-content"
+      ],
+      "h": 2160,
+      "id": "03-tabletop",
+      "issues": [],
+      "params": {},
+      "route": "studio/tabletop",
+      "sha": "2528bc5b98",
+      "stage": "03-tabletop",
+      "thumb": ".thumbs/03-tabletop.jpg",
+      "title": "studio/tabletop",
+      "w": 3840
+    },
+    {
+      "angle": null,
+      "capturedAt": 1792339478,
+      "file": "04-walk.png",
+      "flags": [
+        "crushed-black"
+      ],
+      "h": 2160,
+      "id": "04-walk",
+      "issues": [],
+      "params": {},
+      "route": "studio/walk",
+      "sha": "117d369e25",
+      "stage": "04-walk",
+      "thumb": ".thumbs/04-walk.jpg",
+      "title": "studio/walk",
+      "w": 3840
+    },
+    {
+      "angle": null,
+      "capturedAt": 1792339394,
+      "file": "05-fab1.png",
+      "flags": [
+        "edge-content"
+      ],
+      "h": 2160,
+      "id": "05-fab1",
+      "issues": [],
+      "params": {},
+      "route": "fab/station/1",
+      "sha": "03be534fe1",
+      "stage": "05-fab1",
+      "thumb": ".thumbs/05-fab1.jpg",
+      "title": "fab/station/1",
+      "w": 3840
+    },
+    {
+      "angle": null,
+      "capturedAt": 1792339321,
+      "file": "06-fab6.png",
+      "flags": [
+        "edge-content"
+      ],
+      "h": 2160,
+      "id": "06-fab6",
+      "issues": [],
+      "params": {},
+      "route": "fab/station/6",
+      "sha": "32d16e284d",
+      "stage": "06-fab6",
+      "thumb": ".thumbs/06-fab6.jpg",
+      "title": "fab/station/6",
+      "w": 3840
+    },
+    {
+      "angle": null,
+      "capturedAt": 1792339326,
+      "file": "07-fab12.png",
+      "flags": [
+        "edge-content"
+      ],
+      "h": 2160,
+      "id": "07-fab12",
+      "issues": [],
+      "params": {},
+      "route": "fab/station/12",
+      "sha": "b84de1ae97",
+      "stage": "07-fab12",
+      "thumb": ".thumbs/07-fab12.jpg",
+      "title": "fab/station/12",
+      "w": 3840
+    },
+    {
+      "angle": null,
+      "capturedAt": 1792339332,
+      "file": "08-floorplan.png",
+      "flags": [
+        "edge-content"
+      ],
+      "h": 2160,
+      "id": "08-floorplan",
+      "issues": [],
+      "params": {},
+      "route": "chip/floorplan",
+      "sha": "71e5de257d",
+      "stage": "08-floorplan",
+      "thumb": ".thumbs/08-floorplan.jpg",
+      "title": "chip/floorplan",
+      "w": 3840
+    },
+    {
+      "angle": null,
+      "capturedAt": 1792339337,
+      "file": "09-package.png",
+      "flags": [
+        "edge-content"
+      ],
+      "h": 2160,
+      "id": "09-package",
+      "issues": [],
+      "params": {},
+      "route": "chip/package",
+      "sha": "3cbff5a7a0",
+      "stage": "09-package",
+      "thumb": ".thumbs/09-package.jpg",
+      "title": "chip/package",
+      "w": 3840
+    },
+    {
+      "angle": null,
+      "capturedAt": 1792339450,
+      "file": "10-hud.png",
+      "flags": [
+        "crushed-black"
+      ],
+      "h": 2160,
+      "id": "10-hud",
+      "issues": [],
+      "params": {},
+      "route": "campus/hud",
+      "sha": "c84df9acb7",
+      "stage": "10-hud",
+      "thumb": ".thumbs/10-hud.jpg",
+      "title": "campus/hud",
+      "w": 3840
+    }
+  ],
+  "title": "Visual pass",
+  "updated": 1792339478,
+  "version": 1
+}

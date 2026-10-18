@@ -77,7 +77,7 @@ Order: what the first demo shows (walk a hot aisle, follow a wafer, build a chip
 - [~] foup
 - [~] oht-vehicle
 - [ ] oht-rail
-- [ ] euv-scanner-highna
+- [~] euv-scanner-highna (0.721, 14820 tris)
 - [ ] litho-track
 - [ ] plasma-etch-cluster
 - [ ] cvd-ald-cluster
@@ -121,3 +121,18 @@ Order: what the first demo shows (walk a hot aisle, follow a wafer, build a chip
 - [ ] interconnect-stack-cutaway
 - [ ] wafer-display-stand
 - [ ] bond-wire-macro
+
+## l1 Training (after rack-ai-1mw)
+- [ ] server-lift
+- [ ] blanking-panel
+- [ ] crash-cart-kvm
+- [ ] aisle-sign
+- [ ] power-cord-c19
+- [ ] quick-disconnect
+- [ ] fiber-patch-lc
+- [ ] loto-tag
+- [ ] esd-wrist-strap
+- [ ] leak-detection-cable
+- [ ] fiber-cleaner
+- [ ] cable-label
+- [ ] velcro-tie
