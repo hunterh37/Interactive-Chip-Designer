@@ -80,3 +80,7 @@ l2 | duv-immersion-scanner | final 0.655 [~] | 4974 | /Users/hunter/dev/RealityH
 l1 | esd-wrist-strap | 0.737 | 1391 | /Users/hunter/dev/RealityHD-lib-l1/docs/assets/esd-wrist-strap.png
 l2 | euv-light-source | 0.754 [~] | 13488 | /Users/hunter/dev/RealityHD-lib-l2/docs/assets/euv-light-source.png
 l2 | duv-immersion-scanner | 0.655 [~] | 4974 | /Users/hunter/dev/RealityHD-lib-l2/docs/assets/duv-immersion-scanner.png
+l1 | leak-detection-cable | 0.812 | 690 | ~/dev/RealityHD-lib-l1/docs/assets/leak-detection-cable.png
+l1 | fiber-cleaner | 0.777 | 1080 | ~/dev/RealityHD-lib-l1/docs/assets/fiber-cleaner.png
+l1 | cable-label | 0.779 | 226 | ~/dev/RealityHD-lib-l1/docs/assets/cable-label.png
+l1 | velcro-tie | 0.818 | 380 | ~/dev/RealityHD-lib-l1/docs/assets/velcro-tie.png

@@ -2,7 +2,7 @@ services:
   - type: web
     name: chipdesigner-api
     runtime: node
-    plan: starter
+    plan: free
     buildCommand: npm ci --workspace server --include-workspace-root
     startCommand: npm start -w server
     healthCheckPath: /healthz

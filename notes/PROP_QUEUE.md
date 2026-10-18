@@ -55,7 +55,7 @@ Order: what the first demo shows (walk a hot aisle, follow a wafer, build a chip
 - [ ] fire-suppression-cylinder
 - [ ] vesda-pipe
 - [ ] emergency-power-off
-- [ ] leak-detection-cable
+- [~] leak-detection-cable
 - [x] aisle-sign
 - [~] crash-cart-kvm 0.792 (unsigned)
 - [ ] loading-dock-leveler
@@ -132,7 +132,7 @@ Order: what the first demo shows (walk a hot aisle, follow a wafer, build a chip
 - [~] fiber-patch-lc 0.797 unsigned
 - [~] loto-tag 0.766 (unsigned, 1414 tris)
 - [~] esd-wrist-strap (0.737, unsigned)
-- [ ] leak-detection-cable
-- [ ] fiber-cleaner
-- [ ] cable-label
-- [ ] velcro-tie
+- [~] leak-detection-cable
+- [~] fiber-cleaner
+- [~] cable-label
+- [~] velcro-tie
