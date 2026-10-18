@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 
 export const U = 0.04445; // 1 rack unit in metres
 
@@ -37,6 +38,25 @@ export function stage(canvas, { xr = false } = {}) {
 
 const mat = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.45, metalness: 0.7, ...o });
 const box = (w, h, d, m) => new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m);
+
+/** RealityHD GLB from /models/<id>.glb, loaded once; clones share geometry and materials. */
+const glbCache = new Map(), gltf = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+export const loadProp = id => {
+  if (!glbCache.has(id)) glbCache.set(id, gltf.loadAsync(`${import.meta.env.BASE_URL}models/${id}.glb`).then(r => r.scene).catch(() => null));
+  return glbCache.get(id);
+};
+/** Low-poly fallback stays in place until the GLB resolves; then it is swapped, fit to size [w,h,d] (h-only when fit='h'). */
+export function prop(id, fallback, size) {
+  const g = new THREE.Group(); g.add(fallback);
+  loadProp(id).then(src => {
+    if (!src) return;
+    const m = src.clone(true), b = new THREE.Box3().setFromObject(m), d = b.getSize(new THREE.Vector3());
+    const k = size ? size[1] / d.y : 1; m.scale.setScalar(k);
+    m.position.set(-(b.min.x + d.x / 2) * k, -b.min.y * k, -(b.min.z + d.z / 2) * k);
+    g.remove(fallback); g.add(m);
+  });
+  return g;
+}
 
 /** Side-panel art: base color plus a pattern in ink, drawn to a canvas. Cached per (design, base, ink). */
 const sideTex = new Map();
@@ -143,26 +163,25 @@ export function buildRoom(racks, catalog) {
 }
 
 /** Die on substrate. 1 grid cell = 0.06 m at tabletop scale. */
+/** Track 2 package: 52×42 mm Si interposer with 4 GPU + 4 HBM chiplets and routed links. 1 mm = 0.01 m. */
+const DIE_COLOR = { G: '#f2731a', H: '#33bf8c' };
 export function buildChip(chip, catalog) {
   const g = new THREE.Group(); g.name = 'chip';
-  const { cols, rows } = catalog.die, s = 0.06, W = cols * s, D = rows * s;
-  const sub = box(W + 0.24, 0.03, D + 0.24, mat('#0d0d0d', { metalness: 0.2, roughness: 0.8 })); sub.position.y = 0.015; g.add(sub);
-  for (let i = 0; i < 40; i++) { // BGA balls along the edge
-    const b = new THREE.Mesh(new THREE.SphereGeometry(0.01, 8, 6), mat('#c9c9c9'));
-    const a = (i / 40) * Math.PI * 2; b.position.set(Math.cos(a) * (W / 2 + 0.09), 0.0, Math.sin(a) * (D / 2 + 0.09)); g.add(b);
+  const t2 = catalog.track2, [W, H] = t2.interposer, s = 0.01, X = x => (x - W / 2) * s, Z = y => (H / 2 - y) * s;
+  const sub = box(W * s + 0.08, 0.02, H * s + 0.08, mat('#0d0d0d', { metalness: 0.2, roughness: 0.8 })); sub.position.y = 0.01; g.add(sub);
+  const ip = box(W * s, 0.006, H * s, mat('#3a3f48', { metalness: 0.6, roughness: 0.35 })); ip.position.y = 0.023; g.add(ip);
+  const bad = new Set(chip.result?.bad ?? []);
+  for (const p of chip.place ?? []) {
+    const [w, h] = t2.dies[p.id], c = bad.has(p.id) ? '#ff4d4d' : DIE_COLOR[p.id[0]];
+    const m = box(w * s, p.id[0] === 'H' ? 0.03 : 0.012, h * s, mat(c, { emissive: c, emissiveIntensity: chip.taped ? 0.5 : 0.15 }));
+    m.position.set(X(p.x + w / 2), 0.026 + m.geometry.parameters.height / 2, Z(p.y + h / 2)); m.userData.die = p.id; g.add(m);
   }
-  const die = box(W + 0.02, 0.02, D + 0.02, mat('#202226')); die.position.y = 0.04; g.add(die);
-  const blocks = new Map(catalog.chipBlocks.map(b => [b.id, b]));
-  chip.cells.forEach((id, i) => {
-    const x = (i % cols) - cols / 2 + 0.5, z = Math.floor(i / cols) - rows / 2 + 0.5;
-    const b = blocks.get(id);
-    const m = box(s * 0.94, b ? 0.025 : 0.004, s * 0.94, b ? mat(b.color, { emissive: b.color, emissiveIntensity: chip.taped ? 0.5 : 0.12 }) : mat('#1a1a1a', { metalness: 0.9 }));
-    m.position.set(x * s, 0.05 + (b ? 0.0125 : 0.002), z * s); m.userData.cell = i; g.add(m);
-  });
-  if (chip.taped) {
-    const lid = box(W + 0.06, 0.012, D + 0.06, mat('#b8bcc4', { metalness: 1, roughness: 0.25, transparent: true, opacity: 0.35 }));
-    lid.position.y = 0.11; g.add(lid);
+  const wire = new THREE.LineBasicMaterial({ color: '#ffe08a' });
+  for (const l of Object.values(chip.result?.links ?? {})) {
+    const pts = [l.from, ...l.path.map(([i, j]) => [(i + 0.5) * 0.5, (j + 0.5) * 0.5]), l.to].map(([x, y]) => new THREE.Vector3(X(x), 0.028, Z(y)));
+    g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), wire));
   }
+  if (chip.taped) { const lid = box(W * s + 0.02, 0.008, H * s + 0.02, mat('#b8bcc4', { metalness: 1, roughness: 0.25, transparent: true, opacity: 0.35 })); lid.position.y = 0.075; g.add(lid); }
   g.position.y = 0.8;
   return g;
 }
@@ -170,6 +189,7 @@ export function buildChip(chip, catalog) {
 /** RealityHD GLB props exported by scripts/export-realityhd.sh (optional; missing files skipped). */
 /** Data-center hall around the player racks: raised floor, background rack rows, containment, trays, lights. */
 export const HALL = { roof: false }; // ceiling, light strips, trays, containment roof: off so the camera sees in
+const FILLERS = ['rack-air-42u', 'rack-nvl72-2025', 'rack-air-42u', 'rack-ai-1mw'];
 export function dataCenterHall(world, { xr = false } = {}) {
   const g = new THREE.Group(); g.name = 'hall';
   const tile = 0.6, nx = 24, nz = 24;
@@ -185,8 +205,9 @@ export function dataCenterHall(world, { xr = false } = {}) {
   const H = 42 * U + 0.12, frame = mat('#16181c', { metalness: 0.5, roughness: 0.6 });
   const led = [mat('#00e0a4', { emissive: '#00e0a4', emissiveIntensity: 1 }), mat('#3aa0ff', { emissive: '#3aa0ff', emissiveIntensity: 1 })];
   const filler = (x, z, ry) => {
-    const r = new THREE.Group(); r.add(at(box(0.6, H, 1.07, frame), 0, H / 2, 0));
-    for (let k = 0; k < 14; k++) if ((x * 7 + k * 3) % 5) r.add(at(box(0.008, 0.008, 0.004, led[k % 2]), 0.2, 0.15 + k * 0.13, 0.537));
+    const lo = new THREE.Group(); lo.add(at(box(0.6, H, 1.07, frame), 0, H / 2, 0));
+    for (let k = 0; k < 14; k++) if ((x * 7 + k * 3) % 5) lo.add(at(box(0.008, 0.008, 0.004, led[k % 2]), 0.2, 0.15 + k * 0.13, 0.537));
+    const r = prop(FILLERS[Math.abs(Math.round(x / PITCH + z)) % FILLERS.length], lo, [0.6, H, 1.07]);
     r.position.set(x, 0, z); r.rotation.y = ry; return r;
   };
   for (let i = -8; i <= 8; i++) {
@@ -195,7 +216,9 @@ export function dataCenterHall(world, { xr = false } = {}) {
     g.add(filler(i * PITCH, 4.4, Math.PI));                    // opposite row across the cold aisle
   }
   const tray = mat('#8a8f98', { metalness: 0.8, roughness: 0.4 });
-  if (HALL.roof) for (const z of [-0.2, -2.6, 4.6]) g.add(at(box(17 * PITCH, 0.05, 0.3, tray), 0, 2.75, z)); // overhead cable trays
+  if (HALL.roof) for (const z of [-0.2, -2.6, 4.6]) for (let i = -2; i <= 2; i++) g.add(at(prop('cable-tray-ladder', box(17 * PITCH / 5, 0.05, 0.3, tray), [3, 0.1, 0.6]), i * 17 * PITCH / 5, 2.7, z)); // overhead cable trays
+  if (!xr) for (const [id, x, z, ry, h] of [['ups-cabinet', -6.4, -4.4, 0, 2], ['battery-rack-li', -5.6, -4.4, 0, 2], ['crah-unit', 6.2, 2.25, -Math.PI / 2, 2.2], ['fire-suppression-cylinder', -6.6, 2.25, 0, 1.6], ['cdu-liquid', 5.6, -4.4, 0, 2.2]])
+    { const o = at(prop(id, at(box(0.7, h, 0.8, frame), 0, h / 2, 0), [0.7, h, 0.8]), x, 0, z); o.rotation.y = ry; g.add(o); }
   const glass = new THREE.MeshStandardMaterial({ color: '#9fd6ff', transparent: true, opacity: 0.08, roughness: 0.1 });
   if (HALL.roof) g.add(at(box(17 * PITCH, 0.02, 3.8, glass), 0, H + 0.1, 2.25)); // cold-aisle containment roof
   if (!xr) {
@@ -217,7 +240,7 @@ export function replace(world, name, obj) {
 /** Every player's die side by side with name tags (live design overview). */
 export function buildDieGrid(chips, catalog) {
   const g = new THREE.Group(); g.name = 'chip';
-  const list = Object.values(chips || {}).filter(c => c.cells.some(Boolean) || c.taped);
+  const list = Object.values(chips || {}).filter(c => c.place);
   const cols = Math.min(4, Math.max(1, Math.ceil(Math.sqrt(list.length)))), gap = 0.95;
   list.forEach((c, i) => {
     const d = buildChip(c, catalog); d.name = '';

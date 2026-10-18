@@ -1,3 +1,4 @@
+import { solve, throttle } from './thermal.js';
 // Real components, list prices USD (2026 street, rounded). u = rack units.
 export const RACKS = [
   { id: 'apc-ar3300', name: 'APC NetShelter SX 42U', u: 42, price: 1890 },
@@ -21,17 +22,8 @@ export const COMPONENTS = [
   { id: 'blank-1u', cat: 'misc', name: '1U blanking panel', u: 1, kw: 0, price: 12, color: '#111111' },
 ];
 
-export const CHIP_BLOCKS = [
-  { id: 'tensor', name: 'Tensor cores', color: '#f2731a', mm2: 60, tflops: 450, w: 90 },
-  { id: 'sram', name: 'SRAM cache', color: '#4d8cf2', mm2: 40, tflops: 0, w: 15 },
-  { id: 'hbm', name: 'HBM4 PHY', color: '#33bf8c', mm2: 30, tflops: 0, w: 25 },
-  { id: 'cpu', name: 'Arm CPU cluster', color: '#d9cc40', mm2: 25, tflops: 8, w: 30 },
-  { id: 'noc', name: 'Network-on-chip', color: '#b3b3b3', mm2: 15, tflops: 0, w: 8 },
-  { id: 'io', name: 'NVLink / CPO I/O', color: '#b366e6', mm2: 20, tflops: 0, w: 20 },
-];
-export const DIE = { cols: 8, rows: 8, reticleMM2: 858 };
-export const isEdge = i => { const x = i % DIE.cols, y = Math.floor(i / DIE.cols); return x === 0 || y === 0 || x === DIE.cols - 1 || y === DIE.rows - 1; };
-
+import { CHIP_BLOCKS, DIE, isEdge } from './die.js';
+export { CHIP_BLOCKS, DIE, isEdge };
 const byId = new Map(COMPONENTS.map(c => [c.id, c]));
 export const component = id => byId.get(id);
 export const rack = id => RACKS.find(r => r.id === id) ?? RACKS[0];
@@ -53,11 +45,12 @@ export function chipScore(chip) {
   // HBM PHYs and I/O SerDes sit on the die edge (shoreline) in real floorplans; interior ones do not connect.
   const edge = id => chip.cells.filter((c, i) => c === id && isEdge(i)).length;
   const bw = edge('hbm') * CHALLENGE.bwPerHBM + n('sram') * CHALLENGE.bwPerSRAM;
-  const effective = Math.min(t.tflops, bw);
+  const th = solve(chip.cells), thr = throttle(th.tmax); // above 95 °C the clock derates
+  const effective = Math.round(Math.min(t.tflops, bw) * thr);
   const checks = { power: t.watts <= CHALLENGE.watts, memory: edge('hbm') > 0, io: edge('io') > 0, control: n('cpu') > 0 };
   const passed = Object.values(checks).filter(Boolean).length;
   const score = Math.round(effective * (checks.power ? 1 : 0.4) * (0.55 + 0.15 * (passed - (checks.power ? 1 : 0))));
-  return { ...t, bandwidth: bw, effective, checks, score, misplaced: n('hbm') + n('io') - edge('hbm') - edge('io') };
+  return { ...t, bandwidth: bw, effective, checks, score, tmax: th.tmax, hot: th.hot, throttle: +thr.toFixed(2), misplaced: n('hbm') + n('io') - edge('hbm') - edge('io') };
 }
 
 export function chipTotals(chip) {

@@ -14,9 +14,13 @@ test('two guests: live count, chip dies on host, leaderboard, racks in shared ro
   await host.locator('#next').click();
   for (const [p, n] of [[a, 6], [b, 3]]) {
     await p.locator('#go-chip').click(); await p.locator('#begin').click();
-    await paint(p, 'tensor', [...Array(n).keys()]); await paint(p, 'hbm', [23]); await paint(p, 'io', [24]); await paint(p, 'cpu', [22]);
+    if (await p.locator('#tipok').isVisible()) await p.locator('#tipok').click();
+    await expect(p.locator('#grid .die')).toHaveCount(8);
   }
   await expect(statRow(host, 'Designing')).toHaveText('2');
+  await expect(a.locator('#meters')).toContainText('°C');
+  await a.locator('#cool').click();
+  await expect(a.locator('#hint')).toContainText(/AI cool/, { timeout: 20000 });
   await a.locator('#tape').click(); await b.locator('#tape').click();
   await expect(a.locator('#s-result.on')).toBeVisible({ timeout: 15000 });
   await expect(b.locator('#s-result.on')).toBeVisible({ timeout: 15000 });

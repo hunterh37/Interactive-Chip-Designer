@@ -5,7 +5,13 @@ cd "$(dirname "$0")/.."
 OUT="$PWD/web/public/models"
 mkdir -p "$OUT"
 ( cd ../RealityHD && swift build -c release --product realityhd >/dev/null )
+IDS="rack-air-42u rack-nvl72-2025 rack-ai-1mw cable-tray-ladder cdu-liquid ups-cabinet battery-rack-li rack-pdu crah-unit network-patch-panel fire-suppression-cylinder"
 for id in desktop-monitor laptop; do ../RealityHD/.build/release/realityhd export "$id" --lod 1 --size 512 --out "$OUT"; done
+# Hall props: GLB only, meshopt geometry + 512px WebP textures (~0.5 MB per rack). Missing ids keep the box fallback in scene.js.
+for id in $IDS; do
+  ../RealityHD/.build/release/realityhd export "$id" --lod 1 --size 512 --out "$OUT" || continue
+  npx -y @gltf-transform/cli@4.1.1 optimize "$OUT/$id.glb" "$OUT/$id.opt.glb" --compress meshopt --texture-compress webp --texture-size 512 >/dev/null 2>&1 && mv "$OUT/$id.opt.glb" "$OUT/$id.glb"
+done
 
 # Fallback: realityhd's USDZ step needs Blender (/opt/homebrew/bin/blender is a dangling cask wrapper).
 # Convert each GLB to USDZ with stdlib python (UsdPreviewSurface, PNG textures, 64-byte aligned stored zip).

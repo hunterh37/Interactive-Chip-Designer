@@ -11,7 +11,7 @@ struct TrainingInspector: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(t.step.title).font(.title2).fontWeight(.semibold)
                     Text(t.step.instruction).font(.body)
-                    ProgressView(value: t.progress).tint(Theme.accent)
+                    ProgressView(value: t.progress).terawattStyle()
                     Text("\(t.done.count) of \(TrainStep.allCases.count)  ·  \(t.step.zoom.title)")
                         .font(.caption).foregroundStyle(.secondary)
                 }
@@ -19,15 +19,15 @@ struct TrainingInspector: View {
                     Button("Back") { store.training.back() }.disabled(t.step == .ppe)
                     Spacer()
                     Button(t.step == .campus ? "Finish" : "Done") { store.training.complete() }
-                        .buttonStyle(.borderedProminent).disabled(t.finished)
+                        .buttonStyle(.monoPrimary).disabled(t.finished)
                 }
             }
-            Section("Procedure") {
+            Section(header: MonoLabel("Procedure")) {
                 ForEach(TrainStep.allCases, id: \.self) { s in
                     Button { store.training.jump(s) } label: {
                         HStack {
-                            Image(systemName: t.done.contains(s) ? "checkmark.circle.fill" : s == t.step ? "circle.inset.filled" : "circle")
-                                .foregroundStyle(t.done.contains(s) || s == t.step ? Theme.accent : .secondary)
+                            Text(ASCII.mark(done: t.done.contains(s), current: s == t.step))
+                                .foregroundStyle(t.done.contains(s) || s == t.step ? Theme.fg : Theme.mute)
                             Text("\(s.rawValue + 1)  \(s.title)")
                             Spacer()
                             if s.zoom != .rack { Text(s.zoom.title).font(.caption).foregroundStyle(.secondary) }
@@ -41,7 +41,7 @@ struct TrainingInspector: View {
                 Button("Walk") { Task { await openImmersive(id: SceneID.walk) } }
             }
         }
-        .tint(Theme.accent)
-        .navigationTitle("Rack install")
+        .terawattStyle()
+        .navigationTitle("RACK INSTALL")
     }
 }

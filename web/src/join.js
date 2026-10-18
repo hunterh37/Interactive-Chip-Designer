@@ -2,6 +2,7 @@ import { catalog, connect } from './net.js';
 import * as THREE from 'three';
 import { stage, buildRack, buildChip, buildRoom, replace, emptyRack, realityHDProps, paintOf } from './scene.js';
 import { monoCatalog, BLOCK_STYLE, bar, scramble, asciiField, asciiDie, LOGO } from './ascii.js';
+import { buildGlobe, setPins, toLatLon, placeName, fmtLatLon, faceQuat } from './globe.js';
 import { USDZExporter } from 'three/examples/jsm/exporters/USDZExporter.js';
 
 const $ = id => document.getElementById(id);
@@ -19,8 +20,7 @@ let s = null, screen = 'intro', brush = 'tensor', deadline = 0, fabbing = false,
 const net = connect({ room, kind: 'phone', mode: 'chip', name: name || 'guest', pid, onState: st => { s = st; render(); }, onError: e => toast(e) });
 const send = op => net.send(op);
 const me = () => s?.chips?.[pid];
-const result = () => me()?.result ?? { tflops: 0, watts: 0, bandwidth: 0, effective: 0, score: 0, checks: {}, usedMM2: 0 };
-const cells = () => me()?.cells ?? Array(cat.die.cols * cat.die.rows).fill(null);
+const result = () => me()?.result ?? { passed: false, score: null, points: 0, bad: [], links: {} };
 
 // ── background field + screens
 const field = asciiField($('field'));
@@ -48,15 +48,16 @@ $('name').onkeydown = e => e.key === 'Enter' && enter();
 
 // ── menu
 $('go-chip').onclick = () => { me()?.taped ? go('result') : go('brief'); };
-$('go-rack').onclick = () => go('rack');
+$('go-rack').onclick = () => goRack();
 
 // ── brief
 $('brief-back').onclick = () => go('menu');
 $('spec').innerHTML = [
-  ['Power budget', `≤ ${POWER} W`], ['Memory', '≥ 1 × HBM4 · edge'], ['Interconnect', '≥ 1 × I/O · edge'], ['Control', '≥ 1 × CPU'], ['Die', `${cat.die.cols}×${cat.die.rows} · ${cat.die.reticleMM2} mm²`],
+  ['Interposer', '52 × 42 mm Si'], ['Chiplets', '4 GPU 11.5×10.5 · 4 HBM 10.5×10.2'], ['Links', 'P 600 GB/s ≤5 mm · S 300 GB/s ≤6 mm'],
+  ['Wire budget', 'Σ GB/s × mm ≤ 13,500'], ['Clearance', '1 mm die gap · 1 mm edge'], ['Workloads', '5 · worst GPU + HBM °C'], ['Score', '< 1 beats random baseline'],
 ].map(([k, v]) => `<div class="row"><span class="mute">${k}</span><span>${v}</span></div>`).join('');
 $('begin').onclick = () => {
-  send({ type: 'my.clear' }); deadline = Date.now() + DURATION * 1000; go('design'); $('binfo').textContent = INFO[brush];
+  send({ type: 'my.clear' }); deadline = Date.now() + DURATION * 1000; go('design'); $('binfo').textContent = '';
   if (!store.get('cd-tip')) { tipHeld = Date.now(); showTip(); }
 };
 
@@ -65,72 +66,57 @@ const chipStage = stage($('view'));
 chipStage.scene.background = null;
 chipStage.camera.position.set(0, 1.55, 0.62); chipStage.controls.target.set(0, 0.82, 0); chipStage.controls.enableZoom = false;
 chipStage.tick.push(t => { const c = chipStage.world.getObjectByName('chip'); if (c) c.rotation.y = Math.sin(t / 3000) * 0.25; });
-$('pal').innerHTML = '';
-cat.chipBlocks.forEach(b => {
-  const x = document.createElement('button'); x.dataset.id = b.id;
-  x.innerHTML = `<i>${b.glyph}</i>${b.short}`; x.onclick = () => { brush = b.id; $('binfo').textContent = INFO[b.id] ?? ''; render(); };
-  $('pal').append(x);
-});
-const grid = $('grid');
-const isEdge = i => { const x = i % cat.die.cols, y = Math.floor(i / cat.die.cols); return !x || !y || x === cat.die.cols - 1 || y === cat.die.rows - 1; };
-for (let i = 0; i < cat.die.cols * cat.die.rows; i++) { const d = document.createElement('div'); d.dataset.i = i; grid.append(d); }
-const INFO = {
-  tensor: 'Tensor cores: matrix math. All the compute, most of the power (~20 W/cell).',
-  sram: 'SRAM cache: on-die memory. +150 TF of bandwidth, low power.',
-  hbm: 'HBM4 PHY: stacked DRAM link. +900 TF of bandwidth. Edge cells only.',
-  cpu: 'Arm CPU cluster: control. At least 1 required.',
-  noc: 'Network-on-chip: wiring between blocks. No score.',
-  io: 'NVLink / CPO I/O: chip-to-chip link. At least 1, edge cells only.',
+$('pal').hidden = true;
+const T2 = cat.track2, [IW, IH] = T2.interposer, SV = 'http://www.w3.org/2000/svg';
+const grid = $('grid'); grid.className = 'ip';
+const svg = document.createElementNS(SV, 'svg'); svg.setAttribute('viewBox', `0 0 ${IW} ${IH}`); grid.append(svg);
+const heatImg = document.createElementNS(SV, 'image'); heatImg.setAttribute('width', IW); heatImg.setAttribute('height', IH); heatImg.setAttribute('preserveAspectRatio', 'none'); svg.append(heatImg);
+const [cx0, cy0, cx1, cy1] = T2.contact;
+svg.insertAdjacentHTML('beforeend', `<rect x="${cx0}" y="${IH - cy1}" width="${cx1 - cx0}" height="${cy1 - cy0}" class="contact"/><rect x="${T2.edge}" y="${T2.edge}" width="${IW - 2 * T2.edge}" height="${IH - 2 * T2.edge}" class="margin"/><g id="wires"></g><g id="dies"></g><g id="hots"></g>`);
+let drag = null, local = null; // local: optimistic place while dragging
+const place = () => local ?? me()?.place ?? [];
+const svgPt = e => { const r = svg.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * IW, (e.clientY - r.top) / r.height * IH]; };
+grid.onpointerdown = e => {
+  const t = e.target.closest('[data-i]'); if (!t || me()?.taped) return;
+  const i = +t.dataset.i, p = place()[i], [mx, my] = svgPt(e), [, h] = T2.dies[p.id];
+  local = place().map(q => ({ ...q })); drag = { i, dx: mx - p.x, dy: my - (IH - p.y - h) }; grid.setPointerCapture(e.pointerId);
+  if (navigator.vibrate) navigator.vibrate(4);
 };
+grid.onpointermove = e => {
+  if (!drag) return; const [mx, my] = svgPt(e), p = local[drag.i], [, h] = T2.dies[p.id];
+  p.x = Math.round((mx - drag.dx) * 4) / 4; p.y = Math.round((IH - (my - drag.dy) - h) * 4) / 4; drawPlace();
+};
+grid.onpointerup = grid.onpointercancel = () => {
+  if (!drag) return; const p = local[drag.i]; drag = null;
+  send({ type: 'my.move', i: local.indexOf(p), x: p.x, y: p.y }); setTimeout(() => { local = null; render(); }, 400);
+};
+const INFO = {};
 
 // ── how-to popover: loops a demo floorplan being drawn
 const DEMO = [
-  ['Pick a block below, then tap or drag on the die to place it. Tap again to erase.', 'tensor', [27, 28, 35, 36]],
-  ['Tensor cores make compute. Fill the middle of the die with them.', 'tensor', [18, 19, 20, 21, 26, 29, 34, 37, 42, 43, 44, 45]],
-  ['Compute is capped by memory bandwidth. Put HBM4 on the dashed edge cells to feed it.', 'hbm', [8, 16, 24, 15, 23, 31]],
-  ['SRAM next to the cores adds a little more bandwidth.', 'sram', [10, 13, 50, 53]],
-  ['Add 1 CPU and 1 I/O (edge) to pass the checks. Stay under 1000 W.', 'cpu', [2], 'io', [60]],
-  ['Highest effective TFLOPS wins. Tape out before the timer hits 0.', null, []],
+  'Track 2: place 4 GPU and 4 HBM chiplets on a 52 × 42 mm silicon interposer. Drag a die to move it.',
+  'Every GPU links to two HBMs: its primary (600 GB/s, ≤ 5 mm wire) and a secondary (300 GB/s, ≤ 6 mm). Yellow lines are the routed wires.',
+  'Wires and PHYs dissipate power: 0.20 pJ/bit at the ends plus 0.08 pJ/bit per mm. Total GB/s × mm must stay ≤ 13,500.',
+  'Keep 1 mm between dies and 1 mm from the edge. Red dies break a rule. Only the dashed center sits on good cooler contact.',
+  'Five workloads run. Score = worst GPU and HBM rise vs the random baseline. Below 1.000 wins. Try AI cool.',
 ];
-const demo = $('demo');
-for (let i = 0; i < cat.die.cols * cat.die.rows; i++) { const d = document.createElement('div'); if (isEdge(i)) d.className = 'e'; d.textContent = '·'; demo.append(d); }
+$('demo').hidden = true;
 let demoT = null;
 function showTip() {
   $('tip').hidden = false; clearTimeout(demoT);
-  const put = (i, id) => { const d = demo.children[i], st = BLOCK_STYLE[id]; d.textContent = st.g; d.className = 'f pop'; d.style.background = st.c; };
-  const run = (step, k) => {
-    if ($('tip').hidden) return;
-    if (step === 0 && k === 0) [...demo.children].forEach((d, i) => { d.textContent = '·'; d.className = isEdge(i) ? 'e' : ''; d.style.background = ''; });
-    const [cap, ...pairs] = DEMO[step];
-    const todo = []; for (let p = 0; p < pairs.length; p += 2) if (pairs[p]) pairs[p + 1].forEach(i => todo.push([i, pairs[p]]));
-    $('tipcap').textContent = cap; $('tipstep').textContent = `${step + 1} / ${DEMO.length}`;
-    if (k < todo.length) { put(...todo[k]); demoT = setTimeout(() => run(step, k + 1), 160); }
-    else demoT = setTimeout(() => run((step + 1) % DEMO.length, 0), 1900);
-  };
-  run(0, 0);
+  const run = k => { if ($('tip').hidden) return; $('tipcap').textContent = DEMO[k]; $('tipstep').textContent = `${k + 1} / ${DEMO.length}`; demoT = setTimeout(() => run((k + 1) % DEMO.length), 4200); };
+  run(0);
 }
 let tipHeld = 0;
 $('help').onclick = () => { tipHeld = Date.now(); showTip(); };
 $('tipok').onclick = () => { $('tip').hidden = true; clearTimeout(demoT); store.set('cd-tip', '1'); deadline += Date.now() - tipHeld; };
-let painting = false, lastCell = -1;
-const paintAt = e => {
-  const t = document.elementFromPoint(e.clientX, e.clientY); if (!t?.dataset?.i || !grid.contains(t)) return;
-  const i = +t.dataset.i; if (i === lastCell) return; lastCell = i;
-  const block = cells()[i] === brush ? null : brush;
-  if (cells()[i] === block) return;
-  t.classList.remove('pop'); void t.offsetWidth; t.classList.add('pop');
-  if (navigator.vibrate) navigator.vibrate(4);
-  send({ type: 'my.paint', cell: i, block });
-};
-grid.onpointerdown = e => { painting = true; lastCell = -1; grid.setPointerCapture(e.pointerId); paintAt(e); };
-grid.onpointermove = e => painting && paintAt(e);
-grid.onpointerup = grid.onpointercancel = () => { painting = false; };
 $('clear').onclick = () => send({ type: 'my.clear' });
+$('cool').onclick = () => send({ type: 'my.autocool' });
 $('tape').onclick = () => tapeout();
 
 function tapeout() {
   if (fabbing) return;
-  if (!cells().some(Boolean)) return toast('empty die');
+  if (!result().passed) return toast(result().reason || 'layout breaks a rule');
   fabbing = true; send({ type: 'my.tapeout' }); fab();
 }
 
@@ -139,13 +125,13 @@ setInterval(() => {
   const left = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
   $('timer').textContent = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
   $('timer').classList.toggle('low', left <= 10);
-  if (left === 0) cells().some(Boolean) ? tapeout() : (deadline = Date.now() + 30e3, toast('place at least one block'));
+  if (left === 0) result().passed ? tapeout() : (deadline = Date.now() + 30e3, toast('fix the layout to tape out'));
 }, 250);
 
 // ── fab sequence
 async function fab() {
   go('fab'); const log = $('fablog'); log.innerHTML = '';
-  const steps = ['Netlist freeze', 'Place & route', 'EUV lithography · 14 layers', 'Etch & deposit', 'CoWoS package', 'Burn-in · bin'];
+  const steps = ['Route 8 links', 'Check reach + 13,500 budget', 'Build power traces', 'Thermal solve · 5 workloads', 'Compare to random baseline', 'CoWoS package'];
   for (const st of steps) {
     const line = document.createElement('div'); log.append(line); scramble(line, st.toUpperCase(), 260); field.pulse();
     await new Promise(r => setTimeout(r, 420)); line.classList.add('done');
@@ -231,8 +217,70 @@ $('roomview').addEventListener('pointerup', e => {
 });
 const mine = () => s?.racks?.[pid] ?? emptyRack();
 
+// ── site vote: before building, the room picks one data center location on a globe
+const siteStage = stage($('siteview'));
+siteStage.scene.background = null;
+siteStage.camera.position.set(0, 0, 3.3); siteStage.controls.target.set(0, 0, 0);
+siteStage.controls.enablePan = false; siteStage.controls.minDistance = 1.35; siteStage.controls.maxDistance = 4.5; siteStage.controls.rotateSpeed = 0.5;
+const globe = buildGlobe(); siteStage.world.add(globe);
+const sun = new THREE.DirectionalLight('#ffffff', 1.2); sun.position.set(-2, 1, 3); siteStage.scene.add(sun);
+let spinTo = null, siteSig = '', lockedShown = false;
+siteStage.tick.push(() => {
+  if (spinTo) { globe.quaternion.slerp(spinTo, 0.08); if (globe.quaternion.angleTo(spinTo) < 0.002) spinTo = null; }
+  else if (!Object.keys(s?.site?.pins || {}).length) globe.rotation.y += 0.0015;
+  const d = siteStage.camera.position.length(); siteStage.controls.rotateSpeed = 0.15 + (d - 1.35) * 0.18; // finer drag when zoomed in
+});
+const siteSheet = sheet('sitesheet', 'sitehint');
+const goRack = () => { if (s?.site?.chosen) { rackFitted = false; lastSlots = -1; rackUiSig = ''; go('rack'); } else go('site'); };
+$('site-back').onclick = () => go('menu');
+let sdown = null;
+$('siteview').addEventListener('pointerdown', e => { sdown = [e.clientX, e.clientY]; });
+$('siteview').addEventListener('pointerup', e => {
+  if (!sdown || Math.hypot(e.clientX - sdown[0], e.clientY - sdown[1]) > 8 || s?.site?.chosen) return;
+  const r = $('siteview').getBoundingClientRect();
+  ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  ray.setFromCamera(ndc, siteStage.camera);
+  const pinHit = ray.intersectObject(globe.getObjectByName('pins'), true)[0];
+  if (pinHit) { send({ type: 'site.vote', target: pinHit.object.userData.pin }); navigator.vibrate?.(10); return; }
+  const hit = ray.intersectObject(globe.getObjectByName('earth'))[0]; if (!hit) return;
+  const { lat, lon } = toLatLon(globe.worldToLocal(hit.point.clone()));
+  send({ type: 'site.pin', lat, lon, place: placeName(lat, lon) }); navigator.vibrate?.(15); siteSheet(false);
+});
+const focusPin = p => { spinTo = faceQuat(p.lat, p.lon); };
+
+function renderSite() {
+  const site = s.site || { pins: {}, tally: {} }, ids = Object.keys(site.pins);
+  const sig = JSON.stringify([site.pins, site.tally, site.chosen?.id]);
+  if (sig !== siteSig) { siteSig = sig; setPins(globe, site, pid); }
+  const mineV = site.votes?.[pid], tally = site.tally || {};
+  $('sitecount').textContent = `${ids.length} pin${ids.length === 1 ? '' : 's'}`;
+  if (site.chosen) {
+    const c = site.chosen;
+    $('sitehead').textContent = 'Site chosen'; $('sitecue').innerHTML = `<span>${c.place || fmtLatLon(c.lat, c.lon)}</span>`;
+    $('sitetitle').textContent = `${c.votes} vote${c.votes === 1 ? '' : 's'} · ${c.owner}`;
+    if (!lockedShown) { lockedShown = true; focusPin(c); navigator.vibrate?.([20, 60, 20]); }
+    $('siteui').innerHTML = `<div class="row"><span class="mute">Location</span><span>${fmtLatLon(c.lat, c.lon)}</span></div>`;
+    const b = btn('Build racks here →', () => goRack(), 'primary'); b.style.cssText = 'width:100%;padding:16px;margin-top:12px'; $('siteui').append(b);
+    return;
+  }
+  lockedShown = false;
+  $('sitehead').textContent = 'Pick the site';
+  $('sitecue').innerHTML = `<span>${site.pins[pid] ? 'Tap again to move your pin · tap a pin to vote' : 'Tap the globe to drop a pin'}</span>`;
+  $('sitetitle').textContent = ids.length ? `Vote · ${ids.length} site${ids.length === 1 ? '' : 's'}` : 'No sites yet';
+  const ui = $('siteui'); ui.innerHTML = '';
+  if (!ids.length) { ui.append(el('div', 'mute', 'Everyone drops one pin. Most votes when the host starts wins.')); return; }
+  ids.sort((a, b) => (tally[b] || 0) - (tally[a] || 0) || site.pins[a].at - site.pins[b].at).forEach(id => {
+    const p = site.pins[id], row = el('div', 'vote' + (id === site.leader ? ' lead' : ''));
+    const info = el('div', 'n'); info.append(el('div', '', p.place || fmtLatLon(p.lat, p.lon)), el('div', 'p mute', `${p.owner}${id === pid ? ' · you' : ''} · ${fmtLatLon(p.lat, p.lon)}`));
+    info.onclick = () => focusPin(p);
+    row.append(info, el('span', 'v', String(tally[id] || 0)),
+      btn(mineV === id ? 'Voted' : 'Vote', () => { send({ type: 'site.vote', target: id }); focusPin(p); }, mineV === id ? 'on' : ''));
+    ui.append(row);
+  });
+}
+
 // Host owns the active program (s.show.mode). Guests see only that one and follow switches.
-const CHIP_SCREENS = ['brief', 'design', 'fab', 'result'], RACK_SCREENS = ['rack', 'room'];
+const CHIP_SCREENS = ['brief', 'design', 'fab', 'result'], RACK_SCREENS = ['site', 'rack', 'room'];
 let shownMode = null;
 function followMode() {
   const m = s?.show?.mode === 'rack' ? 'rack' : 'chip';
@@ -245,7 +293,7 @@ function followMode() {
   const wrong = m === 'rack' ? CHIP_SCREENS.includes(screen) : RACK_SCREENS.includes(screen);
   if (wrong || (screen === 'menu' && !first)) {
     if (screen === 'fab') return false; // let the tape-out animation finish
-    if (m === 'rack') { rackFitted = false; lastSlots = -1; rackUiSig = ''; go('rack'); } else go(me()?.taped ? 'result' : 'brief');
+    if (m === 'rack') goRack(); else go(me()?.taped ? 'result' : 'brief');
     return true;
   }
   return false;
@@ -259,56 +307,72 @@ function render() {
   if (!s) return;
   if (screen === 'design') renderDesign();
   if (screen === 'result') renderResult();
+  if (screen === 'site') renderSite();
   if (screen === 'rack') renderRack();
   if (screen === 'room') renderRoom();
 }
 
-function renderDesign() {
-  const r = result(), c = cells();
-  $('dname').textContent = `${name || 'Guest'} · die`;
-  replace(chipStage.world, 'chip', buildChip({ cells: c, taped: false }, cat));
-  const cap = 6500;
-  $('meters').innerHTML = [
-    ['Compute', bar(r.tflops, cap), `${r.tflops.toLocaleString()} TF`],
-    ['Bandwidth', bar(r.bandwidth, cap), `${r.bandwidth.toLocaleString()} TF`],
-    ['Power', bar(r.watts, POWER * 1.3), `${r.watts} W`],
-    ['Effective', bar(r.effective, cap), `${r.effective.toLocaleString()} TF`],
-  ].map(([k, b, v]) => `<span class="mute">${k}</span><pre class="ascii">${b}</pre><span class="stat">${v}</span>`).join('');
-  const ck = r.checks || {};
-  $('checks').innerHTML = [['power', `≤${POWER}W`], ['memory', 'HBM'], ['io', 'I/O'], ['control', 'CPU']]
-    .map(([k, l]) => `<span class="${ck[k] ? 'ok' : ''}">${ck[k] ? '■' : '□'} ${l}</span>`).join('');
-  $('hint').textContent = hintFor(r, c);
-  $('pal').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.id === brush));
-  [...grid.children].forEach((d, i) => {
-    const st = BLOCK_STYLE[c[i]];
-    d.textContent = st ? st.g : '·'; d.style.background = st ? st.c : '';
-    d.className = [st ? 'f' : '', isEdge(i) ? 'e' : '', (c[i] === 'hbm' || c[i] === 'io') && !isEdge(i) ? 'bad' : ''].join(' ').trim();
-  });
+const heatCanvas = document.createElement('canvas');
+function drawHeat(r) {
+  const h = r.heat; if (!h) { heatImg.removeAttribute('href'); return; }
+  heatCanvas.width = h.nx; heatCanvas.height = h.ny; const x = heatCanvas.getContext('2d'), im = x.createImageData(h.nx, h.ny);
+  const lo = 25, hi = Math.max(60, r.worstGpu);
+  for (let j = 0; j < h.ny; j++) for (let i = 0; i < h.nx; i++) {
+    const t = Math.max(0, Math.min(1, (h.map[j * h.nx + i] - lo) / (hi - lo))), o = ((h.ny - 1 - j) * h.nx + i) * 4;
+    im.data[o] = 255 * Math.min(1, t * 2); im.data[o + 1] = 255 * Math.max(0, t * 2 - 1) * 0.85; im.data[o + 2] = 60 * (1 - t); im.data[o + 3] = 40 + 150 * t;
+  }
+  x.putImageData(im, 0, 0); heatImg.setAttribute('href', heatCanvas.toDataURL());
+}
+function drawPlace() {
+  const r = result(), bad = new Set(drag ? [] : r.bad ?? []);
+  $('dies').innerHTML = place().map((p, i) => {
+    const [w, h] = T2.dies[p.id], y = IH - p.y - h;
+    return `<g data-i="${i}" class="die ${p.id[0] === 'G' ? 'gpu' : 'hbm'}${bad.has(p.id) ? ' bad' : ''}"><rect x="${p.x}" y="${y}" width="${w}" height="${h}"/><text x="${p.x + w / 2}" y="${y + h / 2 + 1.2}">${p.id}</text></g>`;
+  }).join('');
+  $('wires').innerHTML = drag ? '' : Object.entries(r.links ?? {}).map(([id, l]) => {
+    const pts = [l.from, ...l.path.map(([i, j]) => [(i + 0.5) * 0.5, (j + 0.5) * 0.5]), l.to].map(([x, y]) => `${x},${IH - y}`).join(' ');
+    return `<polyline class="${id[0] === 'P' ? 'wp' : 'ws'}" points="${pts}"/>`;
+  }).join('');
+  $('hots').innerHTML = drag || !r.passed ? '' : [[r.gpuHot, 'g'], [r.hbmHot, 'h']].map(([[x, y], k]) => `<circle class="hot ${k}" cx="${x}" cy="${IH - y}" r="1.2"/>`).join('');
 }
 
-function hintFor(r, c) {
-  const has = id => c.includes(id), ck = r.checks || {};
-  if (!has('tensor')) return '→ Place tensor cores. They make the compute.';
-  if (r.misplaced) return '✕ HBM4 and I/O only work on the dashed edge cells.';
-  if (!ck.memory) return '→ Add HBM4 on the edge. Compute is 0 without bandwidth.';
-  if (!ck.power) return `✕ ${r.watts} W is over budget. Remove tensor cores.`;
-  if (r.bandwidth < r.tflops) return `→ Memory-bound: ${(r.tflops - r.bandwidth).toLocaleString()} TF idle. Add HBM4 or SRAM.`;
-  if (!ck.io) return '→ Add an I/O block on the edge.';
-  if (!ck.control) return '→ Add a CPU cluster.';
-  if (r.tflops < r.bandwidth && r.watts < POWER - 20) return `→ Compute-bound: ${POWER - r.watts} W left. Add tensor cores.`;
-  return '■ Balanced. Tape out, or trade cells for more.';
+function renderDesign() {
+  const r = result();
+  $('dname').textContent = `${name || 'Guest'} · interposer`;
+  replace(chipStage.world, 'chip', buildChip({ place: place(), result: r, taped: false }, cat));
+  const ref = r.ref ?? { gpu: 100, hbm: 85 };
+  $('meters').innerHTML = !r.passed ? '' : [
+    ['GPU max', bar(r.worstGpu - 25, (ref.gpu - 25) * 1.3), `${r.worstGpu} °C`],
+    ['HBM max', bar(r.worstHbm - 25, (ref.hbm - 25) * 1.3), `${r.worstHbm} °C`],
+    ['GB/s·mm', bar(r.weighted, 13500), `${r.weighted.toLocaleString()}`],
+    ['Score', bar(r.score, 1.3), r.score.toFixed(3)],
+  ].map(([k, b, v]) => `<span class="mute">${k}</span><pre class="ascii">${b}</pre><span class="stat">${v}</span>`).join('');
+  const why = r.reason ?? '';
+  $('checks').innerHTML = [['gap', !/clearance/.test(why)], ['ports', !/capacity|track/.test(why)], ['reach', !/reach|exceeds|needs/.test(why)], ['13,500', !/13,500/.test(why)], ['< 1.000', r.passed && r.score < 1]]
+    .map(([l, ok]) => `<span class="${ok ? 'ok' : ''}">${ok ? '■' : '□'} ${l}</span>`).join('');
+  $('hint').textContent = hintFor(r);
+  drawHeat(r); drawPlace();
+}
+
+function hintFor(r) {
+  const cooled = me()?.cooled;
+  if (!r.passed) return `✕ ${r.reason}`;
+  if (cooled && cooled.after < cooled.before && r.score === cooled.after) return `■ AI cool: ${cooled.before.toFixed(3)} → ${cooled.after.toFixed(3)}.`;
+  const g = (r.worstGpu - 25) / (r.ref.gpu - 25), h = (r.worstHbm - 25) / (r.ref.hbm - 25);
+  if (g >= h) return `→ GPU binds: ${r.worstGpu} °C in ${r.gpuWorkload.replace('_', ' ')}. Spread GPUs toward the cooler center.`;
+  return `→ HBM binds: ${r.worstHbm} °C in ${r.hbmWorkload.replace('_', ' ')}. Move HBMs off GPU hot sides.`;
 }
 
 function renderResult() {
   const r = result();
-  const board = Object.entries(s.chips || {}).filter(([, c]) => c.taped).sort((a, b) => b[1].result.score - a[1].result.score);
+  const board = Object.entries(s.chips || {}).filter(([, c]) => c.taped).sort((a, b) => (b[1].result.points ?? 0) - (a[1].result.points ?? 0));
   const rank = board.findIndex(([id]) => id === pid) + 1;
   $('rank').textContent = rank ? `#${rank} of ${board.length}` : '';
-  $('score').textContent = r.score.toLocaleString();
-  $('die').textContent = asciiDie(cells(), cat.die.cols);
-  $('stats').innerHTML = [
-    ['Effective compute', `${r.effective.toLocaleString()} TFLOPS`], ['Peak compute', `${r.tflops.toLocaleString()} TFLOPS`],
-    ['Bandwidth limit', `${r.bandwidth.toLocaleString()} TFLOPS`], ['TDP', `${r.watts} W`], ['Area', `${r.usedMM2} mm²`],
+  $('score').textContent = r.score?.toFixed(3) ?? '—';
+  $('die').textContent = '';
+  $('stats').innerHTML = !r.passed ? '' : [
+    ['Worst GPU', `${r.worstGpu} °C · ${r.gpuWorkload}`], ['Worst HBM', `${r.worstHbm} °C · ${r.hbmWorkload}`],
+    ['Baseline', `${r.ref.gpu} / ${r.ref.hbm} °C`], ['Bandwidth·length', `${r.weighted.toLocaleString()} / 13,500`], ['Wire + PHY', `${(r.wireW + r.phyW).toFixed(1)} W`],
   ].map(([k, v]) => `<div class="row"><span class="mute">${k}</span><span class="stat">${v}</span></div>`).join('');
 }
 

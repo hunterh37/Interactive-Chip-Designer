@@ -17,7 +17,7 @@ struct InspectorView: View {
         @Bindable var store = store
         let c = store.current.campus
         Form {
-            Section("Campus") {
+            Section(header: MonoLabel("Campus")) {
                 TextField("Name", text: $store.current.name)
                 Picker("Site", selection: $store.current.campus.site) {
                     ForEach(SiteID.allCases, id: \.self) { Text(Site.of($0).title).tag($0) }
@@ -26,7 +26,7 @@ struct InspectorView: View {
                     Slider(value: $store.current.campus.powerBudgetMW, in: 50...5000, step: 50)
                 }
             }
-            Section("Hall") {
+            Section(header: MonoLabel("Hall")) {
                 LabeledContent("Length \(Int(c.hall.length)) m") {
                     Slider(value: $store.current.campus.hall.length, in: 40...400, step: 10)
                 }
@@ -37,7 +37,7 @@ struct InspectorView: View {
                     Slider(value: $store.current.campus.hall.clearHeight, in: 6...14, step: 1)
                 }
             }
-            Section("Racks") {
+            Section(header: MonoLabel("Racks")) {
                 Picker("Rack", selection: $store.current.campus.rackPreset) {
                     ForEach(RackPreset.table, id: \.id) { Text($0.title).tag($0.id) }
                 }
@@ -62,7 +62,7 @@ struct InspectorView: View {
                 Button("Save") { store.save() }
             }
         }
-        .tint(Theme.accent)
+        .terawattStyle()
         .onChange(of: store.current.campus.rackPreset) { _, p in
             for i in store.current.campus.rows.indices { store.current.campus.rows[i].preset = p }
         }
@@ -74,6 +74,6 @@ struct InspectorView: View {
             }
         }
         .onChange(of: store.current.campus) { _, _ in store.persist() }
-        .navigationTitle("Inspector")
+        .navigationTitle("INSPECTOR")
     }
 }

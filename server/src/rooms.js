@@ -1,4 +1,5 @@
-import { component, rack, rackTotals, chipTotals, chipScore, DIE, CHIP_BLOCKS } from './catalog.js';
+import { defaultPlace, score as placeScore, optimize, INTERPOSER } from './interposer.js';
+import { component, rack, rackTotals, chipTotals, DIE, CHIP_BLOCKS } from './catalog.js';
 
 const COLORS = /^#[0-9a-f]{6}$/i;
 export const newRoomCode = () => Array.from({ length: 4 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.floor(Math.random() * 24)]).join('');
@@ -10,10 +11,23 @@ export function newState() {
     players: {},
     chips: {}, // playerId -> personal challenge die
     show: { stage: 0, mode: 'chip' }, // presenter state shared by desktop host and WebXR
+    site: newSite(), // rack mode step 0: room picks one data center location on the globe
     started: null, // ms timestamp once the host starts the experience; joins stay open
     rev: 0,
   };
 }
+
+/** Personal Track 2 entry: 8 chiplets on the interposer, result cached at each op. */
+export const newChip = owner => { const place = defaultPlace(); return { owner, place, taped: false, at: null, cooled: null, result: placeScore(place) }; };
+export const newSite = () => ({ pins: {}, votes: {}, chosen: null });
+const num = (v, lo, hi) => typeof v === 'number' && Number.isFinite(v) && v >= lo && v <= hi;
+/** Pin id with the most votes; ties go to the earliest pin. */
+export function siteLeader(site) {
+  const tally = siteTally(site);
+  return Object.keys(site.pins).sort((a, b) => (tally[b] || 0) - (tally[a] || 0) || site.pins[a].at - site.pins[b].at)[0] ?? null;
+}
+export const siteTally = site => Object.values(site.votes).reduce((t, id) => (site.pins[id] && (t[id] = (t[id] || 0) + 1), t), {});
+const lockSite = s => { const id = siteLeader(s.site); s.site.chosen = id ? { ...s.site.pins[id], id, votes: siteTally(s.site)[id] || 0 } : null; };
 
 /** Applies one client op to state. Returns error string or null. Pure aside from mutation of `s`. */
 /** Paintable rack parts and side-panel designs. Colors live in rack.paint; frame/accent mirror paint.frame/paint.led. */
@@ -24,7 +38,7 @@ export const newRack = owner => ({ owner, rackId: 'apc-ar3300', frame: '#1c1d20'
 
 export function apply(s, op, playerId) {
   if (op.type.startsWith('rack.') && !s.racks[playerId]) s.racks[playerId] = newRack(s.players[playerId]?.name ?? 'guest');
-  if (op.type.startsWith('my.') && !s.chips[playerId]) s.chips[playerId] = { owner: s.players[playerId]?.name ?? 'guest', cells: Array(DIE.cols * DIE.rows).fill(null), taped: false, at: null };
+  if (op.type.startsWith('my.') && !s.chips[playerId]) s.chips[playerId] = newChip(s.players[playerId]?.name ?? 'guest');
   const c = s.chips[playerId];
   const r = s.racks[playerId];
   switch (op.type) {
@@ -67,25 +81,45 @@ export function apply(s, op, playerId) {
       if (op.cell < 0 || op.cell >= s.chip.cells.length) return 'bad cell';
       if (op.block !== null && !CHIP_BLOCKS.some(b => b.id === op.block)) return 'unknown block';
       s.chip.cells[op.cell] = op.block; s.chip.taped = false; break;
+    case 'site.pin': { // { lat, lon, place } drops or moves this player's pin and votes for it
+      if (s.site.chosen) return 'site locked';
+      if (!num(op.lat, -90, 90) || !num(op.lon, -180, 180)) return 'bad location';
+      s.site.pins[playerId] = { lat: +op.lat.toFixed(4), lon: +op.lon.toFixed(4), place: String(op.place || '').slice(0, 40), owner: s.players[playerId]?.name ?? 'guest', at: Date.now() };
+      s.site.votes[playerId] = playerId; break;
+    }
+    case 'site.vote':
+      if (s.site.chosen) return 'site locked';
+      if (!s.site.pins[op.target]) return 'no such pin';
+      s.site.votes[playerId] = op.target; break;
+    case 'site.lock': if (!Object.keys(s.site.pins).length) return 'no pins'; lockSite(s); break;
+    case 'site.reopen': s.site.chosen = null; break;
     case 'player.name': {
       const n = String(op.name || '').trim().slice(0, 16); if (!n) return 'name required';
       if (s.players[playerId]) s.players[playerId].name = n;
-      if (s.racks[playerId]) s.racks[playerId].owner = n; if (s.chips[playerId]) s.chips[playerId].owner = n; break;
+      if (s.racks[playerId]) s.racks[playerId].owner = n; if (s.chips[playerId]) s.chips[playerId].owner = n;
+      if (s.site.pins[playerId]) s.site.pins[playerId].owner = n; break;
     }
-    case 'my.paint':
+    case 'my.move': { // { i, x, y } mm, lower-left corner, y up (judge convention)
       if (c.taped) return 'already taped out';
-      if (op.cell < 0 || op.cell >= c.cells.length) return 'bad cell';
-      if (op.block !== null && !CHIP_BLOCKS.some(b => b.id === op.block)) return 'unknown block';
-      c.cells[op.cell] = op.block; break;
-    case 'my.clear': c.cells.fill(null); c.taped = false; c.at = null; break;
+      const p = c.place[op.i]; if (!p) return 'bad chiplet';
+      if (!num(op.x, -20, INTERPOSER.w + 20) || !num(op.y, -20, INTERPOSER.h + 20)) return 'bad position';
+      p.x = Math.round(op.x * 10) / 10; p.y = Math.round(op.y * 10) / 10;
+      c.cooled = null; c.result = placeScore(c.place); break;
+    }
+    case 'my.autocool': {
+      if (c.taped) return 'already taped out';
+      const r = optimize(c.place); c.place = r.place; c.result = r.after; c.cooled = r.before.passed ? { before: r.before.score, after: r.after.score } : null; break;
+    }
+    case 'my.clear': Object.assign(c, newChip(c.owner)); break;
     case 'my.tapeout':
-      if (!c.cells.some(Boolean)) return 'empty die';
+      if (!c.result.passed) return 'layout breaks a rule';
       c.taped = true; c.at = Date.now(); break;
-    case 'lobby.reset': s.chips = {}; s.racks = {}; s.chip = newState().chip; s.started = null; s.show = { stage: 0, mode: s.show?.mode ?? 'chip' }; break;
+    case 'lobby.reset': s.chips = {}; s.racks = {}; s.chip = newState().chip; s.started = null; s.site = newSite(); s.show = { stage: 0, mode: s.show?.mode ?? 'chip' }; break;
     case 'lobby.start': s.started ??= Date.now(); break;
     case 'lobby.stop': s.started = null; break;
     case 'show.set': {
       const st = Math.max(0, Math.min(2, op.stage | 0)), md = op.mode === 'rack' ? 'rack' : 'chip';
+      if (md === 'rack' && st > 0 && !s.site.chosen && Object.keys(s.site.pins).length) lockSite(s); // leaving Join locks the vote
       s.show = { stage: st, mode: md }; s.started = st > 0 ? (s.started ?? Date.now()) : null; break;
     }
     case 'chip.clear': s.chip.cells.fill(null); s.chip.taped = false; break;
@@ -102,6 +136,7 @@ export function snapshot(s) {
   const racks = Object.fromEntries(Object.entries(s.racks).map(([id, r]) => [id, { ...r, totals: rackTotals(r) }]));
   const all = Object.values(racks).map(r => r.totals);
   const room = { racks: all.length, kw: +all.reduce((a, t) => a + t.kw, 0).toFixed(2), price: all.reduce((a, t) => a + t.price, 0), ordered: Object.values(s.racks).filter(r => r.ordered).length };
-  const chips = Object.fromEntries(Object.entries(s.chips || {}).map(([id, c]) => [id, { ...c, result: chipScore(c) }]));
-  return { ...s, racks, chips, totals: { room, chip: chipTotals(s.chip) } };
+  const chips = s.chips || {};
+  const site = { ...(s.site || newSite()), tally: siteTally(s.site || newSite()), leader: siteLeader(s.site || newSite()) };
+  return { ...s, racks, chips, site, totals: { room, chip: chipTotals(s.chip) } };
 }

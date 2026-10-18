@@ -7,12 +7,12 @@ struct FabInspector: View {
     var body: some View {
         let at = store.current.wafer.station
         Form {
-            Section("Steps") {
+            Section(header: MonoLabel("Steps")) {
                 ForEach(FabStation.allCases, id: \.self) { s in
                     Button { store.current.wafer = .at(s) } label: {
                         HStack {
-                            Image(systemName: s.rawValue < at.rawValue ? "checkmark.circle.fill" : s == at ? "circle.inset.filled" : "circle")
-                                .foregroundStyle(s.rawValue <= at.rawValue ? Theme.accent : .secondary)
+                            Text(ASCII.mark(done: s.rawValue < at.rawValue, current: s == at))
+                                .foregroundStyle(s.rawValue <= at.rawValue ? Theme.fg : Theme.mute)
                             Text("\(s.rawValue + 1)  \(s.title)")
                             Spacer()
                         }
@@ -29,8 +29,8 @@ struct FabInspector: View {
                 Button("Walk") { Task { await openImmersive(id: SceneID.walk) } }
             }
         }
-        .tint(Theme.accent)
+        .terawattStyle()
         .onChange(of: store.current.wafer) { _, _ in store.persist() }
-        .navigationTitle("Fab 1")
+        .navigationTitle("FAB 1")
     }
 }

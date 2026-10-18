@@ -33,6 +33,12 @@
   #board .row { font-size:15px; padding:10px 0; } #board .row b { font-weight:400; font-variant-numeric:tabular-nums; }
   #board .row.new { animation:flash 1.2s ease-out; }
   @keyframes flash { 0% { background:#fff; color:#000; } 100% { background:transparent; } }
+  #join.globe { background:linear-gradient(90deg, rgba(0,0,0,.85) 0, rgba(0,0,0,.6) 40%, transparent 62%); justify-content:flex-start; padding-left:6vw; gap:4vw; }
+  #join.globe #qr { width:min(30vh, 280px) !important; }
+  #sites { right:36px; top:96px; width:min(380px, 30vw); background:rgba(0,0,0,.78); padding:14px 16px; border:1px solid var(--line); }
+  #sites .row { font-size:14px; padding:9px 0; } #sites .row b { font-weight:400; font-variant-numeric:tabular-nums; }
+  #sites .row.lead b, #sites .row.lead span:first-child { color:#00e0a4; }
+  #sites small { display:block; font-size:10px; color:var(--mute); letter-spacing:.08em; margin-top:2px; }
   #stats { right:36px; bottom:120px; width:260px; }
 
   /* presenter controls */
@@ -64,6 +70,7 @@
   <div class="layer hidden" id="mini"><canvas id="qr2"></canvas><div><span class="label">Join</span><b id="code2">----</b><span class="label" id="count2"></span></div></div>
   <div class="layer hidden" id="board"><div class="label" style="margin-bottom:8px" id="boardlbl">Leaderboard</div><div id="rows"></div></div>
   <div class="layer hidden" id="stats"></div>
+  <div class="layer hidden" id="sites"><div class="label" style="margin-bottom:8px" id="siteslbl">Site vote</div><div id="siterows"></div></div>
 
   <button class="layer" id="reset">Reset</button>
   <div class="layer" id="ctl"><button id="prev">← Prev</button><div id="stagename"><span id="sname">Join</span><span id="dots"></span></div><button class="primary" id="next">Next →</button></div>

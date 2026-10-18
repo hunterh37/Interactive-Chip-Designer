@@ -10,12 +10,13 @@ struct LiveJoinView: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            TextField("Room", text: $code).textFieldStyle(.roundedBorder).frame(width: 120)
+            TextField("ROOM", text: $code).font(Theme.mono(20)).tracking(3).frame(width: 120)
+                .padding(.vertical, 6).overlay(alignment: .bottom) { Rectangle().fill(Theme.dim).frame(height: 1) }
                 .textInputAutocapitalization(.characters)
-            Button("Live Rack", systemImage: "server.rack") { go(.rack) }
-            Button("Live Chip", systemImage: "cpu") { go(.chip) }
-            if live.connected { Text("\(live.room) · \(live.state?.players.count ?? 0) in room").foregroundStyle(.secondary) }
-            if let e = live.lastError { Text(e).foregroundStyle(.red).lineLimit(1) }
+            Button("Live Rack") { go(.rack) }.buttonStyle(.mono)
+            Button("Live Chip") { go(.chip) }.buttonStyle(.mono)
+            if live.connected { Text("● \(live.room) · \(live.state?.players.count ?? 0) IN ROOM").font(Theme.mono(12)).foregroundStyle(Theme.mute) }
+            if let e = live.lastError { Text("! " + e.uppercased()).font(Theme.mono(11)).tracking(1).lineLimit(1) }
         }
         .disabled(false)
     }
@@ -63,7 +64,8 @@ struct LiveSceneView: View {
                     if live.state?.chip.taped == true { Text("Taped out") }
                 }
             }
-            .font(.headline.monospacedDigit()).padding(.horizontal, 24).padding(.vertical, 12).glassBackgroundEffect()
+            .font(Theme.mono(17, .medium).monospacedDigit()).textCase(.uppercase).foregroundStyle(Theme.fg)
+            .padding(.horizontal, 24).padding(.vertical, 12).monoPanel()
         }
     }
 }

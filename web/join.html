@@ -37,6 +37,15 @@
   .grid div.pop { animation:pop .25s ease-out; }
   @keyframes pop { 0% { transform:scale(.7); } 100% { transform:scale(1); } }
 
+  .ip { flex:none; width:100%; touch-action:none; user-select:none; }
+  .ip svg { width:100%; display:block; background:#111318; border:1px solid var(--line); }
+  .ip .contact { fill:none; stroke:var(--dim); stroke-dasharray:1 1; stroke-width:.2; }
+  .ip .margin { fill:none; stroke:#333; stroke-width:.15; }
+  .ip .die rect { stroke:#000; stroke-width:.25; fill-opacity:.85; cursor:grab; }
+  .ip .gpu rect { fill:#f2731a; } .ip .hbm rect { fill:#33bf8c; } .ip .bad rect { fill:#ff4d4d; }
+  .ip .die text { font-size:3px; text-anchor:middle; fill:#000; pointer-events:none; font-family:inherit; }
+  .ip polyline { fill:none; stroke:#ffe08a; stroke-width:.35; } .ip .ws { stroke-dasharray:.8 .5; stroke-width:.25; }
+  .ip .hot { fill:none; stroke:#fff; stroke-width:.35; }
   .grid div.e { border-style:dashed; border-color:var(--dim); }
   .grid div.bad { outline:1px solid #ff4d4d; outline-offset:-3px; }
   #help { padding:2px 10px; font-size:13px; }
@@ -63,7 +72,13 @@
   .sheet.min { transform:translateY(calc(100% - 52px)); }
   .handle { flex:none; height:52px; display:flex; align-items:center; justify-content:space-between; padding:0 20px; border:none; border-bottom:1px solid var(--line); width:100%; }
   .handle::before { content:''; position:absolute; left:50%; top:7px; width:36px; height:3px; margin-left:-18px; background:var(--dim); }
-  #rackui, #roominfo { flex:1; overflow:auto; padding:12px 20px 24px; }
+  #s-site { padding:0; }
+  .sitecue { position:absolute; left:0; right:0; top:calc(max(12px, env(safe-area-inset-top)) + 40px); text-align:center; pointer-events:none; z-index:2; } .sitecue span { background:rgba(0,0,0,.7); padding:6px 10px; }
+  .vote { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line); }
+  .vote .n { flex:1; font-size:12px; } .vote .p { font-size:10px; margin-top:2px; }
+  .vote .v { font-size:22px; font-weight:300; font-variant-numeric:tabular-nums; min-width:28px; text-align:right; }
+  .vote button { padding:8px 12px; font-size:10px; } .vote.lead .v { color:#00e0a4; }
+  #rackui, #roominfo, #siteui { flex:1; overflow:auto; padding:12px 20px 24px; }
   .hud { position:absolute; inset:max(12px, env(safe-area-inset-top)) 20px auto; display:flex; justify-content:space-between; align-items:center; z-index:2; }
   .item { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line); }
   .item .n { flex:1; font-size:12px; } .item .p { font-size:10px; margin-top:2px; }
@@ -124,7 +139,7 @@
     <div class="grid" id="grid"></div>
     <div class="err" id="err"></div>
     <div class="sp"></div>
-    <div class="actions"><button id="clear">Clear</button><button class="primary" id="tape">Tape out</button></div>
+    <div class="actions"><button id="clear">Clear</button><button id="cool">AI cool</button><button class="primary" id="tape">Tape out</button></div>
   </section>
 
   <section class="screen" id="s-fab">
@@ -145,6 +160,13 @@
     <div class="kv" id="stats"></div>
     <div class="sp"></div>
     <div class="actions"><button id="again">Again</button><button id="tomenu">Menu</button><button class="primary" id="toroom">Room</button></div>
+  </section>
+
+  <section class="screen" id="s-site">
+    <canvas class="view full3d" id="siteview"></canvas>
+    <div class="hud"><button id="site-back">←</button><span class="label" id="sitehead">Pick the site</span><span class="label stat" id="sitecount"></span></div>
+    <div class="sitecue label" id="sitecue"><span>Tap the globe to drop a pin</span></div>
+    <div class="sheet" id="sitesheet"><button class="handle" id="sitehandle"><span class="label" id="sitetitle">Sites</span><span class="label" id="sitehint">Hide ↓</span></button><div id="siteui"></div></div>
   </section>
 
   <section class="screen" id="s-rack">

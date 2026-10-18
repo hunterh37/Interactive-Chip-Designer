@@ -1,5 +1,7 @@
 import http from 'node:http';
 import { WebSocketServer } from 'ws';
+import { surrogateFit } from './thermal.js'; // before catalog.js: breaks the catalog<->thermal init cycle
+import { T2 } from './interposer.js';
 import { RACKS, COMPONENTS, CHIP_BLOCKS, DIE } from './catalog.js';
 import { PAINT_PARTS, DESIGNS } from './rooms.js';
 import { newState, apply, snapshot } from './rooms.js';
@@ -22,8 +24,8 @@ const json = (res, code, body) => {
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, 'http://x');
   if (req.method === 'OPTIONS') return json(res, 204, {});
-  if (url.pathname === '/healthz') return json(res, 200, { ok: true, rooms: rooms.size });
-  if (url.pathname === '/api/catalog') return json(res, 200, { racks: RACKS, components: COMPONENTS, chipBlocks: CHIP_BLOCKS, die: DIE, paintParts: PAINT_PARTS, designs: DESIGNS });
+  if (url.pathname === '/healthz') return json(res, 200, { ok: true, rooms: rooms.size, surrogate: surrogateFit() });
+  if (url.pathname === '/api/catalog') return json(res, 200, { racks: RACKS, components: COMPONENTS, chipBlocks: CHIP_BLOCKS, die: DIE, track2: { interposer: T2.interposer, edge: T2.edge, gap: T2.gap, dies: T2.dies, links: T2.links, workloads: Object.keys(T2.workloads), contact: T2.thermal.cooling_contact_rect_mm }, paintParts: PAINT_PARTS, designs: DESIGNS });
   if (url.pathname === '/api/rooms' && req.method === 'POST') {
     const code = 'DEMO'; room(code);
     return json(res, 200, { code, joinUrl: `${WEB_URL}/join.html?room=${code}` });
@@ -67,4 +69,5 @@ setInterval(() => { // drop idle empty rooms after 6 h
   for (const [c, r] of rooms) if (!r.sockets.size && Date.now() - r.touched > 6 * 3600e3) rooms.delete(c);
 }, 600e3);
 
+console.log('thermal surrogate', JSON.stringify(surrogateFit()));
 server.listen(PORT, () => console.log(`chipdesigner server :${PORT}`));

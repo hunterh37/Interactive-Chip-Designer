@@ -7,51 +7,66 @@ struct HomeView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
-            Text("Terawatt").font(.extraLargeTitle2).fontWeight(.semibold)
-            HStack(spacing: 16) {
-                tile("Design Studio", "building.2") {
+            VStack(alignment: .leading, spacing: 6) {
+                MonoLabel("// datacenter + silicon")
+                ScrambleText(text: "TERAWATT", duration: 0.7)
+                    .font(Theme.mono(56, .bold)).tracking(6)
+            }
+            HStack(spacing: 12) {
+                tile("01", "Design Studio", "▦") {
                     store.mode = .studio
                     openWindow(id: SceneID.tabletop); openWindow(id: SceneID.inspector)
                 }
-                tile("Fab", "circle.grid.cross") {
+                tile("02", "Fab", "◎") {
                     store.mode = .fab
                     openWindow(id: SceneID.tabletop); openWindow(id: SceneID.inspector)
                 }
-                tile("Training", "graduationcap") {
+                tile("03", "Training", "≡") {
                     store.mode = .training; store.training = TrainingState()
                     openWindow(id: SceneID.tabletop); openWindow(id: SceneID.inspector)
                 }
-                tile("Chip Workshop", "cpu") {
+                tile("04", "Chip Workshop", "█") {
                     store.openChip()
                     openWindow(id: SceneID.tabletop); openWindow(id: SceneID.inspector)
                 }
             }
             LiveJoinView()
-            HStack {
-                Text("Projects").font(.title3)
+            HStack(alignment: .firstTextBaseline) {
+                MonoLabel("Projects [\(store.projects.count)]")
                 Spacer()
-                Button("New", systemImage: "plus") { store.new(); store.save() }
+                Button("+ New") { store.new(); store.save() }.buttonStyle(.mono)
             }
             List(store.projects) { p in
-                Button(p.name) { store.open(p); openWindow(id: SceneID.tabletop) }
-                    .swipeActions { Button("Delete", role: .destructive) { store.delete(p) } }
+                Button { store.open(p); openWindow(id: SceneID.tabletop) } label: {
+                    HStack { Text("> \(p.name.uppercased())").tracking(1); Spacer(); Text("→").foregroundStyle(Theme.mute) }
+                        .font(Theme.mono(15))
+                }
+                .listRowBackground(Color.clear)
+                .swipeActions { Button("Delete", role: .destructive) { store.delete(p) } }
             }
             .listStyle(.plain)
+            .overlay(alignment: .top) { Rectangle().fill(Theme.line).frame(height: 1) }
         }
         .padding(32)
-        .tint(Theme.accent)
+        .terawattStyle(field: true)
         .ornament(attachmentAnchor: .scene(.bottom)) { HUDStrip() }
     }
 
-    private func tile(_ title: String, _ icon: String, _ action: @escaping () -> Void) -> some View {
+    private func tile(_ idx: String, _ title: String, _ glyph: String, _ action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            VStack(spacing: 12) {
-                Image(systemName: icon).font(.system(size: 40)).foregroundStyle(Theme.accent)
-                Text(title).font(.headline)
+            VStack(alignment: .leading, spacing: 10) {
+                Text(idx).font(Theme.mono(11)).foregroundStyle(Theme.mute)
+                Text(String(repeating: glyph, count: 3)).font(Theme.mono(30))
+                Spacer(minLength: 0)
+                Text(title.uppercased()).font(Theme.mono(13, .medium)).tracking(1.6)
             }
-            .frame(maxWidth: .infinity, minHeight: 140)
+            .padding(16)
+            .frame(maxWidth: .infinity, minHeight: 140, alignment: .leading)
+            .background(Theme.bg.opacity(0.7))
+            .overlay(Rectangle().stroke(Theme.dim, lineWidth: 1))
+            .contentShape(Rectangle())
+            .hoverEffect(.highlight)
         }
-        .buttonStyle(.bordered)
-        .buttonBorderShape(.roundedRectangle(radius: 24))
+        .buttonStyle(.plain)
     }
 }
