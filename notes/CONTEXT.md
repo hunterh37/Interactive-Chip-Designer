@@ -46,14 +46,3 @@
 - Scenes/TrainingInspector; Home tile Training; routes training/step/1..18, training/walk.
 - Tests: TrainingFlowTests (29 total pass). Prop queue: notes/PROP_QUEUE.md "l1 Training".
 
-## Rack to the Future twin (AppMode.twin)
-- Source spec: docs/Rack-to-the-Future-Technical-Spec.pdf (+ .txt extract). Home tile "Rack to the Future" opens tabletop + inspector (ScenarioPanel).
-- Terawatt/Resources/twin-presets.json: rack catalog with year points (2025/2030 projection/2035), user cases A/B/C, static sentiment for 6 Earth sites.
-- Terawatt/Twin/Scenario.swift: Scenario (budget, grid cap, launch $/kg, PUE, energy price, year, case mix, building $/MW, sites), TwinSite > TwinBuilding > TwinHall (cooling, rackMix). TwinScale (chip..offWorld), TwinFocus (zoomedIn/zoomedOut), TwinLens (heat, power, business, manufacturing, comms).
-- Terawatt/Twin/ScenarioEngine.swift: pure. rack(id, year) interpolates; run(sc) -> TwinMetrics; checks in order grid, budget, serving, cooling, latency; firstFailing.cause is a TwinFocus. Off-world: radiator 826 W/m2, 5 kg/m2, solar 7 kg/kW, launch multiple LEO 1, Moon 5, Mars 10. Sentiment con > 0.4 adds building cost and delay. TwinLensMath maps metrics to 0...1 stress.
-- Terawatt/Twin/TwinBuilder.swift: procedural levels; tappable entities named tap:site:i, tap:building:i, tap:hall:i, tap:rack:<id>, tap:chip. hall() is 1:1 meters (walk) and scaled on tabletop.
-- Terawatt/Twin/ScenarioPanel.swift: breadcrumb, constraint gauges (tap failing -> zoom to cause), lens, year, level editors, presets, case mix, off-world toggles, assumptions. TwinHUD ornament.
-- ProjectStore: Project.scenarioRaw (optional), focus, lens, twin, openTwin, zoomIn/zoomOut/zoom(to:). SceneKey.twin rebuilds tabletop/walk.
-- Routes: twin/1-fleet ... twin/6-2025 follow the spec demo flow.
-- Tests: TerawattTests/TwinEngineTests.swift (worked example 631 racks, grid binds before budget, cooling fit, year interpolation, off-world, case demand). 39 total pass.
-- Assumptions (spec open questions): tokens/s per chip from RackPreset values, building $11M/MW, 2030 rack points, sentiment static.

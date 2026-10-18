@@ -10,7 +10,6 @@ struct InspectorView: View {
         case .chip: ChipInspector()
         case .training: TrainingInspector()
         case .studio: studio
-        case .twin: ScenarioPanel()
         }
     }
 

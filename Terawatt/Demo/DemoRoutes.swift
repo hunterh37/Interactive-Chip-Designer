@@ -91,43 +91,6 @@ enum DemoRoutes {
                 await t.wait(2); await t.ready(); await t.wait(3); t.done()
             }
         }
-        // Rack to the Future demo flow (docs/Rack-to-the-Future-Technical-Spec.pdf, "Demo flow").
-        book.group("twin") { b in
-            @MainActor func twin(_ f: TwinFocus, lens: TwinLens = .heat, _ edit: (inout Scenario) -> Void = { _ in }) {
-                store.current = Project(name: "Rack to the Future")
-                var sc = Scenario(); edit(&sc)
-                store.current.scenarioRaw = sc
-                store.mode = .twin; store.focus = f; store.lens = lens
-            }
-            b.route("1-fleet", "Fleet globe, presets, case B") { t in
-                twin(TwinFocus(scale: .fleet), lens: .power); await show(t, [SceneID.tabletop, SceneID.inspector])
-            }
-            b.route("2-site", "Earth site") { t in twin(TwinFocus(scale: .site, site: 0)); await show(t, [SceneID.tabletop, SceneID.inspector]) }
-            b.route("2-building", "Building cutaway") { t in twin(TwinFocus(scale: .building, site: 0)); await show(t, [SceneID.tabletop, SceneID.inspector]) }
-            b.route("2-hall", "Hall, heat lens") { t in twin(TwinFocus(scale: .hall, site: 0)); await show(t, [SceneID.tabletop, SceneID.inspector]) }
-            b.route("2-walk", "Hall walk immersive") { t in
-                twin(TwinFocus(scale: .hall, site: 0))
-                await t.openImmersive(SceneID.walk)
-                await t.wait(2); await t.ready(); await t.wait(3); t.done()
-            }
-            b.route("3-chip", "GPU chip 5.5 kW") { t in twin(TwinFocus(scale: .chip, site: 0)); await show(t, [SceneID.tabletop, SceneID.inspector]) }
-            b.route("3-air", "Hall switched to air: cooling fails") { t in
-                twin(TwinFocus(scale: .chip, site: 0)) { $0.sites[0].buildings[0].halls[0].cooling = .airChillers }
-                await show(t, [SceneID.tabletop, SceneID.inspector])
-            }
-            b.route("4-grid", "More GPU racks: grid binds before budget") { t in
-                twin(TwinFocus(scale: .fleet), lens: .power) { $0.addRacksEverywhere(.gpu, 20) }
-                await show(t, [SceneID.tabletop, SceneID.inspector])
-            }
-            b.route("5-leo", "LEO on, business lens") { t in
-                twin(TwinFocus(scale: .offWorld), lens: .business) { $0.addRacksEverywhere(.gpu, 20); $0.setOffWorld(.leo, true) }
-                await show(t, [SceneID.tabletop, SceneID.inspector])
-            }
-            b.route("6-2025", "Same fleet in 2025") { t in
-                twin(TwinFocus(scale: .fleet), lens: .power) { $0.year = 2025 }
-                await show(t, [SceneID.tabletop, SceneID.inspector])
-            }
-        }
     }
 }
 #endif

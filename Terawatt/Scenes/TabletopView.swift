@@ -12,17 +12,8 @@ struct TabletopView: View {
         RealityView { content in
             content.add(root)
         }
-        .gesture(SpatialTapGesture().targetedToAnyEntity().onEnded { v in twinTap(v.entity.name) })
         .task(id: store.sceneKey) {
             training = nil
-            if store.mode == .twin, let tv = store.sceneKey.twin {
-                fab = nil; chipScene = nil
-                let e = TwinBuilder.tabletop(tv.scenario, store.twin, focus: tv.focus, lens: tv.lens)
-                e.position.y = -0.28
-                root.children.removeAll()
-                root.addChild(e)
-                return
-            }
             if store.mode == .training {
                 fab = nil; chipScene = nil
                 let t = TrainingScene()
@@ -80,23 +71,6 @@ struct TabletopView: View {
         .onChange(of: store.training) { _, s in training?.apply(s, animated: true) }
         .onChange(of: store.explode) { _, e in chipScene?.setExplode(e, animated: true) }
         .onChange(of: store.current.wafer.station) { _, s in fab?.apply(s, animated: true) }
-        .ornament(attachmentAnchor: .scene(.bottomFront)) {
-            if store.mode == .twin { TwinHUD() } else if store.mode != .fab && store.mode != .training { HUDStrip() }
-        }
-    }
-
-    /// Pinch on an object zooms one level into it ("tap:site:3", "tap:rack:gpu", "tap:chip").
-    private func twinTap(_ name: String) {
-        guard store.mode == .twin else { return }
-        let p = name.split(separator: ":").map(String.init)
-        guard p.first == "tap", p.count >= 2 else { return }
-        let v = p.count > 2 ? p[2] : ""
-        switch p[1] {
-        case "site": store.zoomIn(site: Int(v))
-        case "building": store.zoomIn(building: Int(v))
-        case "hall": store.zoomIn(hall: Int(v))
-        case "rack": store.zoomIn(rack: RackPresetID(rawValue: v))
-        default: store.zoomIn()
-        }
+        .ornament(attachmentAnchor: .scene(.bottomFront)) { if store.mode != .fab && store.mode != .training { HUDStrip() } }
     }
 }

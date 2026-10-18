@@ -15,15 +15,15 @@ Order: what the first demo shows (walk a hot aisle, follow a wafer, build a chip
 - [~] rack-lpu (built, unsigned, 0.722, 14937 tris)
 - [~] rack-air-42u (built, unsigned, 0.745, 14949 tris)
 - [~] rack-nvl72-2025 (built, unsigned, 0.733, 13765 tris)
-- [ ] gpu-module-2035
-- [ ] rack-manifold
-- [ ] cdu-liquid
-- [ ] immersion-tank
-- [ ] switch-tray-cpo
-- [ ] power-shelf-800vdc
-- [ ] hall-shell
-- [ ] hall-column
-- [ ] campus-building
+- [~] gpu-module-2035 (gate 0.737, default view hides package)
+- [~] rack-manifold (gate 0.549, tiny at gate framing, 5164 tris > 4000)
+- [~] cdu-liquid (gate 0.543, window interior illegible)
+- [~] immersion-tank 0.737
+- [~] switch-tray-cpo 0.749
+- [~] power-shelf-800vdc (0.766, 5696 tris, wear 5)
+- [~] hall-shell (0.722, 17190 tris, edges 5 wear 4)
+- [~] hall-column 0.776
+- [~] campus-building 0.784
 - [ ] dry-cooler
 - [ ] chiller-unit
 - [ ] transformer-pad
@@ -64,19 +64,19 @@ Order: what the first demo shows (walk a hot aisle, follow a wafer, build a chip
 - [ ] esd-workbench
 - [ ] dc-roof-mech
 - [ ] perimeter-fence
-- [ ] orbital-dc-module
-- [ ] space-radiator-panel
-- [ ] solar-array-wing
-- [ ] lunar-dc-habitat
-- [ ] mars-dc-dome
-- [ ] ground-station-dish
-- [ ] earth-site-pin
+- [~] orbital-dc-module (built, 0.72, in budget; needs strap/ORU detail)
+- [~] space-radiator-panel (built, 0.73, in budget; tubes hidden under tiles)
+- [~] solar-array-wing (built, 0.69, in budget; no cell grid detail)
+- [~] lunar-dc-habitat 0.731
+- [~] mars-dc-dome 0.738
+- [~] ground-station-dish 0.618
+- [~] earth-site-pin 0.700
 
 ## l2 Fab
 - [~] wafer-300mm (0.832, unsigned, iter 3)
 - [~] foup
 - [~] oht-vehicle
-- [ ] oht-rail
+- [~] oht-rail (0.692)
 - [~] euv-scanner-highna (0.721, 14820 tris)
 - [~] litho-track (0.809, unsigned)
 - [~] plasma-etch-cluster 0.797 (helper: Props/Fab/ClusterTool.swift)
@@ -86,19 +86,19 @@ Order: what the first demo shows (walk a hot aisle, follow a wafer, build a chip
 - [~] diffusion-furnace (0.711)
 - [~] wet-bench (0.732)
 - [~] pvd-cluster 0.789 (ClusterTool chamberExtra variant)
-- [ ] ebeam-metrology
-- [ ] probe-station
-- [ ] dicing-saw
-- [ ] hybrid-bonder
-- [ ] ffu-ceiling-tile
-- [ ] cleanroom-floor-grate
+- [~] ebeam-metrology 0.658 (built, unsigned, 7506 tris)
+- [~] probe-station 0.715 (built, unsigned, 6616 tris)
+- [~] dicing-saw 0.699 (built, unsigned, 6134 tris)
+- [~] hybrid-bonder 0.697 (built, unsigned, 7044 tris)
+- [~] ffu-ceiling-tile (0.712)
+- [~] cleanroom-floor-grate (0.724)
 - [ ] cleanroom-wall-panel
-- [ ] fab-yellow-light-panel
-- [ ] tool-status-tower
-- [ ] foup-stocker
-- [ ] efem-robot
-- [ ] euv-light-source
-- [ ] duv-immersion-scanner
+- [~] fab-yellow-light-panel (0.774)
+- [~] tool-status-tower 0.548 (built, unsigned, 864 tris over 600)
+- [~] foup-stocker 0.767 (built, unsigned; interior and roof ports weak)
+- [~] efem-robot 0.728 (built, unsigned; arm too small vs column)
+- [~] euv-light-source 0.754
+- [~] duv-immersion-scanner 0.655
 - [ ] wafer-cassette
 - [ ] reticle-pod
 - [ ] air-shower
@@ -128,10 +128,10 @@ Order: what the first demo shows (walk a hot aisle, follow a wafer, build a chip
 - [~] crash-cart-kvm 0.792 (unsigned)
 - [x] aisle-sign
 - [~] power-cord-c19 (0.812, unsigned)
-- [ ] quick-disconnect
-- [ ] fiber-patch-lc
-- [ ] loto-tag
-- [ ] esd-wrist-strap
+- [~] quick-disconnect 0.754 (1480 tris, unsigned)
+- [~] fiber-patch-lc 0.797 unsigned
+- [~] loto-tag 0.766 (unsigned, 1414 tris)
+- [~] esd-wrist-strap (0.737, unsigned)
 - [ ] leak-detection-cable
 - [ ] fiber-cleaner
 - [ ] cable-label

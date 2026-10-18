@@ -43,3 +43,40 @@ l1 | rack-nvl72-2025 | 0.733 [~] | 13765 | /Users/hunter/dev/RealityHD-lib-l1/do
 l3 | wafer-display-stand | 0.725 | 8364 | docs/assets/wafer-display-stand.png
 l3 | bond-wire-macro | 0.797 | 10112 | docs/assets/bond-wire-macro.png
 l1 | power-cord-c19 | 0.812 | 1664 | /Users/hunter/dev/RealityHD-lib-l1/docs/assets/power-cord-c19.png
+l2 | oht-rail | 0.692 [~] | 600 | /Users/hunter/dev/RealityHD-lib-l2/docs/assets/oht-rail.png
+l2 | ffu-ceiling-tile | 0.712 [~] | 1196 | /Users/hunter/dev/RealityHD-lib-l2/docs/assets/ffu-ceiling-tile.png
+l2 | cleanroom-floor-grate | 0.724 [~] | 420 | /Users/hunter/dev/RealityHD-lib-l2/docs/assets/cleanroom-floor-grate.png
+l2 | fab-yellow-light-panel | 0.774 [~] | 360 | /Users/hunter/dev/RealityHD-lib-l2/docs/assets/fab-yellow-light-panel.png
+l1 | gpu-module-2035 | 0.737 [~] | 5048 | /Users/hunter/dev/RealityHD-lib-l1/docs/assets/gpu-module-2035.png
+l1 | rack-manifold | 0.549 [~] | 5164 | /Users/hunter/dev/RealityHD-lib-l1/docs/assets/rack-manifold.png
+l1 | cdu-liquid | 0.543 [~] | 12280 | /Users/hunter/dev/RealityHD-lib-l1/docs/assets/cdu-liquid.png
+l1 | quick-disconnect | 0.754 | 1480 | /Users/hunter/dev/RealityHD-lib-l1/docs/assets/quick-disconnect.png
+l3 | orbital-dc-module | 0.72 [~] fail | 12168 | docs/assets/orbital-dc-module.png
+l3 | space-radiator-panel | 0.73 [~] fail | 2840 | docs/assets/space-radiator-panel.png
+l3 | solar-array-wing | 0.69 [~] fail | 3000 | docs/assets/solar-array-wing.png
+l2 | ebeam-metrology | 0.658 | 7506 | /Users/hunter/dev/RealityHD-lib-l2/docs/assets/ebeam-metrology.png
+l2 | probe-station | 0.715 | 6616 | /Users/hunter/dev/RealityHD-lib-l2/docs/assets/probe-station.png
+l2 | dicing-saw | 0.699 | 6134 | /Users/hunter/dev/RealityHD-lib-l2/docs/assets/dicing-saw.png
+l1 | immersion-tank | 0.737 [~] | 11046 | /Users/hunter/dev/RealityHD-lib-l1/docs/assets/immersion-tank.png
+l1 | switch-tray-cpo | 0.749 [~] | 7504 | /Users/hunter/dev/RealityHD-lib-l1/docs/assets/switch-tray-cpo.png
+l1 | fiber-patch-lc | 0.797 | 1728 | /Users/hunter/dev/RealityHD-lib-l1/docs/assets/fiber-patch-lc.png
+l2 | hybrid-bonder | 0.697 | 7044 | /Users/hunter/dev/RealityHD-lib-l2/docs/assets/hybrid-bonder.png
+l2 | tool-status-tower | 0.548 | 864 | /Users/hunter/dev/RealityHD-lib-l2/docs/assets/tool-status-tower.png
+l2 | foup-stocker | 0.767 [~] | 10356 | /Users/hunter/dev/RealityHD-lib-l2/docs/assets/foup-stocker.png
+l2 | efem-robot | 0.728 [~] | 3484 | /Users/hunter/dev/RealityHD-lib-l2/docs/assets/efem-robot.png
+l1 | power-shelf-800vdc | 0.766 | 5696 | ~/dev/RealityHD-lib-l1/docs/assets/power-shelf-800vdc.png
+l1 | hall-shell | 0.722 | 17190 | ~/dev/RealityHD-lib-l1/docs/assets/hall-shell.png
+l3 | lunar-dc-habitat | 0.731 [~] fail | 14928 | docs/assets/lunar-dc-habitat.png
+l3 | mars-dc-dome | 0.738 [~] fail | 11352 | docs/assets/mars-dc-dome.png
+l1 | loto-tag | 0.766 | 1414 | /Users/hunter/dev/RealityHD-lib-l1/docs/assets/loto-tag.png
+l3 | ground-station-dish | 0.618 [~] fail | 11270 | docs/assets/ground-station-dish.png
+l3 | earth-site-pin | 0.700 [~] fail | 1212 | docs/assets/earth-site-pin.png
+l2 | euv-light-source | 0.754 [~] | 13488 | /Users/hunter/dev/RealityHD-lib-l2/docs/assets/euv-light-source.png
+l2 | duv-immersion-scanner | 0.655 [~] | 4974 | /Users/hunter/dev/RealityHD-lib-l2/docs/assets/duv-immersion-scanner.png
+l1 | hall-column | 0.776 [~] | 708 | ~/dev/RealityHD-lib-l1/docs/assets/hall-column.png
+l1 | campus-building | 0.784 [~] | 13500 | ~/dev/RealityHD-lib-l1/docs/assets/campus-building.png
+l2 | euv-light-source | 0.754 [~] | 13488 | /Users/hunter/dev/RealityHD-lib-l2/docs/assets/euv-light-source.png
+l2 | duv-immersion-scanner | final 0.655 [~] | 4974 | /Users/hunter/dev/RealityHD-lib-l2/docs/assets/duv-immersion-scanner.png
+l1 | esd-wrist-strap | 0.737 | 1391 | /Users/hunter/dev/RealityHD-lib-l1/docs/assets/esd-wrist-strap.png
+l2 | euv-light-source | 0.754 [~] | 13488 | /Users/hunter/dev/RealityHD-lib-l2/docs/assets/euv-light-source.png
+l2 | duv-immersion-scanner | 0.655 [~] | 4974 | /Users/hunter/dev/RealityHD-lib-l2/docs/assets/duv-immersion-scanner.png

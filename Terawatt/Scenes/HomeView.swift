@@ -9,10 +9,6 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 24) {
             Text("Terawatt").font(.extraLargeTitle2).fontWeight(.semibold)
             HStack(spacing: 16) {
-                tile("Rack to the Future", "globe.americas") {
-                    store.openTwin()
-                    openWindow(id: SceneID.tabletop); openWindow(id: SceneID.inspector)
-                }
                 tile("Design Studio", "building.2") {
                     store.mode = .studio
                     openWindow(id: SceneID.tabletop); openWindow(id: SceneID.inspector)
