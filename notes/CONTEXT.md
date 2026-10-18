@@ -14,7 +14,7 @@
 ## Types
 - CampusStats: rackCount, gpuCount, itMW, facilityMW, pue, wue, pflopsFP4, prefillTokS, decodeTokS, usdPerMTok, capexUSD, carbonTPerYr, latencyMs, cableKm, overBudget.
 - CampusMath.stats(spec, installedChips:, chip:) is the entry point for HUD.
-- Fab and Chip Workshop tiles currently open the Inspector only.
+- Fab and Chip Workshop tiles open tabletop + inspector.
 
 ## Design Studio (done)
 - Inspector edits site, budget, hall L/W/H, rows, racks per row (clamped by CampusSpec.maxRacksPerRow), rack preset, cooling, power. Autosaves via ProjectStore.persist(). Hall change calls CampusSpec.relayoutRooms().
@@ -29,3 +29,12 @@
 - Placeholders: foup, oht-vehicle, 12 tool ids render as light boxes via PropFactory.sizes/fabIDs until RealityHD terawatt-fab merges; wafer is a cylinder entity with lookMaterial.
 - Scenes/FabInspector: step list (tap to jump), Next, Restart, Walk. Tabletop scales bay length to 1.1 m; Walk is 1:1 at tool 1.
 - Tests: TerawattTests/FabFlowTests.swift (16 tests total pass).
+
+## Chip Workshop (done)
+- AppMode.chip. Project gains optional chipStepRaw, tapedOut, packaged (old files decode). ProjectStore: micro, explode, delta, openChip, tapeOut (freezes ChipSpec, TDP from model, resets wafer, mode .fab), package, install (installCount = racks x 72), uninstall.
+- Model/ChipMath: ChipStep (7), MicroLevel, ChipMath (reticle 858 mm2, 26 mm wide strip floorplan, power by block W/mm2 x node, timing, HBM stacks = PHY area / 22.5, perf capped 20 PFLOPS/stack, unitCostUSD), ChipLoop.delta -> CampusDelta (PFLOPS, MW, $/Mtok).
+- CampusMath.stats adds installed chips to tokens (8k decode, 120k prefill x perfFactor) and capex. Installed chips are additive to preset GPUs.
+- Reality/ChipBuilder (ChipScene, 1 mm = 0.01 m): die canvas (heat in simulate), reticle, package explode (setExplode animates), integrate, micro wafer/die/transistor placeholders.
+- Scenes/ChipInspector: steps, controls, readout, micro picker. FabInspector shows Package when wafer finished and chip taped out. HUDStrip shows delta row when installed.
+- Placeholder prop ids: hbm-stack, gpu-module-2035, compute-tray-gpu.
+- Tests: TerawattTests/ChipLoopTests.swift (24 total pass). No StageDirector chip routes yet.
