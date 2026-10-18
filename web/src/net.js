@@ -6,10 +6,10 @@ export async function catalog() { return (await fetch(`${API}/api/catalog`)).jso
 export async function createRoom() { return (await fetch(`${API}/api/rooms`, { method: 'POST' })).json(); }
 
 /** Live room connection with auto-reconnect. onState(state), onPose(id, p). */
-export function connect({ room, kind, mode, name, onState, onPose, onError }) {
+export function connect({ room = 'DEMO', kind, mode, name, pid = '', onState, onPose, onError }) {
   let ws, closed = false, queue = [];
   const open = () => {
-    ws = new WebSocket(`${WS}?room=${room}&kind=${kind}&mode=${mode}&name=${encodeURIComponent(name || kind)}`);
+    ws = new WebSocket(`${WS}?room=${room}&kind=${kind}&mode=${mode}&name=${encodeURIComponent(name || kind)}&pid=${pid}`);
     ws.onopen = () => { queue.forEach(m => ws.send(m)); queue = []; };
     ws.onmessage = e => {
       const m = JSON.parse(e.data);

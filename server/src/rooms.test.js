@@ -2,28 +2,43 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { newState, apply, snapshot } from './rooms.js';
 
-test('rack add totals and capacity', () => {
-  const s = newState();
-  assert.equal(apply(s, { type: 'rack.add', id: 'dgx-b200' }, 'p'), null);
-  assert.equal(snapshot(s).totals.rack.u, 10);
-  for (let i = 0; i < 3; i++) apply(s, { type: 'rack.add', id: 'dgx-b200' }, 'p');
-  assert.equal(apply(s, { type: 'rack.add', id: 'pure-x70' }, 'p'), 'rack full');
+const join = (s, id, name = id) => { s.players[id] = { name, kind: 'phone', mode: 'rack' }; };
+
+test('each player gets their own rack; room totals sum', () => {
+  const s = newState(); join(s, 'a'); join(s, 'b');
+  assert.equal(apply(s, { type: 'rack.add', id: 'dgx-b200' }, 'a'), null);
+  assert.equal(apply(s, { type: 'rack.add', id: 'r760' }, 'b'), null);
+  const snap = snapshot(s);
+  assert.equal(snap.racks.a.totals.u, 10);
+  assert.equal(snap.racks.b.totals.u, 2);
+  assert.equal(snap.totals.room.racks, 2);
+  assert.equal(snap.racks.a.owner, 'a');
+});
+
+test('capacity per rack', () => {
+  const s = newState(); join(s, 'a');
+  for (let i = 0; i < 4; i++) apply(s, { type: 'rack.add', id: 'dgx-b200' }, 'a');
+  assert.equal(apply(s, { type: 'rack.add', id: 'pure-x70' }, 'a'), 'rack full');
 });
 
 test('color validation and order', () => {
-  const s = newState();
-  apply(s, { type: 'rack.color', frame: 'red' }, 'p');
-  assert.equal(s.rack.frame, '#1c1d20');
-  assert.equal(apply(s, { type: 'rack.order' }, 'p'), 'empty rack');
-  apply(s, { type: 'rack.add', id: 'r760' }, 'p');
-  assert.equal(apply(s, { type: 'rack.order' }, 'p'), null);
-  assert.equal(s.rack.ordered.price, 1890 + 18500);
+  const s = newState(); join(s, 'a');
+  apply(s, { type: 'rack.color', frame: 'red' }, 'a');
+  assert.equal(s.racks.a.frame, '#1c1d20');
+  assert.equal(apply(s, { type: 'rack.order' }, 'a'), 'empty rack');
+  apply(s, { type: 'rack.add', id: 'r760' }, 'a');
+  assert.equal(apply(s, { type: 'rack.order' }, 'a'), null);
+  assert.equal(s.racks.a.ordered.price, 1890 + 18500);
+  assert.equal(snapshot(s).totals.room.ordered, 1);
 });
 
-test('chip paint and tapeout', () => {
-  const s = newState();
-  assert.equal(apply(s, { type: 'chip.tapeout' }, 'p'), 'empty die');
-  apply(s, { type: 'chip.paint', cell: 0, block: 'tensor' }, 'p');
+test('chip paint, tapeout, lobby reset', () => {
+  const s = newState(); join(s, 'a');
+  assert.equal(apply(s, { type: 'chip.tapeout' }, 'a'), 'empty die');
+  apply(s, { type: 'chip.paint', cell: 0, block: 'tensor' }, 'a');
   assert.ok(snapshot(s).totals.chip.tflops > 0);
-  assert.equal(apply(s, { type: 'chip.paint', cell: 99, block: 'tensor' }, 'p'), 'bad cell');
+  apply(s, { type: 'rack.add', id: 'r760' }, 'a');
+  apply(s, { type: 'lobby.reset' }, 'a');
+  assert.deepEqual(s.racks, {});
+  assert.equal(s.chip.cells[0], null);
 });

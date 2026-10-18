@@ -1,14 +1,14 @@
 import http from 'node:http';
 import { WebSocketServer } from 'ws';
 import { RACKS, COMPONENTS, CHIP_BLOCKS, DIE } from './catalog.js';
-import { newState, apply, snapshot, newRoomCode } from './rooms.js';
+import { newState, apply, snapshot } from './rooms.js';
 
 const PORT = process.env.PORT || 8787;
 const WEB_URL = process.env.WEB_URL || 'http://localhost:5173';
 const rooms = new Map(); // code -> { state, sockets:Set }
 
 function room(code) {
-  code = String(code || '').toUpperCase().slice(0, 4);
+  code = String(code || 'DEMO').toUpperCase().slice(0, 4); // one lobby for the demo unless a code is given
   if (!rooms.has(code)) rooms.set(code, { state: newState(), sockets: new Set(), touched: Date.now() });
   return rooms.get(code);
 }
@@ -24,8 +24,7 @@ const server = http.createServer((req, res) => {
   if (url.pathname === '/healthz') return json(res, 200, { ok: true, rooms: rooms.size });
   if (url.pathname === '/api/catalog') return json(res, 200, { racks: RACKS, components: COMPONENTS, chipBlocks: CHIP_BLOCKS, die: DIE });
   if (url.pathname === '/api/rooms' && req.method === 'POST') {
-    let code; do code = newRoomCode(); while (rooms.has(code));
-    room(code);
+    const code = 'DEMO'; room(code);
     return json(res, 200, { code, joinUrl: `${WEB_URL}/join.html?room=${code}` });
   }
   const m = url.pathname.match(/^\/api\/rooms\/([A-Z]{4})$/i);
@@ -42,10 +41,11 @@ const broadcast = r => {
 wss.on('connection', (ws, req) => {
   const url = new URL(req.url, 'http://x');
   const r = room(url.searchParams.get('room'));
-  const id = Math.random().toString(36).slice(2, 10);
+  const id = (url.searchParams.get('pid') || '').replace(/[^a-z0-9]/gi, '').slice(0, 16) || Math.random().toString(36).slice(2, 10);
   const kind = ['phone', 'host', 'vision', 'xr'].includes(url.searchParams.get('kind')) ? url.searchParams.get('kind') : 'phone';
   r.state.players[id] = { name: (url.searchParams.get('name') || kind).slice(0, 20), kind, mode: url.searchParams.get('mode') === 'chip' ? 'chip' : 'rack' };
   r.sockets.add(ws);
+  // Stable player id from the client lets a phone keep its rack across reconnects.
   ws.send(JSON.stringify({ t: 'hello', id }));
   broadcast(r);
   ws.on('message', buf => {
@@ -59,7 +59,7 @@ wss.on('connection', (ws, req) => {
     r.touched = Date.now();
     if (err) ws.send(JSON.stringify({ t: 'error', error: err })); else broadcast(r);
   });
-  ws.on('close', () => { r.sockets.delete(ws); delete r.state.players[id]; broadcast(r); });
+  ws.on('close', () => { r.sockets.delete(ws); delete r.state.players[id]; broadcast(r); }); // rack stays in the room
 });
 
 setInterval(() => { // drop idle empty rooms after 6 h

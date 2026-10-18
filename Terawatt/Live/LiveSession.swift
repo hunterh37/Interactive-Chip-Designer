@@ -5,15 +5,20 @@ import Observation
 struct LiveSlot: Codable, Equatable, Sendable { var id: String }
 struct LiveOrder: Codable, Equatable, Sendable { var orderId: String; var price: Double }
 struct LiveRack: Codable, Equatable, Sendable {
-    var rackId: String; var frame: String; var accent: String; var slots: [LiveSlot]; var ordered: LiveOrder?
+    var owner: String?; var totals: LiveRackTotals?; var rackId: String; var frame: String; var accent: String; var slots: [LiveSlot]; var ordered: LiveOrder?
 }
 struct LiveChip: Codable, Equatable, Sendable { var name: String; var cells: [String?]; var taped: Bool }
 struct LivePlayer: Codable, Equatable, Sendable { var name: String; var kind: String; var mode: String }
 struct LiveRackTotals: Codable, Equatable, Sendable { var u: Int; var capacity: Int; var kw: Double; var price: Double }
 struct LiveChipTotals: Codable, Equatable, Sendable { var usedMM2: Int; var tflops: Int; var watts: Int }
-struct LiveTotals: Codable, Equatable, Sendable { var rack: LiveRackTotals; var chip: LiveChipTotals }
+struct LiveRoomTotals: Codable, Equatable, Sendable { var racks: Int; var kw: Double; var price: Double; var ordered: Int }
+struct LiveTotals: Codable, Equatable, Sendable { var room: LiveRoomTotals; var chip: LiveChipTotals }
 struct LiveState: Codable, Equatable, Sendable {
-    var rack: LiveRack; var chip: LiveChip; var players: [String: LivePlayer]; var rev: Int; var totals: LiveTotals
+    /// One rack per phone player; all render in one server room row.
+    var racks: [String: LiveRack]
+    /// Racks in stable left-to-right order (server keeps insertion order; JSON dict order is not kept by Codable).
+    var rackRow: [LiveRack] { racks.sorted { $0.key < $1.key }.map(\.value) }
+    var chip: LiveChip; var players: [String: LivePlayer]; var rev: Int; var totals: LiveTotals
 }
 
 struct LiveComponent: Codable, Equatable, Sendable { var id: String; var cat: String; var name: String; var u: Int; var kw: Double; var price: Double; var color: String }
@@ -34,7 +39,7 @@ final class LiveSession {
         URL(string: Bundle.main.object(forInfoDictionaryKey: "LIVE_API_URL") as? String ?? "https://chipdesigner-api.onrender.com")!
     }
 
-    var room = ""
+    var room = "DEMO"
     var mode = LiveMode.rack
     private(set) var state: LiveState?
     private(set) var catalog: LiveCatalog?

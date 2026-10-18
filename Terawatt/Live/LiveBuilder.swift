@@ -18,7 +18,7 @@ enum LiveBuilder {
         e.position = p; parent.addChild(e)
     }
 
-    static func rack(_ r: LiveRack, _ cat: LiveCatalog) async -> Entity {
+    static func rack(_ r: LiveRack, _ cat: LiveCatalog, cart: Bool = true) async -> Entity {
         let g = Entity(); g.name = "live-rack"
         let units = cat.racks.first { $0.id == r.rackId }?.u ?? 42
         let H = Float(units) * U + 0.12, W: Float = 0.6, D: Float = 1.07, t: Float = 0.03
@@ -41,7 +41,22 @@ enum LiveBuilder {
             g.addChild(srv); y += Float(c.u) * U
         }
         // RealityHD crash cart + monitor beside the rack for scale (PropFactory falls back to sized boxes).
-        let cart = await PropFactory.make("crash-cart-kvm"); cart.position = [0.75, 0, 0.4]; g.addChild(cart)
+        if cart { let c = await PropFactory.make("crash-cart-kvm"); c.position = [0.75, 0, 0.4]; g.addChild(c) }
+        return g
+    }
+
+    static let pitch: Float = 0.7
+
+    /// Server room: every player's rack side by side, centred on the origin.
+    static func room(_ racks: [LiveRack], _ cat: LiveCatalog) async -> Entity {
+        let g = Entity(); g.name = "live-room"
+        for (i, r) in racks.enumerated() {
+            let e = await rack(r, cat, cart: false)
+            e.position.x = (Float(i) - Float(racks.count - 1) / 2) * pitch
+            g.addChild(e)
+        }
+        let cart = await PropFactory.make("crash-cart-kvm")
+        cart.position = [Float(racks.count) / 2 * pitch + 0.5, 0, 0.4]; g.addChild(cart)
         return g
     }
 

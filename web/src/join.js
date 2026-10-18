@@ -1,29 +1,31 @@
 import { catalog, connect } from './net.js';
-import { stage, buildRack, buildChip, replace } from './scene.js';
+import { stage, buildRack, buildChip, replace, emptyRack } from './scene.js';
 import { USDZExporter } from 'three/examples/jsm/exporters/USDZExporter.js';
 
 const q = new URLSearchParams(location.search);
-const room = (q.get('room') || '').toUpperCase();
+const room = (q.get('room') || 'DEMO').toUpperCase();
 let mode = q.get('mode') === 'chip' ? 'chip' : 'rack';
 const name = localStorage.getItem('cd-name') || `Player ${Math.floor(Math.random() * 90 + 10)}`;
 localStorage.setItem('cd-name', name);
+const pid = localStorage.getItem('cd-pid') || Math.random().toString(36).slice(2, 12);
+localStorage.setItem('cd-pid', pid);
 const cat = await catalog();
 const { world, controls } = stage(document.getElementById('view'));
 const ui = document.getElementById('ui');
 document.getElementById('room').textContent = room;
 let s, tab = 'gpu', brush = cat.chipBlocks[0].id, errT;
-const net = connect({ room, kind: 'phone', mode, name, onState: st => { s = st; draw(); }, onError: e => toast(e) });
+const net = connect({ room, kind: 'phone', mode, name, pid, onState: st => { s = st; draw(); }, onError: e => toast(e) });
 const send = op => net.send(op);
 const money = n => '$' + n.toLocaleString();
 function toast(msg) { const e = document.querySelector('.err'); if (!e) return; e.textContent = msg; clearTimeout(errT); errT = setTimeout(() => e.textContent = '', 2500); }
 
 function draw() {
   if (!s) return;
-  replace(world, 'rack', mode === 'rack' ? buildRack(s.rack, cat) : null);
+  replace(world, 'rack', mode === 'rack' ? buildRack(mine(), cat) : null);
   replace(world, 'chip', mode === 'chip' ? buildChip(s.chip, cat) : null);
   controls.target.set(0, mode === 'rack' ? 1 : 0.85, 0);
   const t = s.totals;
-  document.getElementById('sum').textContent = mode === 'rack' ? `${t.rack.u}/${t.rack.capacity}U · ${money(t.rack.price)}` : `${t.chip.tflops} TFLOPS · ${t.chip.watts} W`;
+  document.getElementById('sum').textContent = mode === 'rack' ? `${mine().totals?.u ?? 0}/${mine().totals?.capacity ?? 42}U · ${money(mine().totals?.price ?? 1890)}` : `${t.chip.tflops} TFLOPS · ${t.chip.watts} W`;
   ui.innerHTML = '';
   const tabs = el('div', 'tabs');
   for (const m of ['rack', 'chip']) tabs.append(btn(m === 'rack' ? 'Server Rack' : 'Chip Design', () => { mode = m; draw(); }, mode === m ? 'on' : ''));
@@ -31,8 +33,10 @@ function draw() {
   mode === 'rack' ? rackUI() : chipUI();
 }
 
+const mine = () => s.racks[pid] ?? emptyRack();
+
 function rackUI() {
-  const r = s.rack;
+  const r = mine();
   const colors = el('div', 'item');
   colors.append(el('span', 'n', 'Frame / accent'), colorIn(r.frame, v => send({ type: 'rack.color', frame: v })), colorIn(r.accent, v => send({ type: 'rack.color', accent: v })));
   const frames = el('div', 'pal');
@@ -51,7 +55,7 @@ function rackUI() {
     const it = el('div', 'item'); it.append(el('span', 'n', c.name), btn('Remove', () => send({ type: 'rack.remove', index: i }))); ui.append(it);
   });
   const bar = el('div', 'bar');
-  bar.append(r.ordered ? el('div', 'n', `Order ${r.ordered.orderId} · ${money(r.ordered.price)}`) : btn(`Purchase ${money(s.totals.rack.price)}`, () => send({ type: 'rack.order' }), 'primary'));
+  bar.append(r.ordered ? el('div', 'n', `Order ${r.ordered.orderId} · ${money(r.ordered.price)}`) : btn(`Purchase ${money(r.totals?.price ?? 1890)}`, () => send({ type: 'rack.order' }), 'primary'));
   ui.append(bar);
 }
 

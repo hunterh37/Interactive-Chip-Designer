@@ -6,7 +6,7 @@ struct LiveJoinView: View {
     @Environment(\.openWindow) private var openWindow
     @Environment(\.openImmersiveSpace) private var openImmersive
     @State private var live = LiveSession.shared
-    @State private var code = ""
+    @State private var code = "DEMO"
 
     var body: some View {
         HStack(spacing: 12) {
@@ -44,9 +44,9 @@ struct LiveSceneView: View {
 
     private func rebuild() async {
         guard let s = live.state, let cat = live.catalog else { return }
-        let e: Entity = live.mode == .rack ? await LiveBuilder.rack(s.rack, cat) : LiveBuilder.chip(s.chip, cat)
+        let e: Entity = live.mode == .rack ? await LiveBuilder.room(s.rackRow, cat) : LiveBuilder.chip(s.chip, cat)
         if lifeSize { e.position = [0, 0, -1.6] }
-        else if live.mode == .rack { e.scale = .init(repeating: 0.25); e.position = [0, -0.28, 0] }
+        else if live.mode == .rack { e.scale = .init(repeating: 0.25 / max(1, Float(s.racks.count) * 0.45)); e.position = [0, -0.28, 0] }
         else { e.scale = .init(repeating: 1.2); e.position = [0, -0.2, 0] }
         root.children.removeAll(); root.addChild(e)
     }
@@ -55,9 +55,9 @@ struct LiveSceneView: View {
         if let t = live.state?.totals {
             HStack(spacing: 20) {
                 if live.mode == .rack {
-                    Text("\(t.rack.u)/\(t.rack.capacity)U"); Text(String(format: "%.1f kW", t.rack.kw))
-                    Text(t.rack.price, format: .currency(code: "USD").precision(.fractionLength(0)))
-                    if let o = live.state?.rack.ordered { Text("Ordered \(o.orderId)") }
+                    Text("\(t.room.racks) racks"); Text(String(format: "%.1f kW", t.room.kw))
+                    Text(t.room.price, format: .currency(code: "USD").precision(.fractionLength(0)))
+                    Text("\(t.room.ordered) purchased")
                 } else {
                     Text("\(t.chip.usedMM2) mm²"); Text("\(t.chip.tflops) TFLOPS"); Text("\(t.chip.watts) W")
                     if live.state?.chip.taped == true { Text("Taped out") }

@@ -9,11 +9,10 @@ final class LiveE2ETests: XCTestCase {
     override func tearDown() async throws { phone?.cancel(with: .goingAway, reason: nil); phone = nil }
 
     private func newRoom() async throws -> String {
-        var req = URLRequest(url: LiveSession.apiURL.appending(path: "api/rooms"))
-        req.httpMethod = "POST"; req.timeoutInterval = 90
-        let (data, _) = try await URLSession.shared.data(for: req)
-        let obj = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
-        return try XCTUnwrap(obj["code"] as? String)
+        // Wakes the free-tier dyno, then uses a private 4-letter room so the DEMO lobby is untouched.
+        var req = URLRequest(url: LiveSession.apiURL.appending(path: "healthz")); req.timeoutInterval = 90
+        _ = try await URLSession.shared.data(for: req)
+        return String((0..<4).map { _ in "QWXZ".randomElement()! })
     }
 
     private func wait(_ secs: Double, _ cond: () -> Bool) async -> Bool {
@@ -26,7 +25,7 @@ final class LiveE2ETests: XCTestCase {
         var c = URLComponents(url: LiveSession.apiURL.appending(path: "ws"), resolvingAgainstBaseURL: false)!
         c.scheme = "wss"
         c.queryItems = [.init(name: "room", value: code), .init(name: "kind", value: "phone"),
-                        .init(name: "mode", value: mode), .init(name: "name", value: "TestPhone")]
+                        .init(name: "mode", value: mode), .init(name: "name", value: "TestPhone"), .init(name: "pid", value: "testphone")]
         let t = URLSession.shared.webSocketTask(with: c.url!)
         t.resume(); phone = t
         _ = try await t.receive() // initial state frame
@@ -55,9 +54,9 @@ final class LiveE2ETests: XCTestCase {
         try await joinPhone(code, mode: "rack")
         try await phoneSend(["type": "rack.add", "id": "dgx-b200"])
         try await phoneSend(["type": "rack.color", "frame": "#ff0000"])
-        let ok = await wait(10) { s.state?.rack.slots.first?.id == "dgx-b200" && s.state?.rack.frame == "#ff0000" }
-        XCTAssertTrue(ok, "state=\(String(describing: s.state?.rack))")
-        let e = await LiveBuilder.rack(try XCTUnwrap(s.state).rack, try XCTUnwrap(s.catalog))
+        let ok = await wait(10) { s.state?.racks["testphone"]?.slots.first?.id == "dgx-b200" && s.state?.racks["testphone"]?.frame == "#ff0000" }
+        XCTAssertTrue(ok, "state=\(String(describing: s.state?.racks))")
+        let e = await LiveBuilder.room(try XCTUnwrap(s.state).rackRow, try XCTUnwrap(s.catalog))
         XCTAssertFalse(e.children.isEmpty)
     }
 
@@ -76,22 +75,22 @@ final class LiveE2ETests: XCTestCase {
         let (s, _) = try await joined(.rack)
         defer { s.leave() }
         s.send(["type": "rack.add", "id": "dgx-b200"])
-        let added = await wait(10) { !(s.state?.rack.slots.isEmpty ?? true) }
+        let added = await wait(10) { (s.state?.rackRow.first?.slots.isEmpty == false) }
         XCTAssertTrue(added)
         s.send(["type": "rack.order"])
-        let ok = await wait(10) { s.state?.rack.ordered != nil }
+        let ok = await wait(10) { s.state?.rackRow.first?.ordered != nil }
         XCTAssertTrue(ok, "lastError=\(s.lastError ?? "nil")")
     }
 
     func testReconnectAfterLeave() async throws {
         let (s, code) = try await joined(.rack)
         s.send(["type": "rack.add", "id": "dgx-b200"])
-        _ = await wait(10) { !(s.state?.rack.slots.isEmpty ?? true) }
+        _ = await wait(10) { (s.state?.rackRow.first?.slots.isEmpty == false) }
         s.leave()
         XCTAssertFalse(s.connected)
         await s.join(code, mode: .rack)
-        let ok = await wait(15) { s.connected && s.state?.rack.slots.first?.id == "dgx-b200" }
-        XCTAssertTrue(ok, "state=\(String(describing: s.state?.rack))")
+        let ok = await wait(15) { s.connected && s.state?.rackRow.first?.slots.first?.id == "dgx-b200" }
+        XCTAssertTrue(ok, "state=\(String(describing: s.state?.racks))")
         s.leave()
     }
 }

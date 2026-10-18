@@ -6,6 +6,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 export const U = 0.04445; // 1 rack unit in metres
 
 /** Renderer + scene + orbit camera. Returns handles; caller adds content to `world`. */
+const at = (m, x, y, z) => (m.position.set(x, y, z), m);
+
 export function stage(canvas, { xr = false } = {}) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: xr });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
@@ -43,11 +45,11 @@ export function buildRack(state, catalog) {
   const H = r.u * U + 0.12, W = 0.6, D = 1.07, t = 0.03;
   const frame = mat(state.frame, { metalness: 0.5, roughness: 0.55 });
   const accent = mat(state.accent, { emissive: state.accent, emissiveIntensity: 0.6 });
-  for (const x of [-1, 1]) g.add(Object.assign(box(t, H, D, frame), { position: new THREE.Vector3(x * (W - t) / 2, H / 2, 0) }));
-  g.add(Object.assign(box(W, t, D, frame), { position: new THREE.Vector3(0, H - t / 2, 0) }));
-  g.add(Object.assign(box(W, 0.06, D, frame), { position: new THREE.Vector3(0, 0.03, 0) }));
-  g.add(Object.assign(box(W, H, 0.01, frame), { position: new THREE.Vector3(0, H / 2, -D / 2) }));
-  for (const x of [-1, 1]) g.add(Object.assign(box(0.008, H - 0.1, 0.01, accent), { position: new THREE.Vector3(x * (W / 2 - 0.004), H / 2, D / 2 + 0.006) }));
+  for (const x of [-1, 1]) g.add(at(box(t, H, D, frame), x * (W - t) / 2, H / 2, 0));
+  g.add(at(box(W, t, D, frame), 0, H - t / 2, 0));
+  g.add(at(box(W, 0.06, D, frame), 0, 0.03, 0));
+  g.add(at(box(W, H, 0.01, frame), 0, H / 2, -D / 2));
+  for (const x of [-1, 1]) g.add(at(box(0.008, H - 0.1, 0.01, accent), x * (W / 2 - 0.004), H / 2, D / 2 + 0.006));
   let y = 0.06;
   state.slots.forEach((s, i) => {
     const c = catalog.components.find(x => x.id === s.id); if (!c) return;
@@ -64,6 +66,17 @@ export function buildRack(state, catalog) {
     const led = box(0.012, 0.012, 0.004, accent); led.position.set(0.21, h / 2 - 0.014, 0.462); srv.add(led);
     srv.position.set(0, y + h / 2, 0.06); y += c.u * U; g.add(srv);
   });
+  return g;
+}
+
+export const emptyRack = () => ({ rackId: 'apc-ar3300', frame: '#1c1d20', accent: '#00e0a4', slots: [], ordered: null });
+export const PITCH = 0.7; // rack-to-rack spacing in the server room row
+
+/** Server room: every player's rack in one row, join order left to right. */
+export function buildRoom(racks, catalog) {
+  const g = new THREE.Group(); g.name = 'rack';
+  const list = Object.values(racks);
+  list.forEach((r, i) => { const e = buildRack(r, catalog); e.name = ''; e.position.x = (i - (list.length - 1) / 2) * PITCH; g.add(e); });
   return g;
 }
 

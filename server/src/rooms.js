@@ -5,7 +5,7 @@ export const newRoomCode = () => Array.from({ length: 4 }, () => 'ABCDEFGHJKLMNP
 
 export function newState() {
   return {
-    rack: { rackId: 'apc-ar3300', frame: '#1c1d20', accent: '#00e0a4', slots: [], ordered: null },
+    racks: {}, // playerId -> rack; one rack per phone player, all shown in one server room
     chip: { name: 'HACK-1', cells: Array(DIE.cols * DIE.rows).fill(null), taped: false },
     players: {},
     rev: 0,
@@ -13,8 +13,11 @@ export function newState() {
 }
 
 /** Applies one client op to state. Returns error string or null. Pure aside from mutation of `s`. */
+export const newRack = owner => ({ owner, rackId: 'apc-ar3300', frame: '#1c1d20', accent: '#00e0a4', slots: [], ordered: null });
+
 export function apply(s, op, playerId) {
-  const r = s.rack;
+  if (op.type.startsWith('rack.') && !s.racks[playerId]) s.racks[playerId] = newRack(s.players[playerId]?.name ?? 'guest');
+  const r = s.racks[playerId];
   switch (op.type) {
     case 'rack.add': {
       const c = component(op.id); if (!c) return 'unknown component';
@@ -40,6 +43,7 @@ export function apply(s, op, playerId) {
       if (op.cell < 0 || op.cell >= s.chip.cells.length) return 'bad cell';
       if (op.block !== null && !CHIP_BLOCKS.some(b => b.id === op.block)) return 'unknown block';
       s.chip.cells[op.cell] = op.block; s.chip.taped = false; break;
+    case 'lobby.reset': s.racks = {}; s.chip = newState().chip; break;
     case 'chip.clear': s.chip.cells.fill(null); s.chip.taped = false; break;
     case 'chip.tapeout':
       if (!s.chip.cells.some(Boolean)) return 'empty die';
@@ -50,4 +54,9 @@ export function apply(s, op, playerId) {
   return null;
 }
 
-export const snapshot = s => ({ ...s, totals: { rack: rackTotals(s.rack), chip: chipTotals(s.chip) } });
+export function snapshot(s) {
+  const racks = Object.fromEntries(Object.entries(s.racks).map(([id, r]) => [id, { ...r, totals: rackTotals(r) }]));
+  const all = Object.values(racks).map(r => r.totals);
+  const room = { racks: all.length, kw: +all.reduce((a, t) => a + t.kw, 0).toFixed(2), price: all.reduce((a, t) => a + t.price, 0), ordered: Object.values(s.racks).filter(r => r.ordered).length };
+  return { ...s, racks, totals: { room, chip: chipTotals(s.chip) } };
+}
