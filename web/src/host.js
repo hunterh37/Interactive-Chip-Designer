@@ -11,12 +11,13 @@ history.replaceState(null, '', `?mode=${mode}`);
 const { world, controls, tick } = stage(document.getElementById('view'));
 realityHDProps(world);
 tick.push(t => { const r = world.getObjectByName(mode); if (r && mode === 'chip') r.rotation.y = t / 6000; });
-let last, wasLive = false;
+let last, wasLive = false, framed = false;
 document.getElementById('start').onclick = () => net.send({ type: last?.started ? 'lobby.stop' : 'lobby.start' });
 document.getElementById('min').onclick = e => { const m = document.body.classList.toggle('min'); e.target.textContent = m ? 'Show' : 'Hide'; };
 
 function render() {
   if (!last) return;
+  world.getObjectByName('hall') && (world.getObjectByName('hall').visible = mode === 'rack');
   replace(world, 'rack', mode === 'rack' ? buildRoom(last.racks, cat) : null);
   replace(world, 'chip', mode === 'chip' ? buildChip(last.chip, cat) : null);
   controls.target.set(0, mode === 'rack' ? 1 : 0.85, 0);
@@ -32,7 +33,7 @@ function render() {
        <div class="row"><span class="mute">TDP</span><b class="stat">${t.chip.watts} W</b></div>
        ${last.chip.taped ? '<div class="row"><span>Taped out</span><b>✓</b></div>' : ''}`;
   document.getElementById('reset')?.addEventListener('click', () => confirm('Clear all racks and the die?') && net.send({ type: 'lobby.reset' }));
-  const n = Object.values(last.racks).length; controls.target.x = 0; if (mode === 'rack') controls.object.position.set(0, 1.6, 2.2 + n * 0.45);
+  const n = Object.values(last.racks).length; controls.target.x = 0; if (mode === 'rack' && !framed) { framed = true; controls.object.position.set(1.8, 1.9, 4.0); }
   const live = !!last.started; document.body.classList.toggle('live', live);
   const sb = document.getElementById('start'); sb.textContent = live ? 'End experience' : 'Start experience';
   if (live !== wasLive) { wasLive = live; dispatchEvent(new Event('resize')); }

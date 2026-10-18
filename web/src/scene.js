@@ -23,7 +23,7 @@ export function stage(canvas, { xr = false } = {}) {
   const controls = new OrbitControls(camera, canvas);
   controls.target.set(0, 1, 0); controls.enableDamping = true;
   const world = new THREE.Group(); scene.add(world);
-  const floor = new THREE.Mesh(new THREE.CircleGeometry(3, 64), new THREE.MeshStandardMaterial({ color: '#15171c', roughness: 0.9 }));
+  const floor = new THREE.Mesh(new THREE.CircleGeometry(0.01, 3), new THREE.MeshStandardMaterial({ color: '#15171c', roughness: 0.9 }));
   floor.rotation.x = -Math.PI / 2; if (!xr) scene.add(floor);
   const resize = () => {
     const w = canvas.clientWidth, h = canvas.clientHeight;
@@ -106,17 +106,44 @@ export function buildChip(chip, catalog) {
 }
 
 /** RealityHD GLB props exported by scripts/export-realityhd.sh (optional; missing files skipped). */
-export async function realityHDProps(world) {
-  const loader = new GLTFLoader();
-  const place = [['desktop-monitor', [-1.2, 0.75, 0.6], -0.6], ['laptop', [1.2, 0.75, 0.6], 0.6]];
-  for (const [id, p, ry] of place) {
-    try {
-      const gltf = await loader.loadAsync(`/models/${id}.glb`);
-      gltf.scene.position.set(...p); gltf.scene.rotation.y = ry; world.add(gltf.scene);
-      const desk = box(0.8, 0.75, 0.6, mat('#f1f0ec', { metalness: 0.1 })); desk.position.set(p[0], 0.375, p[2]); world.add(desk);
-    } catch { /* asset not exported */ }
+/** Data-center hall around the player racks: raised floor, background rack rows, containment, trays, lights. */
+export function dataCenterHall(world, { xr = false } = {}) {
+  const g = new THREE.Group(); g.name = 'hall';
+  const tile = 0.6, nx = 24, nz = 24;
+  if (!xr) {
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(nx * tile, nz * tile), mat('#2a2e35', { metalness: 0.3, roughness: 0.7 }));
+    floor.rotation.x = -Math.PI / 2; floor.position.y = 0.001; g.add(floor);
+    const grid = new THREE.GridHelper(nx * tile, nx, '#0e1013', '#0e1013'); grid.position.y = 0.003; g.add(grid);
+    const perf = mat('#3a414b', { metalness: 0.4, roughness: 0.5 });
+    for (let i = -6; i <= 6; i++) g.add(at(box(tile - 0.02, 0.004, tile - 0.02, perf), i * tile, 0.004, 1.2)); // cold-aisle perforated tiles
+    const ceil = new THREE.Mesh(new THREE.PlaneGeometry(nx * tile, nz * tile), mat('#121418', { metalness: 0, roughness: 1, side: THREE.DoubleSide }));
+    ceil.rotation.x = Math.PI / 2; ceil.position.y = 3.2; g.add(ceil);
   }
+  const H = 42 * U + 0.12, frame = mat('#16181c', { metalness: 0.5, roughness: 0.6 });
+  const led = [mat('#00e0a4', { emissive: '#00e0a4', emissiveIntensity: 1 }), mat('#3aa0ff', { emissive: '#3aa0ff', emissiveIntensity: 1 })];
+  const filler = (x, z, ry) => {
+    const r = new THREE.Group(); r.add(at(box(0.6, H, 1.07, frame), 0, H / 2, 0));
+    for (let k = 0; k < 14; k++) if ((x * 7 + k * 3) % 5) r.add(at(box(0.008, 0.008, 0.004, led[k % 2]), 0.2, 0.15 + k * 0.13, 0.537));
+    r.position.set(x, 0, z); r.rotation.y = ry; return r;
+  };
+  for (let i = -8; i <= 8; i++) {
+    if (Math.abs(i) > 3) g.add(filler(i * PITCH, 0.06, 0)); // same row as player racks, beyond them
+    g.add(filler(i * PITCH, -2.4, 0));                        // back row facing hot aisle side
+    g.add(filler(i * PITCH, 4.4, Math.PI));                    // opposite row across the cold aisle
+  }
+  const tray = mat('#8a8f98', { metalness: 0.8, roughness: 0.4 });
+  for (const z of [-0.2, -2.6, 4.6]) g.add(at(box(17 * PITCH, 0.05, 0.3, tray), 0, 2.75, z)); // overhead cable trays
+  const glass = new THREE.MeshStandardMaterial({ color: '#9fd6ff', transparent: true, opacity: 0.08, roughness: 0.1 });
+  g.add(at(box(17 * PITCH, 0.02, 3.8, glass), 0, H + 0.1, 2.25)); // cold-aisle containment roof
+  if (!xr) {
+    const strip = mat('#ffffff', { emissive: '#dfe8ff', emissiveIntensity: 1.2 });
+    for (let x = -4; x <= 4; x += 2) for (const z of [0.9, -3.6]) g.add(at(box(1.4, 0.02, 0.12, strip), x, 3.18, z));
+    for (const z of [0.9, -3]) { const l = new THREE.PointLight('#dfe8ff', 6, 8); l.position.set(0, 3, z); g.add(l); }
+  }
+  world.add(g);
 }
+/** Kept for callers; the hall replaces the old desk/laptop props. */
+export const realityHDProps = (world, o) => dataCenterHall(world, o);
 
 export function replace(world, name, obj) {
   const old = world.getObjectByName(name);

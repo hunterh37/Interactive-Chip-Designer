@@ -7,7 +7,7 @@ const q = new URLSearchParams(location.search);
 const room = (q.get('room') || 'DEMO').toUpperCase(), mode = q.get('mode') === 'chip' ? 'chip' : 'rack';
 const cat = await catalog();
 const { renderer, world, camera } = stage(document.getElementById('view'), { xr: true });
-realityHDProps(world);
+realityHDProps(world, { xr: true });
 const xrb = document.getElementById('xrb');
 for (const B of [ARButton, VRButton]) { const b = B.createButton(renderer); b.style.position = 'static'; xrb.append(b); }
 // Place content 1.5 m ahead on session start.
