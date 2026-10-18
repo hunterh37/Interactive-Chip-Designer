@@ -4,15 +4,15 @@ One prop per agent run. Mark `[x]` when signed off, `[~]` when built but unsigne
 Order: what the first demo shows (walk a hot aisle, follow a wafer, build a chip), then depth.
 
 ## l1 DataCenter
-- [ ] rack-ai-1mw
+- [~] rack-ai-1mw 0.878 (brief thr 0.90, unsigned)
 - [~] cold-plate (7128 tris vs 3000 budget)
 - [~] compute-tray-gpu (built, unsigned, 11992 tris)
 - [~] hot-aisle-containment (0.815, 7308 tris)
-- [ ] raised-floor-tile
-- [ ] overhead-busway
-- [ ] cable-tray-ladder
-- [ ] led-row-light
-- [ ] rack-lpu
+- [x] raised-floor-tile (0.876, 696 tris)
+- [~] overhead-busway (built, unsigned, 0.757, 4032 tris)
+- [~] cable-tray-ladder (built, unsigned, 0.752, 8584 tris)
+- [~] led-row-light (built, unsigned, 0.649, 1192 tris)
+- [~] rack-lpu (built, unsigned, 0.722, 14937 tris)
 - [ ] rack-air-42u
 - [ ] rack-nvl72-2025
 - [ ] gpu-module-2035
@@ -48,7 +48,7 @@ Order: what the first demo shows (walk a hot aisle, follow a wafer, build a chip
 - [ ] storage-jbof
 - [ ] nvme-sled
 - [ ] rack-pdu
-- [ ] blanking-panel
+- [~] blanking-panel 0.777
 - [ ] lpu-card
 - [ ] air-inference-card
 - [ ] raised-floor-pedestal
@@ -56,10 +56,10 @@ Order: what the first demo shows (walk a hot aisle, follow a wafer, build a chip
 - [ ] vesda-pipe
 - [ ] emergency-power-off
 - [ ] leak-detection-cable
-- [ ] aisle-sign
-- [ ] crash-cart-kvm
+- [x] aisle-sign
+- [~] crash-cart-kvm 0.792 (unsigned)
 - [ ] loading-dock-leveler
-- [ ] server-lift
+- [~] server-lift 0.76
 - [ ] rack-pallet-crate
 - [ ] esd-workbench
 - [ ] dc-roof-mech
@@ -79,13 +79,13 @@ Order: what the first demo shows (walk a hot aisle, follow a wafer, build a chip
 - [ ] oht-rail
 - [~] euv-scanner-highna (0.721, 14820 tris)
 - [~] litho-track (0.809, unsigned)
-- [ ] plasma-etch-cluster
-- [ ] cvd-ald-cluster
-- [ ] cmp-tool
-- [ ] ion-implanter
-- [ ] diffusion-furnace
-- [ ] wet-bench
-- [ ] pvd-cluster
+- [~] plasma-etch-cluster 0.797 (helper: Props/Fab/ClusterTool.swift)
+- [~] cvd-ald-cluster 0.798 (ClusterTool chamberExtra variant)
+- [~] cmp-tool 0.708
+- [~] ion-implanter 0.764
+- [~] diffusion-furnace (0.711)
+- [~] wet-bench (0.732)
+- [~] pvd-cluster 0.789 (ClusterTool chamberExtra variant)
 - [ ] ebeam-metrology
 - [ ] probe-station
 - [ ] dicing-saw
@@ -112,21 +112,21 @@ Order: what the first demo shows (walk a hot aisle, follow a wafer, build a chip
 - [~] package-substrate (0.563)
 - [~] chip-package-final (0.822, 12164 tris, unsigned)
 - [x] hbm-stack (0.866, 9512 tris)
-- [ ] die-blank-reticle
-- [ ] die-block-tile
-- [ ] interposer-glass
-- [ ] holo-table
-- [ ] design-workbench-2035
-- [ ] transistor-gaa-cutaway
-- [ ] interconnect-stack-cutaway
+- [x] die-blank-reticle (0.859, signed off)
+- [~] die-block-tile (0.773, 588 tris, unsigned)
+- [~] interposer-glass (gate 0.820, wear 5 < floor 6)
+- [x] holo-table
+- [~] design-workbench-2035 (0.779, 6734 tris, unsigned)
+- [~] transistor-gaa-cutaway 0.743
+- [~] interconnect-stack-cutaway 0.748
 - [ ] wafer-display-stand
 - [ ] bond-wire-macro
 
 ## l1 Training (after rack-ai-1mw)
-- [ ] server-lift
-- [ ] blanking-panel
-- [ ] crash-cart-kvm
-- [ ] aisle-sign
+- [~] server-lift 0.76
+- [~] blanking-panel 0.777
+- [~] crash-cart-kvm 0.792 (unsigned)
+- [x] aisle-sign
 - [ ] power-cord-c19
 - [ ] quick-disconnect
 - [ ] fiber-patch-lc

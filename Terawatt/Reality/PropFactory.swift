@@ -14,7 +14,7 @@ enum PropFactory {
         "plasma-etch-cluster": [4, 2.5, 4], "ion-implanter": [8, 2.5, 3], "pvd-cluster": [4, 2.5, 4],
         "cmp-tool": [4, 2.2, 3], "probe-station": [1.5, 1.8, 1.5], "hybrid-bonder": [3, 2.2, 2.5],
         "hbm-stack": [0.011, 0.0008, 0.01], "gpu-module-2035": [0.12, 0.02, 0.18], "compute-tray-gpu": [0.44, 0.09, 0.9],
-        "server-lift": [0.6, 1.2, 0.9], "crash-cart-kvm": [0.5, 1.0, 0.45], "aisle-sign": [0.6, 0.25, 0.02],
+        "server-lift": [0.6, 1.2, 0.9], "crash-cart-kvm": [0.5, 1.0, 0.45], "aisle-sign": [0.6, 0.55, 0.02],
         "blanking-panel": [0.48, 0.044, 0.01], "loto-tag": [0.075, 0.14, 0.004], "esd-wrist-strap": [0.08, 0.02, 0.08],
         "power-cord-c19": [0.06, 0.03, 1.5], "quick-disconnect": [0.03, 0.03, 0.08], "leak-detection-cable": [2, 0.006, 0.006],
         "fiber-patch-lc": [0.02, 0.01, 2], "fiber-cleaner": [0.03, 0.18, 0.03], "cable-label": [0.03, 0.012, 0.001],

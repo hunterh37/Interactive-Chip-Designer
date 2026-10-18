@@ -31,7 +31,7 @@ final class TrainingScene {
             "cable-manager-left": ([-0.31, rackH / 2, f - 0.1], [0.04, rackH - 0.2, 0.12]),
             "cable-manager-right": ([0.31, rackH / 2, f - 0.1], [0.04, rackH - 0.2, 0.12]),
             "blanking-panels": ([0, RackU.height(u: 40), f - 0.04], [0.48, RackU.pitch * 4, 0.02]),
-            "aisle-sign": ([0, 2.9, f + 0.6], [0.6, 0.25, 0.02]),
+            "aisle-sign": ([0, 2.675, f + 0.6], [0.6, 0.25, 0.02]),
             "trainee-kit": ([0.9, 0.5, f + 0.7], [0.6, 1.0, 0.5]),
         ]
         for s in 1...18 {
@@ -167,7 +167,7 @@ final class TrainingScene {
         cart.position = [0.95, 0, f + 0.9]
         stage.addChild(cart)
         let sign = await PropFactory.make("aisle-sign")
-        sign.position = [0, 2.8, f + 0.6]
+        sign.position = [0, 2.55, f + 0.6]
         stage.addChild(sign)
         let blank = await PropFactory.make("blanking-panel")
         for u in [39, 40, 41, 42] {
