@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ChipDesigner</title><link rel="stylesheet" href="/src/style.css">
+<style>
+  body { display:grid; grid-template-columns: 1fr 380px; height:100vh; overflow:hidden; }
+  aside { border-left:1px solid var(--line); padding:28px; display:flex; flex-direction:column; gap:18px; }
+  h1 { margin:0; font-size:28px; letter-spacing:-.02em; }
+  #qr { background:#fff; border-radius:16px; padding:14px; width:100%; aspect-ratio:1; }
+  #code { font-size:44px; font-weight:700; letter-spacing:.2em; text-align:center; }
+  .modes { display:flex; gap:8px; } .modes button { flex:1; }
+  .row { display:flex; justify-content:space-between; } #players { font-size:14px; }
+</style></head>
+<body>
+  <canvas class="view" id="view"></canvas>
+  <aside>
+    <h1>ChipDesigner</h1>
+    <div class="modes"><button data-mode="rack">Server Rack</button><button data-mode="chip">Chip Design</button></div>
+    <canvas id="qr"></canvas>
+    <div id="code">----</div>
+    <div class="mute" id="url" style="font-size:12px;word-break:break-all"></div>
+    <div id="stats"></div>
+    <div id="players" class="mute"></div>
+  </aside>
+  <script type="module" src="/src/host.js"></script>
+</body></html>

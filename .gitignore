@@ -30,3 +30,5 @@ Package.resolved
 # Misc
 *.log
 .env
+node_modules/
+web/dist/

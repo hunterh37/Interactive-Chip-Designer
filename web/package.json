@@ -1,0 +1,8 @@
+{
+  "name": "@chipdesigner/web",
+  "private": true,
+  "type": "module",
+  "scripts": { "dev": "vite --host", "build": "vite build", "preview": "vite preview" },
+  "dependencies": { "three": "0.169.0", "qrcode": "1.5.4" },
+  "devDependencies": { "vite": "5.4.10" }
+}

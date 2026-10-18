@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: chipdesigner-api
+    runtime: node
+    plan: starter
+    buildCommand: npm ci --workspace server --include-workspace-root
+    startCommand: npm start -w server
+    healthCheckPath: /healthz
+    buildFilter: { paths: [server/**, package.json, package-lock.json] }
+    envVars:
+      - key: WEB_URL
+        value: https://chipdesigner-web.onrender.com
+  - type: web
+    name: chipdesigner-web
+    runtime: static
+    buildCommand: npm ci && npm run build -w web
+    staticPublishPath: web/dist
+    buildFilter: { paths: [web/**, package.json, package-lock.json] }
+    envVars:
+      - key: VITE_API_URL
+        value: https://chipdesigner-api.onrender.com

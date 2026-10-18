@@ -5,7 +5,7 @@ import DicyaninPerfProbe
 #endif
 
 enum SceneID {
-    static let home = "home", inspector = "inspector", tabletop = "tabletop", walk = "walk"
+    static let home = "home", inspector = "inspector", tabletop = "tabletop", walk = "walk", live = "live", liveSpace = "liveSpace"
 }
 
 @main
@@ -47,5 +47,16 @@ struct TerawattApp: App {
             WalkView().environment(store)
         }
         .immersionStyle(selection: .constant(.full), in: .full)
+
+        WindowGroup(id: SceneID.live) {
+            LiveSceneView(lifeSize: false)
+        }
+        .windowStyle(.volumetric)
+        .defaultSize(width: 0.8, height: 0.7, depth: 0.8, in: .meters)
+
+        ImmersiveSpace(id: SceneID.liveSpace) {
+            LiveSceneView(lifeSize: true)
+        }
+        .immersionStyle(selection: .constant(.mixed), in: .mixed)
     }
 }

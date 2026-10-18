@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ChipDesigner</title><link rel="stylesheet" href="/src/style.css">
+<style>
+  body { display:flex; flex-direction:column; height:100dvh; }
+  #view { height:42dvh; flex:none; }
+  header { display:flex; gap:8px; padding:10px 16px; border-bottom:1px solid var(--line); align-items:center; }
+  header .sp { flex:1; }
+  main { flex:1; overflow:auto; padding:12px 16px 24px; }
+  .tabs { display:flex; gap:8px; margin-bottom:12px; } .tabs button { flex:1; }
+  .item { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line); }
+  .item .sw { width:10px; height:28px; border-radius:3px; flex:none; }
+  .item .n { flex:1; font-size:14px; } .item .p { font-size:12px; }
+  .bar { position:sticky; bottom:0; background:var(--bg); padding-top:10px; display:flex; gap:8px; }
+  .bar button { flex:1; }
+  .grid { display:grid; grid-template-columns:repeat(8,1fr); gap:3px; margin:10px 0; }
+  .grid div { aspect-ratio:1; border-radius:4px; background:#2a2d33; }
+  .pal { display:flex; flex-wrap:wrap; gap:6px; } .pal button { padding:6px 10px; font-size:13px; }
+  input[type=color] { width:44px; height:36px; border:none; background:none; }
+</style></head>
+<body>
+  <canvas class="view" id="view"></canvas>
+  <header><b id="room"></b><span class="mute stat" id="sum"></span><span class="sp"></span>
+    <button id="ar">View in AR</button></header>
+  <main id="ui"></main>
+  <a id="ql" rel="ar" style="display:none"><img></a>
+  <script type="module" src="/src/join.js"></script>
+</body></html>

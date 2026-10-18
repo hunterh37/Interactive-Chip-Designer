@@ -26,6 +26,7 @@ struct HomeView: View {
                     openWindow(id: SceneID.tabletop); openWindow(id: SceneID.inspector)
                 }
             }
+            LiveJoinView()
             HStack {
                 Text("Projects").font(.title3)
                 Spacer()
