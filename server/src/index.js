@@ -47,8 +47,8 @@ wss.on('connection', (ws, req) => {
   const r = room(url.searchParams.get('room'));
   const id = (url.searchParams.get('pid') || '').replace(/[^a-z0-9]/gi, '').slice(0, 16) || Math.random().toString(36).slice(2, 10);
   const kind = ['phone', 'host', 'vision', 'xr'].includes(url.searchParams.get('kind')) ? url.searchParams.get('kind') : 'phone';
-  r.state.players[id] = { name: (url.searchParams.get('name') || kind).slice(0, 20), kind, mode: url.searchParams.get('mode') === 'chip' ? 'chip' : 'rack' };
-  const admin = !HOST_KEY || url.searchParams.get('key') === HOST_KEY;
+  const key = url.searchParams.get('key') || ''; const admin = HOST_KEY ? key === HOST_KEY : !!key; // host only via settings trick
+  r.state.players[id] = { name: (url.searchParams.get('name') || kind).slice(0, 20), kind, role: admin ? 'host' : 'participant', mode: url.searchParams.get('mode') === 'chip' ? 'chip' : 'rack' };
   r.sockets.add(ws);
   // Stable player id from the client lets a phone keep its rack across reconnects.
   ws.send(JSON.stringify({ t: 'hello', id }));

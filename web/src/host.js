@@ -7,8 +7,8 @@ import { hostGate } from './hostgate.js'; hostGate();
 
 const $ = id => document.getElementById(id);
 const params = new URLSearchParams(location.search);
-// Host controls only with ?host=<HOST_KEY> (remembered in localStorage), ?host=0 clears. Server enforces the key.
-const hostKey = (() => { const h = params.get('host'); try { if (h === '0') localStorage.removeItem('tw.host'); else if (h) localStorage.setItem('tw.host', h); return localStorage.getItem('tw.host') || ''; } catch { return h && h !== '0' ? h : ''; } })();
+// Host controls only when settings trick stored 'tw.host' (hostgate.js). Server enforces.
+const hostKey = (() => { try { return localStorage.getItem('tw.host') || ''; } catch { return ''; } })();
 const isHost = !!hostKey;
 ['prev', 'next', 'reset'].forEach(id => document.getElementById(id).hidden = !isHost);
 document.querySelectorAll('[data-mode]').forEach(b => b.hidden = !isHost);

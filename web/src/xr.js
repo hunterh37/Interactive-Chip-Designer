@@ -120,5 +120,5 @@ renderer.domElement.addEventListener('click', e => {
 });
 addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(show.stage + 1); if (e.key === 'ArrowLeft') go(show.stage - 1); });
 
-const net = connect({ room, kind: 'xr', key: (() => { try { return localStorage.getItem('tw.host') || new URLSearchParams(location.search).get('host') || ''; } catch { return ''; } })(), mode: 'chip', name: 'WebXR', onState: st => { s = st; render(); } });
+const net = connect({ room, kind: 'xr', key: (() => { try { return localStorage.getItem('tw.host') || ''; } catch { return ''; } })(), mode: 'chip', name: 'WebXR', onState: st => { s = st; render(); } });
 setInterval(() => { if (renderer.xr.isPresenting) net.send({ type: 'pose', p: camera.position.toArray().map(v => +v.toFixed(3)) }); }, 200);
