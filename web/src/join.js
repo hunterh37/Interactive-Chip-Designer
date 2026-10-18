@@ -75,6 +75,11 @@ function chipUI() {
 }
 
 // AR: iOS → AR Quick Look via USDZ export of the live model; Android → WebXR immersive-ar page.
+document.getElementById('full').onclick = e => {
+  const on = document.body.classList.toggle('full');
+  e.target.textContent = on ? 'Edit' : 'Full view';
+  dispatchEvent(new Event('resize'));
+};
 document.getElementById('ar').onclick = async () => {
   const a = document.createElement('a');
   if (a.relList?.supports?.('ar')) {

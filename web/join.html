@@ -13,6 +13,7 @@
   .item .n { flex:1; font-size:14px; } .item .p { font-size:12px; }
   .bar { position:sticky; bottom:0; background:var(--bg); padding-top:10px; display:flex; gap:8px; }
   .bar button { flex:1; }
+  body.full main { display:none; } body.full #view { flex:1; height:auto; }
   .grid { display:grid; grid-template-columns:repeat(8,1fr); gap:3px; margin:10px 0; }
   .grid div { aspect-ratio:1; border-radius:4px; background:#2a2d33; }
   .pal { display:flex; flex-wrap:wrap; gap:6px; } .pal button { padding:6px 10px; font-size:13px; }
@@ -21,7 +22,7 @@
 <body>
   <canvas class="view" id="view"></canvas>
   <header><b id="room"></b><span class="mute stat" id="sum"></span><span class="sp"></span>
-    <button id="ar">View in AR</button></header>
+    <button id="full">Full view</button><button id="ar">View in AR</button></header>
   <main id="ui"></main>
   <a id="ql" rel="ar" style="display:none"><img></a>
   <script type="module" src="/src/join.js"></script>
