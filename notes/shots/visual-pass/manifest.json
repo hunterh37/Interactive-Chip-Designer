@@ -1,7 +1,7 @@
 {
   "job": "visual-pass",
   "project": "Terawatt",
-  "round": 6,
+  "round": 11,
   "stages": [
     {
       "angle": null,
@@ -59,7 +59,7 @@
     },
     {
       "angle": null,
-      "capturedAt": 1792339513,
+      "capturedAt": 1792340031,
       "file": "04-walk.png",
       "flags": [
         "crushed-black"
@@ -69,7 +69,7 @@
       "issues": [],
       "params": {},
       "route": "studio/walk",
-      "sha": "117d369e25",
+      "sha": "e19766c684",
       "stage": "04-walk",
       "thumb": ".thumbs/04-walk.jpg",
       "title": "studio/walk",
@@ -185,6 +185,6 @@
     }
   ],
   "title": "Visual pass",
-  "updated": 1792339585,
+  "updated": 1792340031,
   "version": 1
 }

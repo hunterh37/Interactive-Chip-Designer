@@ -13,14 +13,18 @@ struct Project: Codable, Identifiable, Equatable, Sendable {
     var chipStepRaw: ChipStep?
     var tapedOut: ChipSpec?
     var packaged: Bool?
+    /// Rack to the Future twin; optional so older project files decode.
+    var scenarioRaw: Scenario?
+    var scenario: Scenario { get { scenarioRaw ?? Scenario() } set { scenarioRaw = newValue } }
     var chipStep: ChipStep { get { chipStepRaw ?? .spec } set { chipStepRaw = newValue } }
 }
 
-enum AppMode: Sendable { case studio, fab, chip, training }
+enum AppMode: Sendable { case studio, fab, chip, training, twin }
 
 /// Rebuild trigger for tabletop and walk scenes.
 struct ChipView: Equatable { var chip: ChipSpec; var step: ChipStep; var micro: MicroLevel; var installed: Bool; var packaged: Bool }
-struct SceneKey: Equatable { var mode: AppMode; var campus: CampusSpec?; var chip: ChipView? = nil; var zoom: TrainZoom? = nil }
+struct TwinView: Equatable { var scenario: Scenario; var focus: TwinFocus; var lens: TwinLens }
+struct SceneKey: Equatable { var mode: AppMode; var campus: CampusSpec?; var chip: ChipView? = nil; var zoom: TrainZoom? = nil; var twin: TwinView? = nil }
 
 @MainActor @Observable
 final class ProjectStore {
@@ -33,11 +37,24 @@ final class ProjectStore {
     var explode = false
     /// Session-only; a trainee restarts the procedure per session.
     var training = TrainingState()
+    /// Twin navigation and lens; session-only.
+    var focus = TwinFocus()
+    var lens = TwinLens.heat
+    var twin: TwinMetrics { ScenarioEngine.run(current.scenario) }
+
+    func openTwin() { mode = .twin; focus = TwinFocus(); current.scenarioRaw = current.scenario }
+    func zoomIn(site: Int? = nil, building: Int? = nil, hall: Int? = nil, rack: RackPresetID? = nil) {
+        guard focus.scale != .chip else { return }
+        focus = focus.zoomedIn(site: site, building: building, hall: hall, rack: rack)
+    }
+    func zoomOut() { if focus.scale != .fleet { focus = focus.zoomedOut } }
+    func zoom(to f: TwinFocus) { focus = f }
     var sceneKey: SceneKey {
         SceneKey(mode: mode, campus: mode == .studio || mode == .training ? current.campus : nil,
                  chip: mode == .chip ? ChipView(chip: current.chip, step: current.chipStep, micro: micro,
                                                 installed: current.installedChips > 0, packaged: current.packaged ?? false) : nil,
-                 zoom: mode == .training ? training.step.zoom : nil)
+                 zoom: mode == .training ? training.step.zoom : nil,
+                 twin: mode == .twin ? TwinView(scenario: current.scenario, focus: focus, lens: lens) : nil)
     }
     var delta: CampusDelta { ChipLoop.delta(current.campus, chip: current.chip, installed: current.installedChips) }
 

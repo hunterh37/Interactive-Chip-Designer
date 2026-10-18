@@ -78,7 +78,7 @@ Order: what the first demo shows (walk a hot aisle, follow a wafer, build a chip
 - [~] oht-vehicle
 - [ ] oht-rail
 - [~] euv-scanner-highna (0.721, 14820 tris)
-- [ ] litho-track
+- [~] litho-track (0.809, unsigned)
 - [ ] plasma-etch-cluster
 - [ ] cvd-ald-cluster
 - [ ] cmp-tool
@@ -111,7 +111,7 @@ Order: what the first demo shows (walk a hot aisle, follow a wafer, build a chip
 ## l3 ChipLab
 - [~] package-substrate (0.563)
 - [~] chip-package-final (0.822, 12164 tris, unsigned)
-- [ ] hbm-stack
+- [x] hbm-stack (0.866, 9512 tris)
 - [ ] die-blank-reticle
 - [ ] die-block-tile
 - [ ] interposer-glass
